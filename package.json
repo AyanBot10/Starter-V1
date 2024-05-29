@@ -1,7 +1,7 @@
 {
-  "name": "tgbot",
+  "name": "tg-basic-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Basic-est Telegram Bot Template",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
