@@ -1,10 +1,10 @@
 /***
  * This is the most basic telegram bot template there is, Don't expect much
  */
- 
- console.log("Basic Bot V1.0.1");
- 
- const TelegramBot = require('node-telegram-bot-api');
+
+console.log("Basic Bot V1.0.1");
+
+const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
 const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
 const log = require("./logger.js");
@@ -20,7 +20,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
   for (let [value, x] of Object.entries(global.cmds)) {
     if (x.config.name == command) {
-      x.execute(msg, match, bot);
+      x.run({ event: msg, args: match, api: bot });
       break;
     }
   }

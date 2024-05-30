@@ -1,13 +1,20 @@
 module.exports = {
   config: {
     name: 'help',
-  },
-  execute: (msg, match, bot) => {
-    let help = Object.keys(global.cmds);
-    let text = 'Available Commands:\n';
-    for (let content of help) {
-      text += `${global.cmds[content].config.name}\n`;
+    description: {
+      short: "Provides a list of all available commands",
+      long: "Provides a detailed list of all available commands"
     }
-    bot.sendMessage(msg.chat.id, text);
+  },
+  run: ({ api, event }) => {
+    const commandList = Object.keys(global.cmds);
+    let responseText = 'Available Commands:\n';
+
+    commandList.forEach(command => {
+      const { name, description } = global.cmds[command].config;
+      responseText += `${name} -- *${description?.short || description?.long || description }*\n`;
+    });
+
+    api.sendMessage(event.chat.id, responseText);
   }
 }
