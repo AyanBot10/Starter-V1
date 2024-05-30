@@ -1,3 +1,10 @@
+process.emitWarning = (warning, type) => {
+  if (type !== 'DeprecationWarning') {
+    console.warn(warning);
+    // Disabled Deprecation alerts
+  }
+};
+
 require("./global.js")();
 require("./accountant.js")();
 const log = require("./logger/chalk.js")
