@@ -40,7 +40,7 @@ bot.on('callback_query', (ctx) => {
 
     for (let x of Object.values(global.cmds)) {
       if (x.config.name === command) {
-        x.callback({ event: message, args: match, api: bot, callback: ctx });
+        x.callback({ event: message, args: match, api: bot, ctx });
         break;
       }
     }
