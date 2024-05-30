@@ -1,5 +1,5 @@
 async function main() {
-  global.cmds = new Map();
+  if (!global.cmds) global.cmds = new Map();
   global.bot = {}
   global.bot.config = {}
 }

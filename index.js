@@ -9,7 +9,7 @@ function startProject() {
   });
 
   child.on("close", (code) => {
-    if (code == 1) {
+    if (code == 2) {
       log("Error occurred while connecting to MongoDB", "red", true);
       console.log("Exiting Process, Resolve Issue")
       process.exit(3)
