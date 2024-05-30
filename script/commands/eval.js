@@ -8,16 +8,21 @@ module.exports = {
   },
 
   start: async function({ api, event, args }) {
-    const admin = process.env["admin"] || global.bot.config.admins;
-    if (!admin) return await api.sendMessage(event.chat.id, "Unauthorized...");
-    async function out(...txt) {
-      return await api.sendMessage(event.chat.id, JSON.stringify(txt, null, 2))
-    }
-    if (event.from.id.includes(admin)) {
-      const snippet = `(async () => { try { ${args.join(" ")} } catch(err) { api.sendMessage(event.chat.id, err.message) } })()`;
-      eval(snippet);
-    } else {
-      api.sendMessage(event.chat.id, "Unauthorized");
+    try {
+      const admin = ''
+      // Will add better handling later'
+      async function out(...txt) {
+        return await api.sendMessage(event.chat.id, txt.join(' '))
+      }
+      if (event.from.id == admin) {
+        const snippet = `(async () => { try { ${args.join(" ")} } catch(err) { api.sendMessage(event.chat.id, err.message) } })()`;
+        eval(snippet);
+      } else {
+        api.sendMessage(event.chat.id, "Unauthorized");
+      }
+    } catch (err) {
+      console.log(err);
+      api.sendMessage(event.chat.id, err.message)
     }
   }
 };

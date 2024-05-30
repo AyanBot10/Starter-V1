@@ -12,7 +12,7 @@ global.log = log;
 log("Basic Bot V1.1.1", "cyan", true)
 // text, color, Bold (bool)
 
-context = true
+context = false
 
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
