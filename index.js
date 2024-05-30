@@ -3,11 +3,11 @@
  */
 
 console.log("Basic Bot V1.0.1");
-
+require("global.js")();
+require("./accountant.js")();
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
 const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
-global.cmds = new Map();
 require("./script/command.js")
 const token = process.env["telegram_bot_token"] || config["bot_token"];
 if (!token) {
@@ -18,7 +18,6 @@ if (!token) {
 const userModel = require("./Database/user.js")
 const DB = require("./Database/DB.js")
 const update = require("./Database/updateDB.js")
-
 
 
 const bot = new TelegramBot(token, { polling: true });
