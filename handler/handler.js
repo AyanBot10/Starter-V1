@@ -1,9 +1,8 @@
-const bot = require("./login");
+const bot = require("./login.js");
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
   const args = msg.text.split(" ").slice(1);
-  if (context) console.log(msg);
   for (let [value, x] of Object.entries(global.cmds)) {
     if (x.config.name == command) {
       x.start({ event: msg, args, api: bot });
@@ -13,7 +12,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 });
 
 bot.on('message', async (msg) => {
-  if (database_connection) await update(msg);
+  if (global.database_connection) await update(msg);
 });
 
 bot.on('callback_query', (ctx) => {
