@@ -8,27 +8,32 @@ module.exports = {
   },
   start: ({ api, event }) => {
     const commandList = Object.keys(global.cmds);
-    let responseText = 'Available Commands:\n';
-
-    commandList.forEach(command => {
-      const { name, description } = global.cmds[command].config;
-      const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'No description available');
-      responseText += `${name} -- *${descText}*\n`;
-    });
-
-    api.sendMessage(event.chat.id, responseText);
-  },
-  callback: async function({ event, api, ctx }) {
-    const commandList = Object.keys(global.cmds);
     let responseText = '';
 
     commandList.forEach(command => {
       const { name, description } = global.cmds[command].config;
-      const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'No description available');
-      responseText += `${name} -- <b>${descText}</b>\n`;
+      const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'N/A');
+      responseText += `<a href="tg://bot_command?command=${name}">${name}</a> -- <b>${descText}</b>\n`;
     });
 
     api.sendMessage(event.chat.id, responseText, { parse_mode: 'HTML' });
-    await api.answerCallbackQuery(ctx.id);
+  },
+  callback: async function({ event, api, ctx }) {
+    try {
+      const commandList = Object.keys(global.cmds);
+      let responseText = '';
+
+      commandList.forEach(command => {
+        const { name, description } = global.cmds[command].config;
+        const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'N/A');
+        responseText += `<a href="tg://bot_command?command=${name}">${name}</a> -- <b>${descText}</b>\n`;
+      });
+
+      await api.answerCallbackQuery({ callback_query_id: ctx.id });
+      await api.sendMessage(event.chat.id, responseText, { parse_mode: 'HTML' });
+    } catch (error) {
+      console.error('Error handling callback:', error);
+      await api.sendMessage(event.chat.id, 'There was an error processing your request.');
+    }
   }
 };
