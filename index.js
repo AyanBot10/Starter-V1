@@ -10,11 +10,11 @@ const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
 const log = require("./logger.js");
 global.cmds = new Map();
 require("./script/command.js")
-
-if (!config["bot_token"]) {
+const token = process.env["telegram_bot_token"] || config["bot_token"];
+if (!token) {
   return log("Include Bot Token")
 }
-const bot = new TelegramBot(config["bot_token"], { polling: true });
+const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
