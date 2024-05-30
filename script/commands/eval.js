@@ -9,20 +9,33 @@ module.exports = {
 
   start: async function({ api, event, args }) {
     try {
-      const admin = ''
-      // Will add better handling later'
-      async function out(...txt) {
-        return await api.sendMessage(event.chat.id, txt.join(' '))
+      if (!global.config.has('admins')) {
+        return api.sendMessage(event.chat.id, "Invalid Config");
       }
-      if (event.from.id == admin) {
-        const snippet = `(async () => { try { ${args.join(" ")} } catch(err) { api.sendMessage(event.chat.id, err.message) } })()`;
+
+      const admins = global.config.get('admins');
+      const admin = event.from.id;
+
+      async function out(...txt) {
+        return await api.sendMessage(event.chat.id, txt.join(' '));
+      }
+
+      if (admins.includes(admin)) {
+        const snippet = `(async () => { 
+          try { 
+            ${args.join(" ")} 
+          } catch(err) { 
+            api.sendMessage(event.chat.id, err.message); 
+          } 
+        })();`;
+
         eval(snippet);
       } else {
         api.sendMessage(event.chat.id, "Unauthorized");
       }
     } catch (err) {
       console.log(err);
-      api.sendMessage(event.chat.id, err.message)
+      api.sendMessage(event.chat.id, err.message);
     }
   }
 };
