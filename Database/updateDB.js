@@ -14,7 +14,7 @@ async function updateDB(msg) {
           username: msg.from.username,
         },
       }, { upsert: true, new: true });
-      console.log("New User has been added to the database");
+      global.log(`New User ${msg.from.username}`, "pink", false)
     }
   } catch (error) {
     global.log("Failed To Connect to DB " + error, "white", false)
