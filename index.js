@@ -2,16 +2,19 @@
  * This is the most basic telegram bot template there is, Don't expect much
  */
 
-console.log("Basic Bot V1.0.1");
+console.log("Basic Bot V1.1.1");
 require("./global.js")();
 require("./accountant.js")();
+const log = require("./logger/chalk.js")
+global.log = log;
+// text, color, bold bool
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
 const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
 require("./script/command.js")
 const token = process.env["telegram_bot_token"] || config["bot_token"];
 if (!token) {
-  return console.log("Include Bot Token")
+  return log("Include Bot Token", 'red', true)
 }
 
 
@@ -57,9 +60,10 @@ async function connectDB() {
   try {
     await DB()
   } catch (err) {
-    console.error("Failed to Connect to Database", err)
+    log("Failed to Connect to Database " + err, "red", true)
+    process.exit(1)
   }
 }
 connectDB().then(() => {
-  console.log("Logged In")
+  log("Logged In", "lime", true)
 })

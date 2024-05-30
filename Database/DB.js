@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 
 module.exports = () => {
-  if (!process.env.MONGO_URI || !process.bot.config.MONGO_URI) {
-    console.error("MongoURI not provided")
+  if (!process.env.MONGO_URI) {
+    global.log("MongoURI not provided", 'red', false)
     process.exit(1)
   }
   return mongoose.connect(process.env.MONGO_URI);

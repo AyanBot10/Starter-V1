@@ -17,7 +17,7 @@ async function updateDB(msg) {
       console.log("New User has been added to the database");
     }
   } catch (error) {
-    console.error("DB: Error updating user info", error);
+    global.log("Failed To Connect to DB " + error, "white", false)
   }
 }
 
