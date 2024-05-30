@@ -9,15 +9,19 @@ require("./global.js")();
 require("./accountant.js")();
 const log = require("./logger/chalk.js")
 global.log = log;
-log("Basic Bot V1.1.1", "cyan", true)
+log("Starting Bot", "cyan", true)
 // text, color, Bold (bool)
 
-context = false
+const context = false
+const database_connection = false;
+// Disable connection to database
+
+
 
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
 const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
-require("./script/command.js")
+require("./script/command.js")();
 const token = process.env["telegram_bot_token"] || config["bot_token"];
 if (!token) {
   return log("Include Bot Token", 'red', true)
@@ -44,7 +48,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 });
 
 bot.on('message', async (msg) => {
-  await update(msg);
+  if (database_connection) await update(msg);
 });
 
 bot.on('callback_query', (ctx) => {
@@ -53,10 +57,10 @@ bot.on('callback_query', (ctx) => {
 
   if (match && match[1]) {
     let command = match[1];
-
+    // To-do: const args = msg.text.split(" ").slice(1);
     for (let x of Object.values(global.cmds)) {
       if (x.config.name === command) {
-        x.callback({ event: message, args: match, api: bot, ctx });
+        x.callback({ event: message, api: bot, ctx });
         break;
       }
     }
@@ -75,6 +79,10 @@ async function connectDB() {
   }
 }
 
-connectDB().then(() => {
-  log("Logged In", "green", false)
-})
+if (database_connection) {
+  connectDB().then(() => {
+    log("Logged in while connected to mongodb", "green", false)
+  })
+}
+
+log("Started Bot", "cyan", true)
