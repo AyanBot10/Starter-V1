@@ -13,6 +13,14 @@ const token = process.env["telegram_bot_token"] || config["bot_token"];
 if (!token) {
   return console.log("Include Bot Token")
 }
+
+
+const userModel = require("./Database/user.js")
+const DB = require("./Database/DB.js")
+const update = require("./Database/updateDB.js")
+
+
+
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
@@ -25,10 +33,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 });
 
-bot.on('message', (msg) => {
-  if (config.log_level.messages) {
-    console.log(msg)
-  }
+bot.on('message', async (msg) => {
+  await update(msg);
 });
 
 bot.on('callback_query', (ctx) => {
@@ -47,4 +53,14 @@ bot.on('callback_query', (ctx) => {
   }
 });
 
-console.log("Logged In")
+
+async function connectDB() {
+  try {
+    await DB()
+  } catch (err) {
+    console.error("Failed to Connect to Database", err)
+  }
+}
+connectDB().then(() => {
+  console.log("Logged In")
+})
