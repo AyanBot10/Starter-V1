@@ -19,6 +19,7 @@ require("./script/command.js")();
 const userModel = require("./Database/user.js");
 const DB = require("./Database/DB.js");
 const update = require("./Database/updateDB.js");
+global.update = update;
 
 require("./handler/handler.js")();
 
