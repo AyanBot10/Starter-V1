@@ -3,7 +3,7 @@
  */
 
 console.log("Basic Bot V1.0.1");
-require("global.js")();
+require("./global.js")();
 require("./accountant.js")();
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
