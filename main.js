@@ -33,10 +33,11 @@ const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
+  const args = msg.text.split(" ").slice(1);
   if (context) console.log(msg);
   for (let [value, x] of Object.entries(global.cmds)) {
     if (x.config.name == command) {
-      x.start({ event: msg, args: match, api: bot });
+      x.start({ event: msg, args, api: bot });
       break;
     }
   }

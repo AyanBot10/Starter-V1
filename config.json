@@ -3,5 +3,6 @@
   "log_level": {
     "messages": false
   },
-  "MONGO_URI": ""
+  "MONGO_URI": "",
+  "admins": []
 }
