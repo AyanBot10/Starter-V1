@@ -1,11 +1,24 @@
 module.exports = {
   config: {
     name: 'start',
-    description: "Initiates the Bot"
+    description: {
+      short: "Initiates The Bot",
+      long: this.short
+    }
   },
-  run: ({ event, api }) => {
-    const text = `<a href="tg://bot_command?command=/help">/help</a>`;
-    const message = `Hello, please use the ${text} command to get a list of all available commands`;
-    api.sendMessage(event.chat.id, message, { parse_mode: 'HTML' });
+
+  start: async function({ api, event }) {
+    const helpButton = {
+      text: '/help',
+      callback_data: '/help'
+    };
+    const message = 'Hello, please use the button below to receive a list of all available commands.';
+    const options = {
+      reply_markup: {
+        inline_keyboard: [[helpButton]]
+      }
+    };
+
+    api.sendMessage(event.chat.id, message, options);
   }
-}
+};
