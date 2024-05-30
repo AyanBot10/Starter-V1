@@ -5,6 +5,8 @@ global.log = log;
 log("Basic Bot V1.1.1", "cyan", true)
 // text, color, Bold (bool)
 
+context = true
+
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require("fs")
 const config = JSON.parse(fs.readFileSync("config.json", 'utf-8'));
@@ -24,6 +26,7 @@ const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
+  if (context) console.log(msg);
   for (let [value, x] of Object.entries(global.cmds)) {
     if (x.config.name == command) {
       x.start({ event: msg, args: match, api: bot });
