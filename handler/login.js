@@ -9,7 +9,6 @@ if (!token) {
   return log("Include Bot Token", 'red', true)
   process.exit(3)
 }
-process.stdout.write("\n");
 log("Logging In")
 const bot = new TelegramBot(token, { polling: true });
 log("Logged In")

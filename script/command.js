@@ -17,7 +17,7 @@ async function run() {
         loaded++;
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
-        process.stdout.write(`Bonded ${loaded} commands`);
+        process.stdout.write(`Loaded ${loaded} commands`);
       }
     }
   } catch (err) {
@@ -26,7 +26,7 @@ async function run() {
     global.log(`\nCaught ${errors} error(s) while binding commands`, "blue", true);
   } finally {
     process.stdout.write("\n")
-    global.log(`Commands bonded: ${loaded}`, "cyan", false);
+    global.log(`Commands Loaded: ${loaded}`, "cyan", false);
     return null;
   }
 }

@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+  },
+  anilistUsername: {
+    type: String,
+    default: null,
+    sparse: true
   }
 });
 
