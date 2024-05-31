@@ -1,5 +1,6 @@
 const { spawn } = require("child_process");
 const log = require("./logger/chalk.js");
+require('dotenv').config();
 
 function startProject() {
   const child = spawn("node", ["main.js"], {

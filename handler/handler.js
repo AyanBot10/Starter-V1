@@ -3,9 +3,10 @@ const bot = require("./login.js");
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
   const args = msg.text.split(" ").slice(1);
-  for (let [value, x] of Object.entries(global.cmds)) {
+
+  for (const x of global.cmds.values()) {
     if (x.config.name == command) {
-      x.start({ event: msg, args, api: bot });
+      await x.start({ event: msg, args, api: bot });
       break;
     }
   }
@@ -15,16 +16,15 @@ bot.on('message', async (msg) => {
   if (global.database_connection) await global.update(msg);
 });
 
-bot.on('callback_query', (ctx) => {
-  let { message, data } = ctx;
-  let match = data.match(/\/(\w+)/);
-
-  if (match && match[1]) {
-    let command = match[1];
-    // To-do: const args = msg.text.split(" ").slice(1);
-    for (let x of Object.values(global.cmds)) {
-      if (x.config.name === command) {
-        x.callback({ event: message, api: bot, ctx });
+bot.on('callback_query', async (ctx) => {
+  const { message, data } = ctx;
+  const match = data.match(/\/(\w+)/);
+  const args = message?.text?.split(" ")?.slice(1);
+  if (match) {
+    const command = match[1];
+    for (const x of global.cmds.values()) {
+      if (x.config.name == command) {
+        await x.callback({ event: message, args, api: bot, ctx });
         break;
       }
     }

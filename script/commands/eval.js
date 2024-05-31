@@ -20,7 +20,7 @@ module.exports = {
         return await api.sendMessage(event.chat.id, txt.join(' '));
       }
 
-      if (admins.includes(admin)) {
+      if (false) { // will fix later
         const snippet = `(async () => { 
           try { 
             ${args.join(" ")} 

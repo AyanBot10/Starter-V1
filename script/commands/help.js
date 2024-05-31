@@ -7,11 +7,10 @@ module.exports = {
     }
   },
   start: ({ api, event }) => {
-    const commandList = Object.keys(global.cmds);
     let responseText = '';
 
-    commandList.forEach(command => {
-      const { name, description } = global.cmds[command].config;
+    global.cmds.forEach((commandConfig, commandName) => {
+      const { name, description } = commandConfig.config;
       const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'N/A');
       responseText += `<a href="tg://bot_command?command=${name}">${name}</a> -- <b>${descText}</b>\n`;
     });
@@ -20,11 +19,10 @@ module.exports = {
   },
   callback: async function({ event, api, ctx }) {
     try {
-      const commandList = Object.keys(global.cmds);
       let responseText = '';
 
-      commandList.forEach(command => {
-        const { name, description } = global.cmds[command].config;
+      global.cmds.forEach((commandConfig, commandName) => {
+        const { name, description } = commandConfig.config;
         const descText = description?.short || description?.long || (typeof description === 'string' ? description : 'N/A');
         responseText += `<a href="tg://bot_command?command=${name}">${name}</a> -- <b>${descText}</b>\n`;
       });

@@ -21,7 +21,7 @@ const DB = require("./Database/DB.js");
 const update = require("./Database/updateDB.js");
 global.update = update;
 
-require("./handler/handler.js")();
+require("./handler/handler.js");
 
 async function connectDB() {
   try {
