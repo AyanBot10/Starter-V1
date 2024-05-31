@@ -1,5 +1,5 @@
 const axios = require("axios");
-const User = require("../../Database/user.js");
+//const User = require("../../Database/user.js");
 
 const ANILIST_API_URL = "https://graphql.anilist.co";
 
