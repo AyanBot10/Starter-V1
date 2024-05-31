@@ -12,8 +12,7 @@ async function run() {
 
   try {
     for (let file of files) {
-      if (file.endsWith(".js")) {
-        if (config.includes(file)) return
+      if (file.endsWith(".js") && !config.includes(file)) {
         const command = require(path.join(commandsPath, file));
         global.cmds.set(file, command);
         loaded++;
