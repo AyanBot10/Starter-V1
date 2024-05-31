@@ -7,7 +7,6 @@ process.emitWarning = (warning, type) => {
 const log = require("./logger/chalk.js");
 global.log = log;
 require("./global.js")();
-require("./accountant.js")();
 log("Starting Bot", "cyan", true);
 
 const database_connection = false;

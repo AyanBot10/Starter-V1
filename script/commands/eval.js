@@ -9,18 +9,16 @@ module.exports = {
 
   start: async function({ api, event, args }) {
     try {
-      if (!global.config.has('admins')) {
+      if (!process.env['ADMIN']) {
         return api.sendMessage(event.chat.id, "Invalid Config");
       }
 
-      const admins = global.config.get('admins');
-      const admin = event.from.id;
-
+      const admin = process.env['ADMIN']
       async function out(...txt) {
         return await api.sendMessage(event.chat.id, txt.join(' '));
       }
 
-      if (false) { // will fix later
+      if (admin != event.from.id) {
         const snippet = `(async () => { 
           try { 
             ${args.join(" ")} 

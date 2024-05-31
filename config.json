@@ -1,8 +1,0 @@
-{
-  "bot_token": "",
-  "log_level": {
-    "messages": false
-  },
-  "MONGO_URI": "",
-  "admins": []
-}

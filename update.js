@@ -1,3 +1,9 @@
+process.emitWarning = (warning, type) => {
+  if (type !== 'DeprecationWarning') {
+    console.warn(warning);
+  }
+};
+
 const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 const log = require("./logger/chalk.js")
