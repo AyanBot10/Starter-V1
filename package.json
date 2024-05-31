@@ -12,6 +12,7 @@
   "dependencies": {
     "node-telegram-bot-api": "^0.66.0",
     "kleur": "latest",
-    "mongoose": "latest"
+    "mongoose": "latest",
+    "dotenv": "latest"
   }
 }
