@@ -24,8 +24,6 @@ async function run() {
     errors++;
     global.log(`\nCaught ${errors} error(s) while binding commands`, "blue", true);
   } finally {
-    await new Promise(res => setTimeout(res, 1500))
-    process.stdout.write("\n");
     global.log(`Commands bonded: ${loaded}`, "cyan", false);
     return null;
   }
