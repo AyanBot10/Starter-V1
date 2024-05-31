@@ -9,6 +9,14 @@ global.log = log;
 require("./global.js")();
 log("Starting Bot", "cyan", true);
 
+process.on('uncaughtException', (err) => {
+  console.error(`Uncaught Exception: ${err}`);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 require("./script/command.js")();
 
 const userModel = require("./Database/user.js");
