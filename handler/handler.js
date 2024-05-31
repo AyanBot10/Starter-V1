@@ -13,6 +13,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 });
 
 bot.on('message', async (msg) => {
+  if (process.env['LOG_LEVEL_MESSAGES']) log(msg.text)
   if (global.database_connection) await global.update(msg);
 });
 
