@@ -1,8 +1,8 @@
 const path = require("path");
 const { readdirSync } = require("fs");
 
-function run() {
-  global.log("Binding Commands...", "green", false);
+async function run() {
+  global.log("Binding Commands...", "yellow", false);
   let errors = 0;
   let loaded = 0;
   global.cmds = new Map();
@@ -22,10 +22,11 @@ function run() {
     }
   } catch (err) {
     errors++;
-    global.log(`Caught ${errors} error(s) while binding commands`, "red", false);
+    global.log(`\nCaught ${errors} error(s) while binding commands`, "blue", true);
   } finally {
+    await new Promise(res => setTimeout(res, 1500))
     process.stdout.write("\n");
-    global.log(`Commands bonded: ${loaded}`, "red", false);
+    global.log(`Commands bonded: ${loaded}`, "cyan", false);
     return null;
   }
 }
