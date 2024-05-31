@@ -7,6 +7,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: 'youtube',
+    aliases: ["ytb"],
     description: {
       short: "Search and download Videos from YouTube",
       long: "Search and download videos from YouTube. Results will include thumbnails along with titles and durations."

@@ -4,7 +4,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
   const args = msg.text.split(" ").slice(1);
   for (const x of global.cmds.values()) {
-    if (x.config.name == command?.toLowerCase()) {
+    if (x.config.name?.toLowerCase() == command?.toLowerCase() || (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() == command.toLowerCase()))) {
       await x.start({ event: msg, args, api: bot });
       break;
     }
