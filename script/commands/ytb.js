@@ -75,7 +75,6 @@ async function searchYTB(query) {
         thumbnail_url: video.thumbnail,
         duration: video.timestamp
       }));
-    console.log(videos)
     if (videos.length == 0) {
       throw new Error(`No video found for query: ${query}`)
     }
