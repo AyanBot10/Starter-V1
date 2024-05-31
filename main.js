@@ -9,10 +9,6 @@ global.log = log;
 require("./global.js")();
 log("Starting Bot", "cyan", true);
 
-const database_connection = false;
-
-global.database_connection = database_connection;
-
 require("./script/command.js")();
 
 const userModel = require("./Database/user.js");
@@ -33,7 +29,7 @@ async function connectDB() {
   }
 }
 
-if (database_connection) {
+if (process.env["CONNECT_DB"]) {
   connectDB().then(() => {
     log("Logged in with DB", "green", false);
   });
