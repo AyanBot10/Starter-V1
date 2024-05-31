@@ -6,11 +6,11 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: 'youtube',
-    aliases: ["ytb"],
+    name: 'audio',
+    aliases: ["song", "mp3"],
     description: {
-      short: "Search and download Videos from YouTube",
-      long: "Search and download videos from YouTube. Results will include thumbnails along with titles and durations."
+      short: "Search and download Audios from YouTube",
+      long: "Search and download Audios from YouTube. Results will include thumbnails along with titles and durations."
     }
   },
 
@@ -22,19 +22,14 @@ module.exports = {
 
     try {
       const results = await searchYTB(query);
-      const media = results.map(item => ({
-        type: 'photo',
-        media: item.thumbnail_url
-      }));
-
-      const inline_data = results.map(item => [{
+      const inlineData = results.map(item => [{
         text: `${item.duration} : ${item.title}`,
         callback_data: item.video_url
       }]);
-      await api.sendMediaGroup(event.chat.id, media, { disable_notification: true, reply_to_message_id: event.message_id });
-      await api.sendMessage(event.chat.id, `Found ${inline_data.length} results`, {
-        reply_markup: { inline_keyboard: inline_data },
-        disable_notification: true
+      await api.sendMessage(event.chat.id, `Found  ${inlineData.length} results`, {
+        reply_markup: { inline_keyboard: inlineData },
+        disable_notification: true,
+        reply_to_message_id: event.message_id
       });
       await api.deleteMessage(event.chat.id, processingMessage.message_id);
     } catch (err) {
@@ -50,10 +45,10 @@ module.exports = {
       await api.deleteMessage(ctx.message.chat.id, ctx.message.message_id);
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const link = ctx.data;
-      const dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
+      const dir = path.join(__dirname, "tmp", `${uuid()}.mp3`);
       await downloadVID(link, dir);
       const stream = fs.createReadStream(dir);
-      await api.sendVideo(event.chat.id, stream);
+      await api.sendAudio(event.chat.id, stream, { filename: 'audio.mp3', mimetype: 'audio/mpeg' });
       fs.unlinkSync(dir);
     } catch (err) {
       console.error(err);
@@ -78,7 +73,7 @@ async function searchYTB(query) {
     if (videos.length == 0) {
       throw new Error(`No video found for query: ${query}`)
     }
-    return videos
+    return videos;
   } catch (error) {
     throw error;
   }
@@ -90,11 +85,11 @@ async function downloadVID(videoLink, savePath) {
     const info = await ytdl.getInfo(videoId);
 
     const format = ytdl.chooseFormat(info.formats, {
-      quality: '18',
-      filter: format => format.container === 'mp4' && format.height <= 720 && format.hasAudio && format.hasVideo
+      quality: 'highestaudio',
+      filter: 'audioonly'
     });
     if (!format) {
-      throw new Error('No suitable format found');
+      throw new Error('No suitable audio format found');
     }
 
     const readableStream = ytdl(videoLink, { format });
@@ -107,7 +102,7 @@ async function downloadVID(videoLink, savePath) {
       readableStream.on('error', reject);
     });
   } catch (error) {
-    console.error("Error downloading video:", error.message);
+    console.error("Error downloading audio:", error.message);
     throw error;
   }
 }
