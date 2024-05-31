@@ -1,6 +1,5 @@
 const path = require("path");
 const { readdirSync } = require("fs");
-const config = require("../unloaded.json");
 
 async function run() {
   global.log("Binding Commands...", "yellow", false);
@@ -12,7 +11,7 @@ async function run() {
 
   try {
     for (let file of files) {
-      if (file.endsWith(".js") && !config.includes(file)) {
+      if (file.endsWith(".js")) {
         const command = require(path.join(commandsPath, file));
         global.cmds.set(file, command);
         loaded++;
@@ -23,8 +22,10 @@ async function run() {
     }
   } catch (err) {
     errors++;
+    process.stdout.write("\n")
     global.log(`\nCaught ${errors} error(s) while binding commands`, "blue", true);
   } finally {
+    process.stdout.write("\n")
     global.log(`Commands bonded: ${loaded}`, "cyan", false);
     return null;
   }
