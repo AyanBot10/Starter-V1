@@ -12,6 +12,8 @@ module.exports = {
       if (!process.env['ADMIN']) {
         return api.sendMessage(event.chat.id, "Invalid Config");
       }
+      
+      if (!args[0]) return;
 
       const admin = process.env['ADMIN']
       async function out(...txt) {

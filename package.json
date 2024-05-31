@@ -13,6 +13,7 @@
     "node-telegram-bot-api": "^0.66.0",
     "kleur": "latest",
     "mongoose": "latest",
-    "dotenv": "latest"
+    "dotenv": "latest",
+    "axios": "^1.7.2"
   }
 }
