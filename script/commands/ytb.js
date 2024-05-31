@@ -52,14 +52,14 @@ module.exports = {
       const link = ctx.data;
       const dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
       await downloadVID(link, dir);
-      await api.deleteMessage(event.chat.id, processingMessage.message_id);
       const stream = fs.createReadStream(dir);
       await api.sendVideo(event.chat.id, stream);
       fs.unlinkSync(dir);
     } catch (err) {
       console.error(err);
-      await api.deleteMessage(event.chat.id, processingMessage.message_id);
       await api.sendMessage(event.chat.id, err.message);
+    } finally {
+      await api.deleteMessage(event.chat.id, processingMessage.message_id);
     }
   }
 };
