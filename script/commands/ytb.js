@@ -45,9 +45,8 @@ module.exports = {
   },
 
   callback: async function({ api, event, ctx }) {
-    console.log(ctx)
+    const processingMessage = await api.sendMessage(event.chat.id, "⏳ Downloading...");
     try {
-      const processingMessage = await api.sendMessage(event.chat.id, "⏳ Downloading...");
       await api.deleteMessage(ctx.message.chat.id, ctx.message.message_id);
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const link = ctx.data;
