@@ -18,7 +18,7 @@ module.exports = {
         return await api.sendMessage(event.chat.id, txt.join(' '));
       }
 
-      if (admin != event.from.id) {
+      if (admin == event.from.id) {
         const snippet = `(async () => { 
           try { 
             ${args.join(" ")} 
