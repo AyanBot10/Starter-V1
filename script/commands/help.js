@@ -33,9 +33,7 @@ module.exports = {
               alias.toLowerCase() === command.toLowerCase()
             )
           ) {
-            messageContent += `Aliases: ${x.config?.aliases?.join(
-                            " ,"
-                        )}\n`;
+            messageContent += `Aliases: ${x.config?.aliases?.join(" " )}\n`;
           }
 
           function regexStr(str, name) {
