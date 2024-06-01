@@ -36,19 +36,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 
   if (!commandFound) {
-    const helpButton = {
-      text: "/help",
-      callback_data: "/help"
-    };
-    const message =
-      "Hello, please use the button below to receive a list of all available commands.";
-    const options = {
-      reply_markup: {
-        inline_keyboard: [[helpButton]]
-      }
-    };
-
-    bot.sendMessage(msg.chat.id, message, options);
+    await bot.sendMessage(msg.chat.id, "Say what? come again");
   }
 });
 
