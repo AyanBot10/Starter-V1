@@ -9,7 +9,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const log = require("./logger/chalk.js")
 global.log = log;
 
-const token = process.env["telegram_bot_token"];
+const token = process.env['BOT_TOKEN'];
 if (!token) {
   log("Include Bot Token", 'red', true)
   process.exit(1);
