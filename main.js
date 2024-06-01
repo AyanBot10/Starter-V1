@@ -45,6 +45,7 @@ async function connectDB() {
     log("Connecting To MongoDB", "red", false);
     await DB();
     log("Connection Successful", "green", true);
+    return true
   } catch (err) {
     log("Failed to Connect to Database " + err, "red", true);
     process.exit(1);
@@ -53,8 +54,7 @@ async function connectDB() {
 
 if (process.env["CONNECT_DB"] == 'true') {
   connectDB().then((x) => {
-    if (x) log("Logged in with DB", "green", false)
-    else log("Did not connect to DB")
+    log("Logged in with DB", "green", false)
   });
 }
 
