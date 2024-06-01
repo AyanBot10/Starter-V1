@@ -37,7 +37,7 @@ async function connectDB() {
   }
 }
 
-if (process.env["CONNECT_DB"]) {
+if (process.env["CONNECT_DB"] === true) {
   connectDB().then(() => {
     log("Logged in with DB", "green", false);
   });
