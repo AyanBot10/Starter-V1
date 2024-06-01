@@ -298,7 +298,7 @@ module.exports = {
 
       const sent = await api.sendMessage(
         event.chat.id,
-        err.message,
+        "Darn Error!",
         options
       );
       global.bot.callback.set(sent.message_id, {
