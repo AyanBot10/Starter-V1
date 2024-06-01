@@ -3,7 +3,7 @@ process.emitWarning = (warning, type) => {
     console.warn(warning);
   }
 };
-const use_global = process.env['GLOBAL_COMMANDS'] || true;
+const use_global = process.env['GLOBAL_COMMANDS'] === 'true' ? true : false;
 
 // Will fix this later
 
@@ -12,11 +12,11 @@ require("./global");
 log("Starting Bot", "grey", true);
 
 process.on('uncaughtException', (err) => {
-  console.error(`Uncaught Exception: ${err}`);
+  log(`Uncaught Exception: ${err.message}`, "red");
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason.message);
 });
 
 if (use_global) {
