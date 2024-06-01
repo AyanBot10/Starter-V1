@@ -9,7 +9,8 @@ module.exports = {
     description: {
       short: "Fetches details bout anime",
       long: this.short
-    }
+    },
+    usage: "{pn} <anime_name>"
   },
 
   start: async function({ api, event, args }) {

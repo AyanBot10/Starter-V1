@@ -12,7 +12,8 @@ module.exports = {
     description: {
       short: "Search and download Videos from YouTube",
       long: "Search and download videos from YouTube. Results will include thumbnails along with titles and durations."
-    }
+    },
+    usage: "{pn} <search_query>"
   },
 
   start: async function({ api, event, args }) {
@@ -77,7 +78,7 @@ async function validateUrl(url) {
 
 async function searchYTB(query) {
   try {
-    const searchResults = await ytsr(query, { limit: 10 });
+    const searchResults = await ytsr(query, { limit: 5 });
     const videos = searchResults.items.filter(item => item.type === 'video');
 
     const numVideos = [3, 4][Math.floor(Math.random() * 2)];
@@ -113,7 +114,7 @@ async function downloadVID(videoLink, savePath) {
 
     const format = ytdl.chooseFormat(info.formats, {
       quality: '18',
-      filter: format => format.container === 'mp4' && format.height <= 720 && format.hasAudio && format.hasVideo
+      filter: format => format.container === 'mp4' && format.height <= 1080 && format.hasAudio && format.hasVideo
     });
     if (!format) {
       throw new Error('No suitable format found');

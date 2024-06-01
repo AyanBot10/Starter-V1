@@ -4,7 +4,8 @@ module.exports = {
     description: {
       short: "Provides a list of all available commands",
       long: "Provides a detailed list of all available commands"
-    }
+    },
+    usage: "{pn} - Logs all commands\n" + "{pn} <cmd> Logs the command's info"
   },
   start: async ({ api, event, args }) => {
     if (args[0]) {
@@ -17,6 +18,18 @@ module.exports = {
           messageContent += x.config?.author ? `Author: ${x.config.author}\n` : '';
           if (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase())) {
             messageContent += `Aliases: ${x.config?.aliases?.join(' ,')}\n`
+          }
+
+          function regexStr(str, name) {
+            const regex = /{pn}/g;
+            if (regex.test(str)) {
+              return str.replace(regex, `/${name}`);
+            } else {
+              return str;
+            }
+          }
+          if (x.config.usage) {
+            messageContent += regexStr(x.config.usage, x.config.name)
           }
           messageContent += `Description: ${x.config.description?.short || x.config.description?.long}\n`;
           messageContent += `Usage: ${x.config.usage || "N/A"}`;

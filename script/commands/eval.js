@@ -4,7 +4,8 @@ module.exports = {
     description: {
       short: "Evaluate Code",
       long: "Evaluate Code"
-    }
+    },
+    usage: "{pn} code"
   },
 
   start: async function({ api, event, args }) {

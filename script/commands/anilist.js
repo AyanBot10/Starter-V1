@@ -12,7 +12,8 @@ module.exports = {
     description: {
       short: "Fetches details on anilist users",
       long: this.short
-    }
+    },
+    usage: "{pn} <username>"
   },
 
   start: async function({ api, event, args }) {
@@ -50,47 +51,7 @@ module.exports = {
         }
         return
       }
-      case 'view': {
-        if (!args[1]) return api.sendMessage(event.chat.id, "Include Username")
-        try {
-          const userId = await getUserId(args[1]);
-          const recentActivity = await getUserRecentActivity(userId);
-          const metaImageUrl = `https://img.anili.st/user/${userId}`;
-
-          let message = `❏ Recent activity of \`${args[1]}\`:\n\n`;
-          recentActivity.forEach((activity) => {
-            if (activity.media) {
-              const { romaji, english, native } = activity.media.title;
-              const mediaTitle = english || romaji || native;
-              message += `➤ ${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)} ${activity.progress ? `${activity.progress}` : ""}: \`${mediaTitle}\`\n`;
-            }
-          });
-
-          const response = await axios.get(metaImageUrl, { responseType: 'stream' });
-          api.sendPhoto(chatId, response.data, {
-            caption: message,
-            parse_mode: "Markdown",
-            reply_markup: {
-              inline_keyboard: [
-                        [
-                  {
-                    text: "Profile",
-                    url: `https://anilist.co/user/${args[1]}`,
-                            },
-                        ],
-                    ],
-            },
-          });
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          api.sendMessage(
-            chatId,
-            "Error fetching user data. Make sure the username is correct and the privacy is set to public.",
-          );
-        }
-        return;
-      }
-      default: {
+      case 'view_DELETE': {
         return api.sendMessage(event.chat.id, "Unfinished")
         const user = await User.findOne({ userId: event.from.id });
         if (!user || !user.anilistUsername) {
@@ -138,6 +99,46 @@ module.exports = {
           );
         }
         return
+      }
+      default: {
+        if (!args[1]) return api.sendMessage(event.chat.id, "Include Username")
+        try {
+          const userId = await getUserId(args[1]);
+          const recentActivity = await getUserRecentActivity(userId);
+          const metaImageUrl = `https://img.anili.st/user/${userId}`;
+
+          let message = `❏ Recent activity of \`${args[1]}\`:\n\n`;
+          recentActivity.forEach((activity) => {
+            if (activity.media) {
+              const { romaji, english, native } = activity.media.title;
+              const mediaTitle = english || romaji || native;
+              message += `➤ ${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)} ${activity.progress ? `${activity.progress}` : ""}: \`${mediaTitle}\`\n`;
+            }
+          });
+
+          const response = await axios.get(metaImageUrl, { responseType: 'stream' });
+          api.sendPhoto(chatId, response.data, {
+            caption: message,
+            parse_mode: "Markdown",
+            reply_markup: {
+              inline_keyboard: [
+                        [
+                  {
+                    text: "Profile",
+                    url: `https://anilist.co/user/${args[1]}`,
+                            },
+                        ],
+                    ],
+            },
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          api.sendMessage(
+            chatId,
+            "Error fetching user data. Make sure the username is correct and the privacy is set to public.",
+          );
+        }
+        return;
       }
     }
   }
