@@ -6,7 +6,9 @@ process.emitWarning = (warning, type) => {
 
 const log = require("./logger/chalk.js");
 global.log = log;
-require("./global.js")();
+
+if (!global.cmds) global.cmds = new Map();
+
 log("Starting Bot", "cyan", true);
 
 process.on('uncaughtException', (err) => {
