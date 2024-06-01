@@ -13,7 +13,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 
       const { username, id } = msg.from;
       const groupId = msg.chat?.type === 'group' || msg.chat?.type === 'supergroup' ? msg.chat.id : null;
-      logger(username, x.config.name, id, groupId);
+      logger(username, x.config.name, id, groupId, true);
 
       break;
     }
@@ -45,7 +45,7 @@ bot.on('message', async (msg) => {
 
   if (process.env['LOGGER'] === 'true') {
     if (msg?.text.startsWith("/")) return
-    logger(username, msg.text.substring(0, 100), id, groupId);
+    logger(username, msg.text.substring(0, 100), id, groupId, false);
   }
 });
 
@@ -63,7 +63,7 @@ bot.on('callback_query', async (ctx) => {
 
         const { username, id } = from;
         const groupId = message?.chat?.type === 'group' || message?.chat?.type === 'supergroup' ? message.chat.id : null;
-        logger(username, command, id, groupId);
+        logger(username, command, id, groupId, true);
 
         break;
       }
