@@ -29,7 +29,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
         msg.chat.id :
         null;
-      logger(username, x.config.name, id, groupId);
+      logger(username, x.config.name, id, groupId, true);
 
       break;
     }
@@ -47,13 +47,13 @@ bot.on("message", async msg => {
     msg.chat.id :
     null;
 
-  if (process.env["CONNECT_DB"] === "true" && global.update) {
+  if (process.env["CONNECT_DB"] == "true" && global.update) {
     await global.update(msg);
   }
 
-  if (process.env["LOGGER"] === "true") {
+  if (process.env["LOGGER"] != "false") {
     if (msg?.text.startsWith("/")) return;
-    logger(username, msg.text.substring(0, 100), id, groupId);
+    logger(username, msg.text.substring(0, 100), id, groupId, false);
   }
 });
 
@@ -80,7 +80,7 @@ bot.on("callback_query", async ctx => {
       message?.chat?.type === "supergroup" ?
       message.chat.id :
       null;
-    logger(username, context.cmd, id, groupId);
+    logger(username, context.cmd, id, groupId, true);
   }
 });
 
