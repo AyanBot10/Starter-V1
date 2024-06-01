@@ -29,10 +29,10 @@ module.exports = {
             }
           }
           if (x.config.usage) {
-            messageContent += regexStr(x.config.usage, x.config.name)
+            messageContent += `${regexStr(x.config?.usage || "N/A", x.config.name)}\n`
           }
-          messageContent += `Description: ${x.config.description?.short || x.config.description?.long}\n`;
-          messageContent += `Usage: ${x.config.usage || "N/A"}`;
+          messageContent += `Description: ${x.config.description?.short || x.config.description?.long || (typeof description === 'string' ? description : 'N/A')}\n`;
+
           await api.sendMessage(event.chat.id, messageContent);
           break;
         }
@@ -49,7 +49,7 @@ module.exports = {
         responseText += `${name.toUpperCase()} -- <b>${descText}</b>\n\n`;
       });
 
-      api.sendMessage(event.chat.id, responseText);
+      api.sendMessage(event.chat.id, responseText, { parse_mode: 'HTML' });
     }
   },
   callback: async function({ event, api, ctx }) {
