@@ -51,7 +51,7 @@ module.exports = {
         }
         return
       }
-      case 'view_DELETE': {
+      case 'view': {
         return api.sendMessage(event.chat.id, "Unfinished")
         const user = await User.findOne({ userId: event.from.id });
         if (!user || !user.anilistUsername) {
@@ -103,7 +103,7 @@ module.exports = {
       default: {
         if (!args[0]) return api.sendMessage(event.chat.id, "Include Username")
         try {
-          const userId = await getUserId(args[1]);
+          const userId = await getUserId(args[0]);
           const recentActivity = await getUserRecentActivity(userId);
           const metaImageUrl = `https://img.anili.st/user/${userId}`;
 
