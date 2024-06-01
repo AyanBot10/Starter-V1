@@ -5,7 +5,8 @@ module.exports = {
       short: "Evaluate Code",
       long: "Evaluate Code"
     },
-    usage: "{pn} code"
+    usage: "{pn} code",
+    credits: "Ntkhang"
   },
 
   start: async function({ api, event, args }) {
@@ -13,12 +14,35 @@ module.exports = {
       if (!process.env['ADMIN']) {
         return api.sendMessage(event.chat.id, "Invalid Config");
       }
-      
+
       if (!args[0]) return;
 
+      function output(msg) {
+        if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function")
+          msg = msg.toString();
+        else if (msg instanceof Map) {
+          let text = `Map(${msg.size}) `;
+          text += JSON.stringify(mapToObj(msg), null, 2);
+          msg = text;
+        }
+        else if (typeof msg == "object")
+          msg = JSON.stringify(msg, null, 2);
+        else if (typeof msg == "undefined")
+          msg = "undefined";
+        return api.sendMessage(event.chat.id, msg);
+      }
+
+      function mapToObj(map) {
+        const obj = {};
+        map.forEach(function(v, k) {
+          obj[k] = v;
+        });
+        return obj;
+      }
       const admin = process.env['ADMIN']
-      async function out(...txt) {
-        return await api.sendMessage(event.chat.id, txt.join(' '));
+
+      function out(txt) {
+        output(txt)
       }
 
       if (admin == event.from.id) {

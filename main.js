@@ -54,3 +54,8 @@ if (process.env["CONNECT_DB"] === true) {
 }
 
 log("Started Bot", "cyan", true);
+
+/**
+ * To-do:
+ * Fix MongoDB connection
+ */
