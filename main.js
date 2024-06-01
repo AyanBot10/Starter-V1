@@ -37,11 +37,10 @@ async function connectDB() {
   }
 }
 
-/*
 if (process.env["CONNECT_DB"]) {
   connectDB().then(() => {
     log("Logged in with DB", "green", false);
   });
-}*/
+}
 
 log("Started Bot", "cyan", true);

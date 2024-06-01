@@ -27,11 +27,9 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 });
 
-/*
 bot.on('message', async (msg) => {
   if (process.env["CONNECT_DB"]) await global.update(msg);
 });
-*/
 
 bot.on('callback_query', async (ctx) => {
   const { message, data } = ctx;
