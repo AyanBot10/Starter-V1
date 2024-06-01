@@ -19,7 +19,7 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true });
 if (!global.cmds) global.cmds = new Map();
-require("./script/command.js")();
+require("./script/command.js");
 const commandList = Object.keys(global.cmds);
 
 const array = commandList.map(command => {

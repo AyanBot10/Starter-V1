@@ -3,13 +3,13 @@ process.emitWarning = (warning, type) => {
     console.warn(warning);
   }
 };
+const use_global = process.env['GLOBAL_COMMANDS'] || true;
 
-const log = require("./logger/chalk.js");
-global.log = log;
+// Will fix this later
 
-if (!global.cmds) global.cmds = new Map();
+require("./global");
 
-log("Starting Bot", "cyan", true);
+log("Starting Bot", "grey", true);
 
 process.on('uncaughtException', (err) => {
   console.error(`Uncaught Exception: ${err}`);
@@ -19,13 +19,18 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-require("./script/command.js")();
+if (use_global) {
+  require("./script/command.js");
+} else {
+  log("change the bool of GLOBAL_COMMANDS to true", "red", true)
+  process.exit(3)
+}
 
 let userModel = undefined;
 let DB = undefined;
 let update = undefined;
 
-if (process.env["CONNECT_DB"] === true) {
+if (process.env["CONNECT_DB"] == 'true') {
   userModel = require("./Database/user.js");
   DB = require("./Database/DB.js");
   update = require("./Database/updateDB.js");
@@ -46,7 +51,7 @@ async function connectDB() {
   }
 }
 
-if (process.env["CONNECT_DB"] === true) {
+if (process.env["CONNECT_DB"] == 'true') {
   connectDB().then((x) => {
     if (x) log("Logged in with DB", "green", false)
     else log("Did not connect to DB")
@@ -54,8 +59,3 @@ if (process.env["CONNECT_DB"] === true) {
 }
 
 log("Started Bot", "cyan", true);
-
-/**
- * To-do:
- * Fix MongoDB connection
- */
