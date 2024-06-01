@@ -15,8 +15,10 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         ))
     ) {
       commandFound = true;
+      if (x.config.role && x.config.role > 0) {
+        return await bot.sendMessage(msg.chat.id, "You don't have perms to use this command", { reply_to_message_id: msg.message.message_id })
+      }
       await x.start({ event: msg, args, api: bot });
-
       const { username, id } = msg.from;
       const groupId =
         msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
@@ -74,7 +76,7 @@ bot.on("callback_query", async ctx => {
     );
 
     if (cmd) {
-      cmd.callback({ event: message, api: bot, ctx, args, Callback: context });
+      await cmd.callback({ event: message, api: bot, ctx, args, Callback: context });
     }
   } else {
     // Old Method

@@ -6,7 +6,8 @@ module.exports = {
       long: "Evaluate Code"
     },
     usage: "{pn} code",
-    credits: "Ntkhang"
+    credits: "Ntkhang",
+    role: 1
   },
 
   start: async function({ api, event, args }) {
