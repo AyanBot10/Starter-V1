@@ -101,7 +101,7 @@ module.exports = {
         return
       }
       default: {
-        if (!args[1]) return api.sendMessage(event.chat.id, "Include Username")
+        if (!args[0]) return api.sendMessage(event.chat.id, "Include Username")
         try {
           const userId = await getUserId(args[1]);
           const recentActivity = await getUserRecentActivity(userId);
