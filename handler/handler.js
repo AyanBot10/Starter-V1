@@ -18,8 +18,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
             if (x.config?.role && x.config?.role > 0) {
                 return await bot.sendMessage(
                     msg.chat.id,
-                    "You don't have perms to use this command",
-                    { reply_to_message_id: msg.message.message_id }
+                    "You don't have perms to use this command"
                 );
             }
             await x.start({ event: msg, args, api: bot });

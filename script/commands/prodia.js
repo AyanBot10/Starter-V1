@@ -269,7 +269,6 @@ module.exports = {
     const prompt = args.join(" ");
     let cook;
     try {
-      throw new Error("Test");
       if (!prompt || prompt.length <= 5)
         return api.sendMessage(event.chat.id, "Include a valid prompt");
       const { text, model, rando } = formatPrompt(prompt);
