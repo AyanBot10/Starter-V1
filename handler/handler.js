@@ -38,7 +38,7 @@ bot.on('callback_query', async (ctx) => {
   if (match) {
     const command = match[1];
     for (const x of global.cmds.values()) {
-      if (x.config.name === command) {
+      if (x.config.name?.toLowerCase() === command?.toLowerCase() || (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase()))) {
         await x.callback({ event: message, args, api: bot, ctx });
         break;
       }

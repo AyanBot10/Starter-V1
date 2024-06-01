@@ -1,8 +1,9 @@
 const ytdl = require("@distube/ytdl-core");
-const search = require('yt-search');
+const ytsr = require('ytsr');
 const fs = require("fs-extra");
 const { v4: uuid } = require("uuid");
 const path = require("path");
+const axios = require('axios');
 
 module.exports = {
   config: {
@@ -29,7 +30,7 @@ module.exports = {
 
       const inline_data = results.map(item => [{
         text: `${item.duration} : ${item.title}`,
-        callback_data: item.video_url
+        callback_data: `/youtube ${item.video_url}`
       }]);
       await api.sendMediaGroup(event.chat.id, media, { disable_notification: true, reply_to_message_id: event.message_id });
       await api.sendMessage(event.chat.id, `Found ${inline_data.length} results`, {
@@ -49,7 +50,8 @@ module.exports = {
     try {
       await api.deleteMessage(ctx.message.chat.id, ctx.message.message_id);
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      const link = ctx.data;
+      let link = ctx.data
+      link = (link.split(" "))[1];
       const dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
       await downloadVID(link, dir);
       const stream = fs.createReadStream(dir);
@@ -64,21 +66,41 @@ module.exports = {
   }
 };
 
+async function validateUrl(url) {
+  try {
+    const response = await axios.head(url);
+    return response.status === 200;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function searchYTB(query) {
   try {
-    let { videos } = await search(query);
-    videos = videos
-      .slice(0, [3, 4][Math.floor(Math.random() * 2)])
-      .map(video => ({
-        title: video.title,
-        video_url: video.url,
-        thumbnail_url: video.thumbnail,
-        duration: video.timestamp
-      }));
-    if (videos.length == 0) {
-      throw new Error(`No video found for query: ${query}`)
+    const searchResults = await ytsr(query, { limit: 10 });
+    const videos = searchResults.items.filter(item => item.type === 'video');
+
+    const numVideos = [3, 4][Math.floor(Math.random() * 2)];
+
+    const validVideos = [];
+    for (let video of videos.slice(0, numVideos)) {
+      const isValidThumbnail = await validateUrl(video.bestThumbnail.url);
+      if (isValidThumbnail) {
+        validVideos.push({
+          title: video.title,
+          video_url: video.url,
+          thumbnail_url: video.bestThumbnail.url,
+          duration: video.duration
+        });
+      }
+      if (validVideos.length >= numVideos) break;
     }
-    return videos
+
+    if (validVideos.length === 0) {
+      throw new Error(`No video found for query: ${query}`);
+    }
+
+    return validVideos;
   } catch (error) {
     throw error;
   }
