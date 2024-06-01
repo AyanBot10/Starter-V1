@@ -48,19 +48,25 @@ module.exports = {
 
   callback: async function({ api, event, ctx }) {
     const processingMessage = await api.sendMessage(event.chat.id, "⏳ Downloading...");
+    let dir;
     try {
       await api.deleteMessage(ctx.message.chat.id, ctx.message.message_id);
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       let link = ctx.data
       link = (link.split(" "))[1];
-      const dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
+      dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
       await downloadVID(link, dir);
       const stream = fs.createReadStream(dir);
       await api.sendVideo(event.chat.id, stream);
-      fs.unlinkSync(dir);
+      if (fs.existsSync(dir)) {
+        fs.unlinkSync(dir);
+      }
     } catch (err) {
       console.error(err);
       await api.sendMessage(event.chat.id, err.message);
+      if (fs.existsSync(dir)) {
+        fs.unlinkSync(dir);
+      }
     } finally {
       await api.deleteMessage(event.chat.id, processingMessage.message_id);
     }
