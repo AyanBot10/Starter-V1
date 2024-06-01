@@ -107,7 +107,7 @@ module.exports = {
           const recentActivity = await getUserRecentActivity(userId);
           const metaImageUrl = `https://img.anili.st/user/${userId}`;
 
-          let message = `❏ Recent activity of \`${args[1]}\`:\n\n`;
+          let message = `❏ Recent activity of \`${args[0]}\`:\n\n`;
           recentActivity.forEach((activity) => {
             if (activity.media) {
               const { romaji, english, native } = activity.media.title;
