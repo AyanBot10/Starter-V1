@@ -6,7 +6,6 @@ const path = require("path");
 const axios = require("axios");
 
 const safe_mode = true;
-// Turning off safety allows thumbnails but they sometimes give error
 
 module.exports = {
   config: {
@@ -84,6 +83,11 @@ module.exports = {
     );
     let dir;
     try {
+      function checkSize(filePath) {
+        if (fs.statSync(filePath).size > 49.5 * 1024 * 1024) {
+          throw new Error('Media Size exceeds 50MB size limit');
+        }
+      }
       await api.deleteMessage(
         ctx.message.chat.id,
         ctx.message.message_id
@@ -91,7 +95,8 @@ module.exports = {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const link = ctx.data;
       dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-      await downloadVID(link, dir);
+      await downloadVID(link, dir)
+      checkSize(dir)
       const stream = fs.createReadStream(dir);
       await api.sendVideo(event.chat.id, stream);
       if (fs.existsSync(dir)) {
@@ -104,22 +109,19 @@ module.exports = {
         fs.unlinkSync(dir);
       }
     } finally {
-      await api.deleteMessage(
-        event.chat.id,
-        processingMessage.message_id
-      );
+      if (fs.existsSync(dir)) {
+        fs.unlinkSync(dir);
+      }
+      if (processingMessage.message_id) {
+        await api.deleteMessage(
+          event.chat.id,
+          processingMessage.message_id
+        );
+      }
     }
   }
 };
 
-async function validateUrl(url) {
-  try {
-    const response = await axios.head(url);
-    return response.status === 200;
-  } catch (error) {
-    return false;
-  }
-}
 
 async function searchYTB(query) {
   try {
@@ -128,20 +130,16 @@ async function searchYTB(query) {
       item => item.type === "video"
     );
 
-    let numVideos = [3, 4][Math.floor(Math.random() * 2)];
-    if (safe_mode) numVideos = 8;
+    let numVideos = 8;
 
     const validVideos = [];
     for (let video of videos.slice(0, numVideos)) {
-      const isValidThumbnail = await validateUrl(video.bestThumbnail.url);
-      if (isValidThumbnail) {
-        validVideos.push({
-          title: video.title,
-          video_url: video.url,
-          thumbnail_url: video.bestThumbnail.url,
-          duration: video.duration
-        });
-      }
+      validVideos.push({
+        title: video.title,
+        video_url: video.url,
+        thumbnail_url: video.bestThumbnail.url,
+        duration: video.duration
+      });
       if (validVideos.length >= numVideos) break;
     }
 
