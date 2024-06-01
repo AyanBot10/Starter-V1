@@ -82,7 +82,7 @@ bot.on("callback_query", async ctx => {
                 event: message,
                 api: bot,
                 ctx,
-                Callback: context
+                Context: context
             });
         }
         const { username, id } = from;
