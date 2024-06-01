@@ -4,6 +4,9 @@ const log = require("./logger/chalk.js");
 global.cmds = global.cmds || new Map();
 global.utils = global.utils || new Map();
 global.log = global.log || log;
+global.bot = {};
+
+global.bot.callback = new Map()
 
 
 global.utils.getStream = async function(link) {
