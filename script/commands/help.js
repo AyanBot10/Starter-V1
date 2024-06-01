@@ -5,7 +5,7 @@ module.exports = {
       short: "Provides a list of all available commands",
       long: "Provides a detailed list of all available commands"
     },
-    usage: "{pn} - Logs all commands\n" + "{pn} <cmd> Logs the command's info"
+    usage: "{pn} - Logs all commands\n" + "{pn} <cmd> - Logs the command's info"
   },
   start: async ({ api, event, args }) => {
     if (args[0]) {
@@ -15,7 +15,7 @@ module.exports = {
         if (x.config.name?.toLowerCase() === command?.toLowerCase() || (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase()))) {
           commandFound = true;
           let messageContent = `Command: ${x.config?.name}\n`;
-          messageContent += x.config?.author ? `Author: ${x.config.author}\n` : '';
+          messageContent += x.config?.author ? `\nAuthor: ${x.config.author}\n` : '';
           if (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase())) {
             messageContent += `Aliases: ${x.config?.aliases?.join(' ,')}\n`
           }
@@ -29,9 +29,9 @@ module.exports = {
             }
           }
           if (x.config.usage) {
-            messageContent += `${regexStr(x.config?.usage || "N/A", x.config.name)}\n`
+            messageContent += `\nUsage:\n${regexStr(x.config?.usage || "N/A", x.config.name)}\n`
           }
-          messageContent += `Description: ${x.config.description?.short || x.config.description?.long || (typeof description === 'string' ? description : 'N/A')}\n`;
+          messageContent += `\nDescription: ${x.config.description?.short || x.config.description?.long || (typeof description === 'string' ? description : 'N/A')}\n`;
 
           await api.sendMessage(event.chat.id, messageContent);
           break;
