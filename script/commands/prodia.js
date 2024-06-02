@@ -301,7 +301,7 @@ module.exports = {
         "Darn Error!",
         options
       );
-      global.bot.callback.set(sent.message_id, {
+      global.bot.callback_query.set(sent.message_id, {
         event,
         ctx: sent,
         cmd: this.config.name,
@@ -344,7 +344,7 @@ module.exports = {
         err.message,
         options
       );
-      global.bot.callback.set(sent.message_id, {
+      global.bot.callback_query.set(sent.message_id, {
         event,
         ctx: sent,
         cmd: this.config.name,

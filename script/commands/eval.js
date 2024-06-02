@@ -12,12 +12,7 @@ module.exports = {
 
   start: async function({ api, event, args, message }) {
     try {
-      if (!process.env['ADMIN']) {
-        return api.sendMessage(event.chat.id, "Invalid Config");
-      }
-
       if (!args[0]) return;
-
       function output(msg) {
         if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function") {
           msg = msg.toString();
@@ -32,7 +27,7 @@ module.exports = {
         }
         return api.sendMessage(event.chat.id, msg);
       }
-
+      const out = output
       function mapToObj(map) {
         const obj = {};
         map.forEach(function(v, k) {
