@@ -61,5 +61,6 @@ if (config.server.toggle && config.server.port) {
   const express = require("./server/index.js");
   } catch (err) {
     log("Failed to start server", "red", true)
+    log(err.message, "red")
   }
 }

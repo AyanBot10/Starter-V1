@@ -34,7 +34,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-  global.log("Successfully Started Server at Port " + port)
+  global.log("Successfully Started Server at Port " + port, "cyan", true)
 });
 
 module.exports = app;
