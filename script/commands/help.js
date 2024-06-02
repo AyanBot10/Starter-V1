@@ -19,7 +19,6 @@ module.exports = {
           (x.config.aliases &&
             x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase()))
         ) {
-          // messageContent design inspired by samir's annie bot
           commandFound = true;
           let messageContent = "─── NAME ────⭓\n\n";
           messageContent += `» ${x.config?.name}\n`;
