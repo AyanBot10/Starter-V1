@@ -34,11 +34,11 @@ function create_message(msg, command) {
       }
     },
     Syntax: async function() {
-      return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${command}\` to get the valid usage`);
+      return await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, { reply_to_message_id: msg.message_id });
     },
-    react: async function(emoji_array, message_id) {
+    react: async function(emoji_array, message_id, is_big = true) {
       // [{ type: 'emoji', emoji: '👍' }];
-      return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array , is_big: true })
+      return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array , is_big })
     }
   };
 }
