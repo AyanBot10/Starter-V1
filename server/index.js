@@ -4,6 +4,13 @@ const os = require('os');
 const app = express();
 const { port } = global.config.server;
 
+function formatUptime(uptimeInSeconds) {
+  const hours = Math.floor(uptimeInSeconds / 3600);
+  const minutes = Math.floor((uptimeInSeconds % 3600) / 60);
+  const seconds = Math.floor(uptimeInSeconds % 60);
+  return `${hours}H, ${minutes}M, ${seconds}S`;
+}
+
 app.get('*', (req, res) => {
   const systemInfo = {
     platform: os.platform(),
@@ -13,7 +20,11 @@ app.get('*', (req, res) => {
       total: os.totalmem(),
       free: os.freemem()
     },
-    uptime: os.uptime(),
+    uptime: {
+      os: "Device",
+      uptime_readable: formatUptime(os.uptime()),
+      uptime: os.uptime()
+    },
     loadAvg: os.loadavg(),
     networkInterfaces: os.networkInterfaces(),
     userInfo: os.userInfo()
