@@ -65,12 +65,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       commandFound = true;
       await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
       const { username, id } = msg.from;
-      const groupId =
-        msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
-        msg.chat.id :
-        null;
       logger(username, x.config.name, id, true, "Initiation");
-
       break;
     }
   }
@@ -81,20 +76,23 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 });
 
-
-bot.on("text", async msg => {
-  const { username, id } = msg.from;
-  if (process.env["CONNECT_DB"] == "true" && global.update) {
-    await global.update(msg);
+bot.on("message", async msg => {
+  for (const x of global.cmds.values()) {
+    const args = msg?.text?.split(" ")
+    const { username, id } = msg.from;
+    if (typeof x.chat === "function") {
+      await x.chat({ event: msg, args, api: bot });
+      logger(username, x.config.name, id, true, "Chat");
+      break;
+    }
   }
-
   if (process.env["LOGGER"] != "false") {
     if (msg?.text?.startsWith("/")) return;
     logger(username, msg.text.substring(0, 10), id, false, "Text");
   }
-});
+})
 
-const handleEvent = async (ctx, eventType) => {
+const handleFunctionalEvent = async (ctx, eventType) => {
   const { message, from } = ctx;
   const msg = message;
   if (global.bot?.[eventType].has(message?.message_id)) {
@@ -144,7 +142,8 @@ const handleEvent = async (ctx, eventType) => {
         api: bot,
         ctx,
         Context: context,
-        message: message_function
+        message: message_function,
+        cmd: context?.cmd || cmd?.config?.name || null
       });
     }
 
@@ -153,21 +152,29 @@ const handleEvent = async (ctx, eventType) => {
   }
 };
 
-const events = [
-  "message",
-  "edited_message",
-  "channel_post",
-  "edited_channel_post",
-  "inline_query",
-  "chosen_inline_result",
+const handleEvents = async (ctx, eventType) => {
+  const { message, from } = ctx;
+  const { username, id } = from;
+  logger(username, "EVENT", id, true, eventType);
+}
+
+const functionalEvents = [
   "callback_query",
   "shipping_query",
   "pre_checkout_query",
+  "inline_query",
+  "chosen_inline_result",
+  "chat_join_request"
+];
+
+const chatEvents = [
+  "edited_message",
+  "channel_post",
+  "edited_channel_post",
   "poll",
   "poll_answer",
   "chat_member",
   "my_chat_member",
-  "chat_join_request",
   "audio",
   "document",
   "photo",
@@ -191,8 +198,12 @@ const events = [
   "pinned_message"
 ];
 
-events.forEach(eventType => {
-  bot.on(eventType, async (ctx) => handleEvent(ctx, eventType));
+functionalEvents.forEach(eventType => {
+  bot.on(eventType, async (ctx) => handleFunctionalEvent(ctx, eventType));
+});
+
+chatEvents.forEach(eventType => {
+  bot.on(eventType, async (ctx) => handleEvents(ctx, eventType));
 });
 
 module.exports = bot;
