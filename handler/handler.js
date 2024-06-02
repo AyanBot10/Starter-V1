@@ -38,6 +38,9 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         await bot.sendMessage(msg.chat.id, err.message)
         return null
       }
+    },
+    Syntax: async function() {
+      return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${command}\` to get the valid usage`)
     }
   }
 
@@ -134,6 +137,9 @@ const handleEvent = async (ctx, eventType) => {
           await bot.sendMessage(msg.chat.id, err.message)
           return null
         }
+      },
+      Syntax: async function() {
+        return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${context.cmd}\` to get the valid usage`)
       }
     }
 
