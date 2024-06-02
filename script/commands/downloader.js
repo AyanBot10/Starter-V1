@@ -1,5 +1,4 @@
 const axios = require("axios");
-const { shortLink } = require("qiao-short-link");
 
 function checkLink(url) {
   const regex = /^https:\/\//;
@@ -69,7 +68,7 @@ module.exports = {
     if (!args[0]) return message.Syntax();
     try {
       checkLink(args[0]);
-      message.react("👌", event.message_id);
+      message.react([{ type: 'emoji', emoji: "👌" }], event.message_id);
       const response = await downloader(args[0]);
       if (!response || !response.data || !response.data.formats) {
         throw new Error("Invalid Response");
@@ -79,7 +78,7 @@ module.exports = {
       const durationMinutes = String(Math.floor(response.data.duration / 60)).padStart(2, "0");
       const durationSeconds = String(Math.floor(response.data.duration % 60)).padStart(2, "0");
       const form = {
-        body: `🎦 ${response.data.title || "N/A"}\n\n• Quality: ${chosenFormat.height || "N/A"}p\n• Duration: ${durationMinutes}:${durationSeconds}\n`
+        body: ` ${response.data.title || "Video Downloaded"}`
       };
 
       const inline_keyboard = response.data.formats
@@ -88,7 +87,7 @@ module.exports = {
 
       const reply_markup = { inline_keyboard };
 
-      message.react("🔥", event.message_id, true);
+      message.react([{ type: 'emoji', emoji: "🔥" }], event.message_id, true);
       api.sendChatAction(event.chat.id, "upload_video");
       api.sendVideo(event.chat.id, chosenFormat.url, {
         reply_to_message_id: event.message_id,
@@ -97,7 +96,7 @@ module.exports = {
       });
     } catch (err) {
       message.reply(err.message);
-      message.react("🤡", event.message_id);
+      message.react([{ type: 'emoji', emoji: "💩" }], event.message_id);
     }
   }
 };

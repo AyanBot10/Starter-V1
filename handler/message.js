@@ -38,14 +38,16 @@ function create_message(msg, command) {
     },
     react: async function(emoji_array, message_id, is_big = false) {
       // [{ type: 'emoji', emoji: '👍' }];
-      if (typeof emoji_array !== "object") {
-        emoji_array = [{ type: 'emoji', emoji: emoji_array }]
+      if (typeof emoji_array != "object") {
+        emoji_array = [{ type: 'emoji', emoji: emoji_array }];
       }
-      emoji_array.forEach(item => {
-        if (global.react_emojis.some(emoji => emoji == item.emoji)) {
-          item.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
-        }
-      });
+      if (emoji_array instanceof Array) {
+        emoji_array.forEach(item => {
+          if (global.react_emojis.some(emoji => emoji == item.emoji)) {
+            item.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
+          }
+        });
+      }
       return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array, is_big })
     }
   };
