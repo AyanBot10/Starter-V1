@@ -25,6 +25,7 @@ module.exports = {
           messageContent += `» ${x.config?.name}\n`;
 
           messageContent += "─── INFO ────⭓\n\n";
+          const { description } = x.config;
           const descText =
             description?.short ||
             description?.long ||
