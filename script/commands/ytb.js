@@ -38,7 +38,7 @@ module.exports = {
       const inline_data = results.map(item => [
         {
           text: `${item.duration} : ${item.title}`,
-          callback_data: item.video_url
+          callback_data: `${item.duration_ms}^${item.video_url}`
                 }
             ]);
 
@@ -76,7 +76,7 @@ module.exports = {
     }
   },
 
-  callback_query: async function({ api, event, ctx }) {
+  callback_query: async function({ api, event, ctx, message }) {
     const processingMessage = await api.sendMessage(
       event.chat.id,
       "⏳ Downloading..."
@@ -93,7 +93,17 @@ module.exports = {
         ctx.message.message_id
       );
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      const link = ctx.data;
+      let ms = (ctx.data.split('^'))[0]
+      const link = (ctx.data.split('^'))[1]
+
+      function checkTime(duration_ms) {
+        const ms10M = 10 * 60 * 1000
+        return duration_ms > ms10M;
+      }
+      const valueTime = checkTime(Number(ms))
+      if (valueTime) {
+        return await message.reply("Video is over 10 Mins")
+      }
       dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
       await downloadVID(link, dir)
       checkSize(dir)
@@ -138,6 +148,7 @@ async function searchYTB(query) {
         title: video.title,
         video_url: video.url,
         thumbnail_url: video.bestThumbnail.url,
+        duration_ms: parseDuration(video.duration),
         duration: video.duration
       });
       if (validVideos.length >= numVideos) break;
@@ -151,6 +162,11 @@ async function searchYTB(query) {
   } catch (error) {
     throw error;
   }
+}
+
+function parseDuration(durationString) {
+  const parts = durationString.split(':').map(parseFloat);
+  return parts.reduce((acc, time, index) => acc + time * Math.pow(60, parts.length - index - 1), 0) * 1000;
 }
 
 async function downloadVID(videoLink, savePath) {
