@@ -19,17 +19,17 @@ module.exports = {
       if (!args[0]) return;
 
       function output(msg) {
-        if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function")
+        if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function") {
           msg = msg.toString();
-        else if (msg instanceof Map) {
+        } else if (msg instanceof Map) {
           let text = `Map(${msg.size}) `;
           text += JSON.stringify(mapToObj(msg), null, 2);
           msg = text;
-        }
-        else if (typeof msg == "object")
+        } else if (typeof msg == "object") {
           msg = JSON.stringify(msg, null, 2);
-        else if (typeof msg == "undefined")
+        } else if (typeof msg == "undefined") {
           msg = "undefined";
+        }
         return api.sendMessage(event.chat.id, msg);
       }
 
@@ -40,28 +40,30 @@ module.exports = {
         });
         return obj;
       }
-      const admin = process.env['ADMIN']
 
-      function out(txt) {
-        output(txt)
-      }
+      const code = args.join(" ");
+      const snippet = `
+          (async () => { 
+            try { 
+              ${code} 
+            } catch (err) { 
+              throw err; 
+            } 
+          })();
+        `;
 
-      if (admin == event.from.id) {
-        const snippet = `(async () => { 
-          try { 
-            ${args.join(" ")} 
-          } catch(err) { 
-            api.sendMessage(event.chat.id, err.message); 
-          } 
-        })();`;
-
-        eval(snippet);
-      } else {
-        api.sendMessage(event.chat.id, "Unauthorized");
+      try {
+        await eval(snippet);
+      } catch (err) {
+        output(err.message || String(err));
       }
     } catch (err) {
-      console.log(err.message);
-      api.sendMessage(event.chat.id, err.message);
+      console.log(err.message || String(err));
+      api.sendMessage(event.chat.id, err.message || String(err));
     }
+
+    process.on('unhandledRejection', (reason) => {
+      api.sendMessage(event.chat.id, `Unhandled Rejection: ${reason.message || String(reason)}`);
+    });
   }
 };

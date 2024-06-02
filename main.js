@@ -15,8 +15,8 @@ process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.message}`, "red");
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason.message);
+process.on('unhandledRejection', (reason) => {
+  log(`Unhandled Rejection:\n${reason.message}`, 'red');
 });
 
 if (use_global) {

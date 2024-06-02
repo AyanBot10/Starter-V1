@@ -3,7 +3,7 @@ const logger = require("../logger/usage.js");
 
 
 
-bot.onText(/\/(\w+)/, async (msg, match) => {
+bot.onText(/\/ ?(\w+)/, async (msg, match) => {
   const command = match[1];
 
   const message = {
@@ -23,6 +23,15 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         if (typeof options !== 'object') options = {}
         options['reply_to_message_id'] = msg.message_id
         return await bot.sendMessage(msg.chat.id, text, options)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    },
+    unsend: async function(options) {
+      try {
+        if (!options.message_id) throw new Error("Include message_id")
+        return await api.deleteMessage(event.chat.id, options.message_id)
       } catch (err) {
         await bot.sendMessage(msg.chat.id, err.message)
         return null
@@ -52,7 +61,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         );
       }
       commandFound = true;
-      await x.start({ event: msg, args, api: bot, message });
+      await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
       const { username, id } = msg.from;
       const groupId =
         msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
@@ -88,6 +97,41 @@ bot.on("message", async msg => {
 
 bot.on("callback_query", async ctx => {
   const { message, data, from } = ctx;
+
+
+  const message = {
+    send: async function(text, options) {
+      try {
+        if (!text) throw new Error("Must include Body")
+        if (typeof options !== 'object') options = {}
+        return await bot.sendMessage(msg.chat.id, text, options)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    },
+    reply: async function(text, options) {
+      try {
+        if (!text) throw new Error("Must include Body")
+        if (typeof options !== 'object') options = {}
+        options['reply_to_message_id'] = msg.message_id
+        return await bot.sendMessage(msg.chat.id, text, options)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    },
+    unsend: async function(options) {
+      try {
+        if (!options.message_id) throw new Error("Include message_id")
+        return await api.deleteMessage(event.chat.id, options.message_id)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    }
+  }
+
   if (global.bot.callback.has(message.message_id)) {
     // New Method
     let context = global.bot.callback.get(message.message_id);
@@ -100,7 +144,8 @@ bot.on("callback_query", async ctx => {
         event: message,
         api: bot,
         ctx,
-        Context: context
+        Context: context,
+        message
       });
     }
     const { username, id } = from;
