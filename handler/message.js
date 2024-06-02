@@ -39,8 +39,8 @@ function create_message(msg, command) {
     react: async function(emoji_array, message_id, is_big = false) {
       // [{ type: 'emoji', emoji: '👍' }];
       emoji_array.forEach(item => {
-        if (global.react_emojis.includes(item.emoji)) {
-          item.emoji = "💩";
+        if (global.react_emojis.some(emoji => emoji == item.emoji)) {
+          item.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
         }
       });
       return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array, is_big })
