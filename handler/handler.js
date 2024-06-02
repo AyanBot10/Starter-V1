@@ -1,6 +1,6 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
-const { create_message } = require("./message.js")(bot);
+const { create_message } = require("./message.js");
 const admins = global.config?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set, Commands may not function properly", "red", true)
