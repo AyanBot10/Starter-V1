@@ -1,10 +1,11 @@
 const axios = require("axios");
 const log = require("./logger/chalk.js");
+const config = require("./config.json");
 
 global.cmds = global.cmds || new Map();
 global.utils = global.utils || new Map();
 global.log = global.log || log;
-
+global.config = config;
 global.bot = {};
 global.bot.text = new Map()
 global.bot.message = new Map();

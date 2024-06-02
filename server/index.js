@@ -2,7 +2,7 @@ const express = require('express');
 const os = require('os');
 
 const app = express();
-const { port } = global.config.server;
+const port = global?.config?.server?.port || 3000;
 
 function formatUptime(uptimeInSeconds) {
   const hours = Math.floor(uptimeInSeconds / 3600);

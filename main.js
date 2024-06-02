@@ -5,8 +5,7 @@ process.emitWarning = (warning, type) => {
 };
 
 require("./global");
-const config = require("./config.json");
-global.config = config
+
 
 log("Starting Bot", "grey", true);
 
@@ -55,10 +54,10 @@ if (process.env["CONNECT_DB"] == 'true') {
 
 log("Started Bot", "cyan", true);
 
-if (config.server.toggle && config.server.port) {
+if (config?.server?.toggle && config?.server?.port) {
   log("Starting Express Server", "green")
   try {
-  const express = require("./server/index.js");
+    require("./server/index.js");
   } catch (err) {
     log("Failed to start server", "red", true)
     log(err.message, "red")
