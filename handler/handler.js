@@ -6,7 +6,7 @@ if (admins?.length === 0) {
   global.log("Admin not set, Commands may not function properly", "red", true)
 }
 
-function create_message(msg) {
+function create_message(msg, command) {
   return {
     send: async function(text, options = {}) {
       try {
@@ -66,7 +66,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         );
       }
       commandFound = true;
-      const message = create_message(msg);
+      const message = create_message(msg, x.config.name);
       await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
 
       const { username, id } = msg.from;
@@ -85,7 +85,7 @@ bot.on("message", async msg => {
     const args = msg?.text?.split(" ")
     const { username, id } = msg.from;
     if (typeof x.chat === "function") {
-      const message = create_message(msg);
+      const message = create_message(msg, x.config.name);
       await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name });
       logger(username, x.config.name, id, true, "Chat");
       break;
@@ -100,7 +100,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
     const cmd = Array.from(global.cmds.values()).find(
       cmd => cmd.config.name === context.cmd
     );
-    const message_function = create_message(ctx);
+    const message_function = create_message(ctx, cmd.config.name);
     if (cmd && cmd[eventType]) {
       await cmd[eventType]({
         event: message,

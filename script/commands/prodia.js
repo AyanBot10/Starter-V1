@@ -274,6 +274,7 @@ module.exports = {
       const { text, model, rando } = formatPrompt(prompt);
       cook = await api.sendMessage(event.chat.id, "Processing Query");
       const jobID = await generateImage({ text, model });
+      await global.utils.sleep(2500);
       api.sendChatAction(event.chat.id, 'upload_photo')
       const polledImage = await pollImage({ jobID });
       api.deleteMessage(event.chat.id, cook.message_id);
@@ -319,6 +320,7 @@ module.exports = {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const { text, model, rando } = formatPrompt(prompt);
       const jobID = await generateImage({ text, model });
+            await global.utils.sleep(2500);
       api.sendChatAction(event.chat.id, 'upload_photo')
       const polledImage = await pollImage({ jobID });
       api.deleteMessage(event.chat.id, cook.message_id);
