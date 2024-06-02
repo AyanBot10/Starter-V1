@@ -1,6 +1,15 @@
 const axios = require('axios');
 const { shortLink } = require('qiao-short-link');
 
+function checkLink(url) {
+  const regex = /^https:\/\//;
+  if (regex.test(url)) {
+    return true;
+  } else {
+    throw new Error("Invalid Link Provided");
+  }
+}
+
 async function downloader(url) {
   const link = process.env.DOWNLOADER;
   if (!link) throw new Error("Include the API URI in .env file of the key 'DOWNLOADER'");
@@ -37,10 +46,11 @@ module.exports = {
   start: async function({ event, args, api, message }) {
     if (!args[0]) return message.Syntax();
     try {
+      checkLink(args[0])
       message.react([{ type: 'emoji', emoji: '👌' }], event.message_id);
       const response = await downloader(args[0]);
       if (!response.data || !response.data.data || !response.data.data.formats) {
-        throw new Error("Invalid response structure");
+        throw new Error("Invalid Response");
       }
 
       const form = {
