@@ -2,7 +2,7 @@ const bot = require("./login.js");
 let api = bot;
 const axios = require("axios");
 if (!global.react_emojis) {
-  axios.get(process.env['EMOJI_GIST']).then(response => {
+  axios.get(global.config?.emoji_gist).then(response => {
     global.react_emojis = response.data.emojis
     global.log("Successfully Set global EMOJI", "cyan")
   }).catch(err => {
