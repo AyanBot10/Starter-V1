@@ -61,4 +61,14 @@ global.utils.sleep = async function(ms) {
   return await new Promise(resolve => setTimeout(resolve, ms))
 }
 
+if (!global.react_emojis) {
+  axios.get("https://gist.githubusercontent.com/SatoX69/247e9d735a145fc059715a92ccd7b0f6/raw/4d1287c6750d84e55ece9e405ddc988643baf2b9/allowed_emojis.json").then(response => {
+    global.react_emojis = response.data.emojis
+    global.log("Successfully Set global EMOJI", "cyan")
+  }).catch(err => {
+    global.log("Failed to set global EMOJI", "red")
+    global.react_emojis = []
+  })
+}
+
 module.exports = null;
