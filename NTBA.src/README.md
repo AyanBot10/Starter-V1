@@ -1,1 +1,0 @@
-# Will add modified functions of node-telegram-bot-api in this directory

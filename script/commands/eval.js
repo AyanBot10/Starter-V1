@@ -10,7 +10,7 @@ module.exports = {
     role: 1
   },
 
-  start: async function({ api, event, args }) {
+  start: async function({ api, event, args, message }) {
     try {
       if (!process.env['ADMIN']) {
         return api.sendMessage(event.chat.id, "Invalid Config");
@@ -60,7 +60,7 @@ module.exports = {
         api.sendMessage(event.chat.id, "Unauthorized");
       }
     } catch (err) {
-      console.log(err);
+      console.log(err.message);
       api.sendMessage(event.chat.id, err.message);
     }
   }

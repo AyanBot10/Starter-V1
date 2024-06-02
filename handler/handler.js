@@ -1,8 +1,37 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 
+
+
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
+
+  const message = {
+    send: async function(text, options) {
+      try {
+        if (!text) throw new Error("Must include Body")
+        if (typeof options !== 'object') options = {}
+        return await bot.sendMessage(msg.chat.id, text, options)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    },
+    reply: async function(text, options) {
+      try {
+        if (!text) throw new Error("Must include Body")
+        if (typeof options !== 'object') options = {}
+        options['reply_to_message_id'] = msg.message_id
+        return await bot.sendMessage(msg.chat.id, text, options)
+      } catch (err) {
+        await bot.sendMessage(msg.chat.id, err.message)
+        return null
+      }
+    }
+  }
+
+
+
   const args = msg.text.split(" ").slice(1);
   let commandFound = false;
 
@@ -23,7 +52,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         );
       }
       commandFound = true;
-      await x.start({ event: msg, args, api: bot });
+      await x.start({ event: msg, args, api: bot, message });
       const { username, id } = msg.from;
       const groupId =
         msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
