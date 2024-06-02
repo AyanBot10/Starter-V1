@@ -309,7 +309,7 @@ module.exports = {
       });
     }
   },
-  callback: async function({ event, api, ctx, Context }) {
+  callback_query: async function({ event, api, ctx, Context }) {
     const prompt = Context.prompt;
     let cook;
     try {

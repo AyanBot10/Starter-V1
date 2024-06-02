@@ -10,7 +10,7 @@ function logger(username, commandName, userId, groupId = null, type, cmd) {
   }
 
   if (cmd) {
-    log += ` ${kleur.bold().bgBlack().white('[')}${kleur.red(cmd.toUpperCase())}${kleur.bold().bgBlack().white(']')} ${kleur.bold().bgBlack().white('(Group)')}`;
+    log += ` ${kleur.bold().bgBlack().white('[')}${kleur.red(cmd.toUpperCase())}${kleur.bold().bgBlack().white(']')} ${kleur.bold().bgBlack().white('(Event)')}`;
   }
   console.log(log);
 }

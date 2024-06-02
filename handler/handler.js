@@ -147,10 +147,7 @@ const handleEvent = async (ctx, eventType) => {
 
     const { username, id } = from;
     const groupId =
-      message?.chat?.type === "group" ||
-      message?.chat?.type === "supergroup" ?
-      message.chat.id :
-      null;
+      message?.chat?.type === "private" ? "Inbox" : "Group"
     logger(username, context.cmd, id, groupId, true, eventType);
   }
 };

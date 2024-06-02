@@ -76,7 +76,7 @@ module.exports = {
     }
   },
 
-  callback: async function({ api, event, ctx }) {
+  callback_query: async function({ api, event, ctx }) {
     const processingMessage = await api.sendMessage(
       event.chat.id,
       "⏳ Downloading..."

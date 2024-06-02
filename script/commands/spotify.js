@@ -134,7 +134,7 @@ module.exports = {
       }
     }
   },
-  callback: async function({ event, api, ctx, Context, message }) {
+  callback_query: async function({ event, api, ctx, Context, message }) {
     try {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       await api.deleteMessage(
