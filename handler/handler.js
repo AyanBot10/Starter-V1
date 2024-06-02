@@ -99,7 +99,7 @@ bot.on("callback_query", async ctx => {
   const { message, data, from } = ctx;
 
 
-  const message = {
+  const message_function = {
     send: async function(text, options) {
       try {
         if (!text) throw new Error("Must include Body")
@@ -145,7 +145,7 @@ bot.on("callback_query", async ctx => {
         api: bot,
         ctx,
         Context: context,
-        message
+        message: message_function
       });
     }
     const { username, id } = from;
