@@ -1,3 +1,5 @@
+const bot = require("./login.js");
+
 function create_message(msg, command) {
   return {
     send: async function(text, options = {}) {
