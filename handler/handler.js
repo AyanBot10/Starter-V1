@@ -96,8 +96,8 @@ bot.on("text", async msg => {
 const handleEvent = async (ctx, eventType) => {
   const { message, from } = ctx;
   const msg = message;
-  if (global.bot[eventType].has(message.message_id)) {
-    let context = global.bot[eventType].get(message.message_id);
+  if (global.bot?.[eventType].has(message?.message_id)) {
+    let context = global.bot[eventType].get(message?.message_id);
     const cmd = Array.from(global.cmds.values()).find(
       cmd => cmd.config.name === context.cmd
     );
