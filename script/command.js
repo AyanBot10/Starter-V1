@@ -10,7 +10,7 @@ const commandsPath = path.join(__dirname, "commands");
 const files = readdirSync(commandsPath);
 
 for (let file of files) {
-  if (global.config.handler.skip.includes(file)) continue;
+  if (global.config?.handler?.skip.includes(file)) continue;
   if (file.endsWith(".js")) {
     try {
       const command = require(path.join(commandsPath, file));
