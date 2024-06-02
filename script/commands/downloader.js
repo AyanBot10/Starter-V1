@@ -71,8 +71,7 @@ module.exports = {
         const shortUrl = await shorten(format.url);
         form.body += `${format.height || "--"}: ${shortUrl || "--"}\n`;
       }
-
-      message.react([{ type: 'emoji', emoji: "💯" }], event.message_id);
+     message.react([{ type: 'emoji', emoji: "🔥" }], event.message_id, true);
       api.sendChatAction(event.chat.id, 'upload_video');
       api.sendVideo(event.chat.id, chosenFormat.url, { reply_to_message_id: event.message_id, caption: form.body });
     } catch (err) {

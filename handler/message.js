@@ -36,7 +36,7 @@ function create_message(msg, command) {
     Syntax: async function() {
       return await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, { reply_to_message_id: msg.message_id });
     },
-    react: async function(emoji_array, message_id, is_big = true) {
+    react: async function(emoji_array, message_id, is_big = false) {
       // [{ type: 'emoji', emoji: '👍' }];
       emoji_array.forEach(item => {
         if (global.react_emojis.includes(item.emoji)) {
