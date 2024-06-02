@@ -11,7 +11,7 @@ module.exports = {
     if (!args[0]) return message.Syntax()
     exec(args.join(" "), (error, stdout, stderr) => {
       if (error) {
-        message.reply(`<b><font color="red">${error.message}</font></b>`, { parse_mode: "HTML" });
+        message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" });
       } else {
         message.reply(stdout);
       }
