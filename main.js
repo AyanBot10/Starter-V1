@@ -54,3 +54,12 @@ if (process.env["CONNECT_DB"] == 'true') {
 }
 
 log("Started Bot", "cyan", true);
+
+if (config.server.toggle && config.server.port) {
+  log("Starting Express Server", "green")
+  try {
+  const express = require("./server/index.js");
+  } catch (err) {
+    log("Failed to start server", "red", true)
+  }
+}

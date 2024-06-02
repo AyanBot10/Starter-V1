@@ -1,3 +1,7 @@
 {
-  "admins": []
+  "admins": [],
+  "server": {
+    "toggle": false,
+    "port": 3000
+  }
 }
