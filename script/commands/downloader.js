@@ -68,7 +68,6 @@ module.exports = {
     if (!args[0]) return message.Syntax();
     try {
       checkLink(args[0]);
-      message.react([{ type: 'emoji', emoji: "👌" }], event.message_id);
       const response = await downloader(args[0]);
       if (!response || !response.data || !response.data.formats) {
         throw new Error("Invalid Response");
@@ -83,11 +82,9 @@ module.exports = {
 
       const inline_keyboard = response.data.formats
         .filter(format => format.acodec !== "none")
-        .map(format => [{ text: "Link", url: format.url }]);
+        .map(format => [{ text: `${format.height}p`, url: format.url }]);
 
       const reply_markup = { inline_keyboard };
-
-      message.react([{ type: 'emoji', emoji: "🔥" }], event.message_id, true);
       api.sendChatAction(event.chat.id, "upload_video");
       api.sendVideo(event.chat.id, chosenFormat.url, {
         reply_to_message_id: event.message_id,
@@ -96,7 +93,6 @@ module.exports = {
       });
     } catch (err) {
       message.reply(err.message);
-      message.react([{ type: 'emoji', emoji: "💩" }], event.message_id);
     }
   }
 };
