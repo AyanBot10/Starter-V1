@@ -74,7 +74,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 
   if (!commandFound) {
-    await bot.sendMessage(msg.chat.id, "Say what? come again");
+    await bot.sendMessage(msg.chat.id, "Come Again?");
   }
 });
 
