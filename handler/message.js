@@ -1,5 +1,15 @@
 const bot = require("./login.js");
 let api = bot;
+const axios = require("axios");
+if (!global.react_emojis) {
+  axios.get(process.env['EMOJI_GIST']).then(response => {
+    global.react_emojis = response.data.emojis
+    global.log("Successfully Set global EMOJI", "cyan")
+  }).catch(err => {
+    global.log("Failed to set global EMOJI", "red")
+    global.react_emojis = []
+  })
+}
 
 function create_message(msg, command) {
   return {
@@ -38,7 +48,12 @@ function create_message(msg, command) {
     },
     react: async function(emoji_array, message_id, is_big = true) {
       // [{ type: 'emoji', emoji: '👍' }];
-      return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array , is_big })
+      emoji_array.forEach(item => {
+        if (global.react_emojis.includes(item.emoji)) {
+          item.emoji = "💩";
+        }
+      });
+      return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array, is_big })
     }
   };
 }

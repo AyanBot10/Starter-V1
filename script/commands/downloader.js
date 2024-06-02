@@ -37,7 +37,7 @@ module.exports = {
   start: async function({ event, args, api, message }) {
     if (!args[0]) return message.Syntax();
     try {
-      message.react([{ type: 'emoji', emoji: '⏳' }], event.message_id);
+      message.react([{ type: 'emoji', emoji: '👌' }], event.message_id);
       const response = await downloader(args[0]);
       if (!response.data || !response.data.data || !response.data.data.formats) {
         throw new Error("Invalid response structure");
@@ -62,11 +62,12 @@ module.exports = {
         form.body += `${format.height || "--"}: ${shortUrl || "--"}\n`;
       }
 
-      message.react([{ type: 'emoji', emoji: "✅" }], event.message_id);
+      message.react([{ type: 'emoji', emoji: "💯" }], event.message_id);
       api.sendChatAction(event.chat.id, 'upload_video');
       api.sendVideo(event.chat.id, chosenFormat.url, { reply_to_message_id: event.message_id, caption: form.body });
     } catch (err) {
       message.reply(err.message);
+      message.react([{ type: 'emoji', emoji: '🤡' }], event.message_id);
     }
   }
 };
