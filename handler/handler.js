@@ -1,7 +1,7 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 
-const admin = [];
+const admins = [];
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
@@ -75,6 +75,24 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   }
 });
 
+
+bot.on("text", async msg => {
+  const { username, id } = msg.from;
+  const groupId =
+    msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
+    msg.chat.id :
+    null;
+
+  if (process.env["CONNECT_DB"] == "true" && global.update) {
+    await global.update(msg);
+  }
+
+  if (process.env["LOGGER"] != "false") {
+    if (msg?.text?.startsWith("/")) return;
+    logger(username, msg.text.substring(0, 100), id, groupId, "Text");
+  }
+});
+
 const handleEvent = async (ctx, eventType) => {
   const { message, from } = ctx;
   const msg = message;
@@ -117,13 +135,13 @@ const handleEvent = async (ctx, eventType) => {
       }
     }
 
-
     if (cmd && cmd[eventType]) {
       await cmd[eventType]({
         event: message,
         api: bot,
         ctx,
-        Context: context
+        Context: context,
+        message: message_function
       });
     }
 
@@ -138,7 +156,6 @@ const handleEvent = async (ctx, eventType) => {
 };
 
 const events = [
-  "text",
   "message",
   "edited_message",
   "channel_post",
