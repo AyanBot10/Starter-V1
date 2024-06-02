@@ -20,6 +20,7 @@ process.on('unhandledRejection', (reason) => {
 
 require("./script/command.js");
 
+
 let userModel = undefined;
 let DB = undefined;
 let update = undefined;

@@ -1,8 +1,10 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 
-const admins = [];
-
+const admins = global.config?.admins;
+if (admins.length === 0) {
+  global.log("Admin not set, Commands may not function properly", "red", true)
+}
 bot.onText(/\/(\w+)/, async (msg, match) => {
   const command = match[1];
 
