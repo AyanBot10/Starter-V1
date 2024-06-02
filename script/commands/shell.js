@@ -13,7 +13,7 @@ module.exports = {
       if (error) {
         message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" });
       } else {
-        message.reply(`<pre><b>${stdout}</b></pre>`, { parse_mode: "HTML" });
+        message.reply(stdout);
       }
     });
   }

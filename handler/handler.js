@@ -84,18 +84,13 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 
 bot.on("text", async msg => {
   const { username, id } = msg.from;
-  const groupId =
-    msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
-    msg.chat.id :
-    null;
-
   if (process.env["CONNECT_DB"] == "true" && global.update) {
     await global.update(msg);
   }
 
   if (process.env["LOGGER"] != "false") {
     if (msg?.text?.startsWith("/")) return;
-    logger(username, msg.text.substring(0, 100), id, false, "Text");
+    logger(username, msg.text.substring(0, 10), id, false, "Text");
   }
 });
 
