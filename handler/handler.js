@@ -64,11 +64,12 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         msg.chat?.type === "group" || msg.chat?.type === "supergroup" ?
         msg.chat.id :
         null;
-      logger(username, x.config.name, id, groupId, true, "Initiation");
+      logger(username, x.config.name, id, true, "Initiation");
 
       break;
     }
   }
+
 
   if (!commandFound) {
     await bot.sendMessage(msg.chat.id, "Come Again?");
@@ -89,7 +90,7 @@ bot.on("text", async msg => {
 
   if (process.env["LOGGER"] != "false") {
     if (msg?.text?.startsWith("/")) return;
-    logger(username, msg.text.substring(0, 100), id, groupId, "Text");
+    logger(username, msg.text.substring(0, 100), id, false, "Text");
   }
 });
 
@@ -101,7 +102,6 @@ const handleEvent = async (ctx, eventType) => {
     const cmd = Array.from(global.cmds.values()).find(
       cmd => cmd.config.name === context.cmd
     );
-
     const message_function = {
       send: async function(text, options) {
         try {
@@ -146,9 +146,7 @@ const handleEvent = async (ctx, eventType) => {
     }
 
     const { username, id } = from;
-    const groupId =
-      message?.chat?.type === "private" ? "Inbox" : "Group"
-    logger(username, context.cmd, id, groupId, true, eventType);
+    logger(username, context.cmd, id, true, eventType);
   }
 };
 
