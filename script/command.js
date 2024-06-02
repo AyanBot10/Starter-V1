@@ -10,6 +10,7 @@ const files = readdirSync(commandsPath);
 
 try {
   for (let file of files) {
+    if (global.config.handler.skip.includes(file)) continue;
     if (file.endsWith(".js")) {
       const command = require(path.join(commandsPath, file));
       global.cmds.set(file, command);
@@ -22,7 +23,7 @@ try {
 } catch (err) {
   errors++;
   process.stdout.write("\n")
-  global.log(`\nCaught ${errors} error(s) while binding commands`, "blue", true);
+  global.log(`\nCaught ${errors} error(s) while loading commands\n`, "blue", true);
 } finally {
   process.stdout.write("\n")
   global.log(`Commands Loaded: ${loaded}`, "cyan", false);

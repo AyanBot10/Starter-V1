@@ -6,6 +6,7 @@ process.emitWarning = (warning, type) => {
 
 require("./global");
 
+var log = global.log;
 
 log("Starting Bot", "grey", true);
 

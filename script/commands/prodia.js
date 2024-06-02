@@ -273,8 +273,8 @@ module.exports = {
         return api.sendMessage(event.chat.id, "Include a valid prompt");
       const { text, model, rando } = formatPrompt(prompt);
       cook = await api.sendMessage(event.chat.id, "Processing Query");
-      api.sendChatAction(event.chat.id, 'upload_photo')
       const jobID = await generateImage({ text, model });
+      api.sendChatAction(event.chat.id, 'upload_photo')
       const polledImage = await pollImage({ jobID });
       api.deleteMessage(event.chat.id, cook.message_id);
       await api.sendPhoto(event.chat.id, polledImage, {
@@ -316,10 +316,10 @@ module.exports = {
     try {
       await api.deleteMessage(event.chat.id, ctx.message.message_id);
       cook = await api.sendMessage(event.chat.id, "Lemme Cook");
-      api.sendChatAction(event.chat.id, 'upload_photo')
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const { text, model, rando } = formatPrompt(prompt);
       const jobID = await generateImage({ text, model });
+      api.sendChatAction(event.chat.id, 'upload_photo')
       const polledImage = await pollImage({ jobID });
       api.deleteMessage(event.chat.id, cook.message_id);
       await api.sendPhoto(event.chat.id, polledImage, {
@@ -380,12 +380,9 @@ async function generateImage({ text, model }) {
                 model
             )}&negative_prompt=${encodeURIComponent(
                 `verybadimagenegative_v1.3, ng_deepnegative_v1_75t, (ugly face:0.8),cross-eyed,sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, bad anatomy, DeepNegative, facing away, tilted head, {Multiple people}, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worstquality, low quality, normal quality, jpegartifacts, signature, watermark, username, blurry, bad feet, cropped, poorly drawn hands, poorly drawn face, mutation, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, extra fingers, fewer digits, extra limbs, extra arms,extra legs, malformed limbs, fused fingers, too many fingers, long neck,mutated hands, polar lowres, bad body, bad proportions, gross proportions, text, error, missing fingers, missing arms, missing legs, extra digit, extra arms, extra leg, extra foot, zombie, elf ear, animal ears, cat ears, fox ears, dog ears, rabbit ears, atrist name, user name, multipul angle, split view, grid view, multipul shot`
-            )}&steps=100&cfg=7&seed=${Date.now()}&sampler=${encodeURIComponent(
+            )}&steps=25&cfg=7&seed=${Date.now()}&sampler=${encodeURIComponent(
                 "DPM++ 2M Karras"
-            )}&aspect_ratio=${
-                ["square", "portrait", "landscape"][
-                    Math.floor(Math.random() * 3)
-                ]
+            )}
             }`
     );
     return request.data.job;
@@ -403,7 +400,7 @@ async function pollImage({ jobID }) {
       if (response.status == "succeeded") {
         return `https://images.prodia.xyz/${jobID}.png`;
       } else if (response.status == "generating") {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 3500));
       } else {
         throw new Error("Exception Occurred");
       }

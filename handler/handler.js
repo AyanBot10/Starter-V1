@@ -5,44 +5,47 @@ const admins = global.config?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set, Commands may not function properly", "red", true)
 }
-bot.onText(/\/(\w+)/, async (msg, match) => {
-  const command = match[1];
 
-  const message = {
-    send: async function(text, options) {
+function create_message(msg) {
+  return {
+    send: async function(text, options = {}) {
       try {
-        if (!text) throw new Error("Must include Body")
-        if (typeof options !== 'object') options = {}
-        return await bot.sendMessage(msg.chat.id, text, options)
+        if (!text) throw new Error("Must include Body");
+        if (typeof options !== 'object') options = {};
+        return await bot.sendMessage(msg.chat.id, text, options);
       } catch (err) {
-        await bot.sendMessage(msg.chat.id, err.message)
-        return null
+        await bot.sendMessage(msg.chat.id, err.message);
+        return null;
       }
     },
-    reply: async function(text, options) {
+    reply: async function(text, options = {}) {
       try {
-        if (!text) throw new Error("Must include Body")
-        if (typeof options !== 'object') options = {}
-        options['reply_to_message_id'] = msg.message_id
-        return await bot.sendMessage(msg.chat.id, text, options)
+        if (!text) throw new Error("Must include Body");
+        if (typeof options !== 'object') options = {};
+        options['reply_to_message_id'] = msg.message_id;
+        return await bot.sendMessage(msg.chat.id, text, options);
       } catch (err) {
-        await bot.sendMessage(msg.chat.id, err.message)
-        return null
+        await bot.sendMessage(msg.chat.id, err.message);
+        return null;
       }
     },
     unsend: async function(options) {
       try {
-        if (!options.message_id) throw new Error("Include message_id")
-        return await api.deleteMessage(event.chat.id, options.message_id)
+        if (!options.message_id) throw new Error("Include message_id");
+        return await api.deleteMessage(msg.chat.id, options.message_id);
       } catch (err) {
-        await bot.sendMessage(msg.chat.id, err.message)
-        return null
+        await bot.sendMessage(msg.chat.id, err.message);
+        return null;
       }
     },
     Syntax: async function() {
-      return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${command}\` to get the valid usage`)
+      return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${command}\` to get the valid usage`);
     }
-  }
+  };
+}
+
+bot.onText(/\/(\w+)/, async (msg, match) => {
+  const command = match[1];
 
   const args = msg.text.split(" ").slice(1);
   let commandFound = false;
@@ -63,13 +66,14 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         );
       }
       commandFound = true;
+      const message = create_message(msg);
       await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
+
       const { username, id } = msg.from;
       logger(username, x.config.name, id, true, "Initiation");
       break;
     }
   }
-
 
   if (!commandFound) {
     await bot.sendMessage(msg.chat.id, "Come Again?");
@@ -81,7 +85,8 @@ bot.on("message", async msg => {
     const args = msg?.text?.split(" ")
     const { username, id } = msg.from;
     if (typeof x.chat === "function") {
-      await x.chat({ event: msg, args, api: bot });
+      const message = create_message(msg);
+      await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name });
       logger(username, x.config.name, id, true, "Chat");
       break;
     }
@@ -90,48 +95,12 @@ bot.on("message", async msg => {
 
 const handleFunctionalEvent = async (ctx, eventType) => {
   const { message, from } = ctx;
-  const msg = message;
   if (global.bot?.[eventType].has(message?.message_id)) {
     let context = global.bot[eventType].get(message?.message_id);
     const cmd = Array.from(global.cmds.values()).find(
       cmd => cmd.config.name === context.cmd
     );
-    const message_function = {
-      send: async function(text, options) {
-        try {
-          if (!text) throw new Error("Must include Body")
-          if (typeof options !== 'object') options = {}
-          return await bot.sendMessage(msg.chat.id, text, options)
-        } catch (err) {
-          await bot.sendMessage(msg.chat.id, err.message)
-          return null
-        }
-      },
-      reply: async function(text, options) {
-        try {
-          if (!text) throw new Error("Must include Body")
-          if (typeof options !== 'object') options = {}
-          options['reply_to_message_id'] = msg.message_id
-          return await bot.sendMessage(msg.chat.id, text, options)
-        } catch (err) {
-          await bot.sendMessage(msg.chat.id, err.message)
-          return null
-        }
-      },
-      unsend: async function(options) {
-        try {
-          if (!options.message_id) throw new Error("Include message_id")
-          return await api.deleteMessage(event.chat.id, options.message_id)
-        } catch (err) {
-          await bot.sendMessage(msg.chat.id, err.message)
-          return null
-        }
-      },
-      Syntax: async function() {
-        return await bot.sendMessage(msg.chat.id, `Invalid Usage, type \`/help ${context.cmd}\` to get the valid usage`)
-      }
-    }
-
+    const message_function = create_message(ctx);
     if (cmd && cmd[eventType]) {
       await cmd[eventType]({
         event: message,

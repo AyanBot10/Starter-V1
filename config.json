@@ -3,5 +3,8 @@
   "server": {
     "toggle": true,
     "port": 3000
+  },
+  "handler": {
+    "skip": ["prodia.js"]
   }
 }

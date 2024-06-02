@@ -2,16 +2,16 @@ const axios = require("axios");
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
 
-global.cmds = global.cmds || new Map();
-global.utils = global.utils || new Map();
-global.log = global.log || log;
+global.cmds = new Map();
+global.utils = {};
+global.log = log;
 global.config = config;
 global.bot = {};
-global.bot.text = new Map()
+global.bot.text = [];
 global.bot.message = new Map();
-global.bot.edited_message = new Map();
-global.bot.channel_post = new Map();
-global.bot.edited_channel_post = new Map();
+global.bot.edited_message = new Map()
+global.bot.channel_post = [];
+global.bot.edited_channel_post = [];
 global.bot.inline_query = new Map();
 global.bot.chosen_inline_result = new Map();
 global.bot.callback_query = new Map();
@@ -56,5 +56,9 @@ global.utils.getStream = async function(link) {
     return `Response returned status ${err?.status}`;
   }
 };
+
+global.utils.sleep = async function(ms) {
+  return await new Promise(resolve => setTimeout(resolve, ms))
+}
 
 module.exports = null;
