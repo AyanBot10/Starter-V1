@@ -1,4 +1,5 @@
 const bot = require("./login.js");
+let api = bot;
 
 function create_message(msg, command) {
   return {

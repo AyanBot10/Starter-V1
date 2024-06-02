@@ -41,7 +41,7 @@ module.exports = {
   }
 }
 
-async function download(url) {
+async function downloader(url) {
   const link = process.env('DOWNLOADER');
   if (!link) throw new Error("Include the API URI in .env file of the key 'DOWNLOADER'")
   try {
