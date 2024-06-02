@@ -273,6 +273,7 @@ module.exports = {
         return api.sendMessage(event.chat.id, "Include a valid prompt");
       const { text, model, rando } = formatPrompt(prompt);
       cook = await api.sendMessage(event.chat.id, "Processing Query");
+      api.sendChatAction(event.chat.id, 'upload_photo')
       const jobID = await generateImage({ text, model });
       const polledImage = await pollImage({ jobID });
       api.deleteMessage(event.chat.id, cook.message_id);
@@ -315,6 +316,7 @@ module.exports = {
     try {
       await api.deleteMessage(event.chat.id, ctx.message.message_id);
       cook = await api.sendMessage(event.chat.id, "Lemme Cook");
+      api.sendChatAction(event.chat.id, 'upload_photo')
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       const { text, model, rando } = formatPrompt(prompt);
       const jobID = await generateImage({ text, model });

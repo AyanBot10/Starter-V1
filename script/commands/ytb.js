@@ -81,6 +81,7 @@ module.exports = {
       event.chat.id,
       "⏳ Downloading..."
     );
+    api.sendChatAction(event.chat.id, 'upload_video')
     let dir;
     try {
       function checkSize(filePath) {

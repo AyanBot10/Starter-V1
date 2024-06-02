@@ -76,6 +76,7 @@ module.exports = {
     if (query.match(/^(https:\/\/open\.spotify\.com\/track\/|https:\/\/spotify\.link\/)/i)) {
       try {
         const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
+        api.sendChatAction(event.chat.id, 'upload_audio')
         downloadResponse = await downloadSong(query);
         api.deleteMessage(event.chat.id, prmsg.message_id);
         await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {
@@ -87,7 +88,7 @@ module.exports = {
       }
     } else {
       try {
-        api.sendChatAction(event.chat.id, 'typing');
+        api.sendChatAction(event.chat.id, 'upload_document');
         const tracks = await searchTrack(query, 4);
         if (tracks.length === 0) {
           return message.reply("⚠ | No tracks found for the given query.");
@@ -130,7 +131,7 @@ module.exports = {
         });
       } catch (error) {
         console.error(error);
-        message.reply(`Error: ${error.message}`);
+        message.reply(error.message);
       }
     }
   },
@@ -141,13 +142,8 @@ module.exports = {
         event.chat.id,
         Context.initials.second
       );
-      if (Context.initials.first) {
-        await api.deleteMessage(
-          event.chat.id,
-          Context.initials.first
-        );
-      }
       const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
+      api.sendChatAction(event.chat.id, 'upload_audio')
       downloadResponse = await downloadSong(ctx.data);
       await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {
         caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,

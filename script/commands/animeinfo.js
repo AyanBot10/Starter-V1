@@ -16,7 +16,7 @@ module.exports = {
   start: async function({ api, event, args }) {
     if (!args[0]) return await api.sendMessage(event.chat.id, 'Please provide an anime title to search for.\nFormat: /anime <anime name> \nExample: /animeinfo one punch man.')
     try {
-      api.sendChatAction(event.chat.id, 'typing');
+      api.sendChatAction(event.chat.id, 'upload_document');
       const query = `
         query ($title: String) {
           Media (search: $title, type: ANIME) {

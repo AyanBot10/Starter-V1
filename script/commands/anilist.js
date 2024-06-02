@@ -59,6 +59,7 @@ module.exports = {
         }
 
         try {
+          api.sendChatAction(event.chat.id, 'upload_photo')
           const userId = await getUserId(user.anilistUsername);
           const recentActivity = await getUserRecentActivity(userId);
           const stats = await getUserStats(userId);
@@ -103,6 +104,7 @@ module.exports = {
       default: {
         if (!args[0]) return api.sendMessage(event.chat.id, "Include Username")
         try {
+          api.sendChatAction(event.chat.id, 'upload_photo')
           const userId = await getUserId(args[0]);
           const recentActivity = await getUserRecentActivity(userId);
           const metaImageUrl = `https://img.anili.st/user/${userId}`;
