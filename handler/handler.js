@@ -150,6 +150,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
 
 const handleEvents = async (ctx, eventType) => {
   const { username, id } = ctx?.from;
+  if (ctx?.text?.startsWith("/")) return
   logger(username, "EVENT", id, true, eventType);
 }
 
