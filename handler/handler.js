@@ -86,10 +86,6 @@ bot.on("message", async msg => {
       break;
     }
   }
-  if (process.env["LOGGER"] != "false") {
-    if (msg?.text?.startsWith("/")) return;
-    logger(username, msg.text.substring(0, 10), id, false, "Text");
-  }
 })
 
 const handleFunctionalEvent = async (ctx, eventType) => {
@@ -153,8 +149,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
 };
 
 const handleEvents = async (ctx, eventType) => {
-  const { message, from } = ctx;
-  const { username, id } = from;
+  const { username, id } = ctx?.from;
   logger(username, "EVENT", id, true, eventType);
 }
 
@@ -168,6 +163,9 @@ const functionalEvents = [
 ];
 
 const chatEvents = [
+  //"message",
+  // `message` logs every event
+  "text",
   "edited_message",
   "channel_post",
   "edited_channel_post",
