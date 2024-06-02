@@ -33,7 +33,10 @@ module.exports = {
           if (x.config.author) {
             messageContent += `» Author: ${x.config.author}\n`;
           }
-          messageContent += `» Role: ${x.config?.role || 0}\n`;
+          let role_config = x.config?.role || 0;
+          if (role_config === 0) role_config = "0 (everyone)"
+          if (role_config === 1) role_config = "0 (admin)"
+          messageContent += `» Role: ${role_config}\n`;
           if (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase())) {
             messageContent += `» Aliases: ${x.config?.aliases?.join(" ")}\n`;
           }
