@@ -82,7 +82,7 @@ module.exports = {
 
       const inline_keyboard = response.data.formats
         .filter(format => format.acodec !== "none")
-        .map((format, i) => [{ text: `${format?.height !== "null" ? format.height : `CDN ${i + 1}`}`, url: format.url }]);
+        .map((format, i) => [{ text: `${format?.height || `CDN ${i + 1}`}`, url: format.url }]);
 
       const reply_markup = { inline_keyboard };
       api.sendChatAction(event.chat.id, "upload_video");
