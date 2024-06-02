@@ -28,3 +28,5 @@ function startProject() {
 }
 
 startProject();
+
+// Inspired by GoatBot-V2 Repo by NTKhang03
