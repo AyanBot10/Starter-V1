@@ -3,11 +3,10 @@ process.emitWarning = (warning, type) => {
     console.warn(warning);
   }
 };
-const use_global = process.env['GLOBAL_COMMANDS'] === 'true' ? true : false;
-
-// Will fix this later
 
 require("./global");
+const config = require("./config.json");
+global.config = config
 
 log("Starting Bot", "grey", true);
 
@@ -19,12 +18,7 @@ process.on('unhandledRejection', (reason) => {
   log(`Unhandled Rejection:\n${reason.message}`, 'red');
 });
 
-if (use_global) {
-  require("./script/command.js");
-} else {
-  log("change the bool of GLOBAL_COMMANDS to true", "red", true)
-  process.exit(3)
-}
+require("./script/command.js");
 
 let userModel = undefined;
 let DB = undefined;
