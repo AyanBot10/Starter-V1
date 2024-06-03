@@ -261,16 +261,16 @@ module.exports = {
   config: {
     name: "imagine",
     aliases: ["prodia"],
-    usage: "{pn} <prompt>" +
+    usage: "{pn} <prompt.length >= 5>" +
       ` --v ModelID\nAvailable Models:\n\n${modes.join("\n")}`,
     description: "Image Generator from Prodia"
   },
-  start: async function({ event, args, api }) {
+  start: async function({ event, args, api, message, cmd }) {
     const prompt = args.join(" ");
     let cook;
     try {
       if (!prompt || prompt.length <= 5)
-        return api.sendMessage(event.chat.id, "Include a valid prompt");
+        return message.Syntax(cmd);
       const { text, model, rando } = formatPrompt(prompt);
       cook = await api.sendMessage(event.chat.id, "Processing Query");
       const jobID = await generateImage({ text, model });

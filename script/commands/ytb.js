@@ -18,10 +18,10 @@ module.exports = {
     usage: "{pn} <search_query>"
   },
 
-  start: async function({ api, event, args }) {
+  start: async function({ api, event, args, message, cmd }) {
     let query = args.join(" ");
     if (!query)
-      return api.sendMessage(event.chat.id, "Include a search query");
+      return message.Syntax(cmd);
 
     const processingMessage = await api.sendMessage(
       event.chat.id,

@@ -13,8 +13,8 @@ module.exports = {
     usage: "{pn} <anime_name>"
   },
 
-  start: async function({ api, event, args }) {
-    if (!args[0]) return await api.sendMessage(event.chat.id, 'Please provide an anime title to search for.\nFormat: /anime <anime name> \nExample: /animeinfo one punch man.')
+  start: async function({ api, event, args, cmd }) {
+    if (!args[0]) return message.Syntax(cmd)
     try {
       api.sendChatAction(event.chat.id, 'upload_document');
       const query = `

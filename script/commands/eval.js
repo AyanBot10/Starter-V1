@@ -10,9 +10,9 @@ module.exports = {
     role: 1
   },
 
-  start: async function({ api, event, args, message }) {
+  start: async function({ api, event, args, message, cmd }) {
     try {
-      if (!args[0]) return;
+      if (!args[0]) return message.Syntax(cmd);
 
       function output(msg) {
         if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function") {

@@ -16,7 +16,7 @@ module.exports = {
     usage: "{pn} <username>"
   },
 
-  start: async function({ api, event, args }) {
+  start: async function({ api, event, args, message, cmd }) {
     const chatId = event.chat.id;
     switch (args[0]) {
       case 'set': {
@@ -102,7 +102,7 @@ module.exports = {
         return
       }
       default: {
-        if (!args[0]) return api.sendMessage(event.chat.id, "Include Username")
+        if (!args[0]) return message.Syntax(cmd)
         try {
           api.sendChatAction(event.chat.id, 'upload_photo')
           const userId = await getUserId(args[0]);
