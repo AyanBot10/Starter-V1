@@ -13,6 +13,7 @@ module.exports = {
   start: async function({ api, event, args, message }) {
     try {
       if (!args[0]) return;
+
       function output(msg) {
         if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function") {
           msg = msg.toString();
@@ -28,6 +29,7 @@ module.exports = {
         return api.sendMessage(event.chat.id, msg);
       }
       const out = output
+
       function mapToObj(map) {
         const obj = {};
         map.forEach(function(v, k) {
@@ -53,12 +55,10 @@ module.exports = {
         output(err.message || String(err));
       }
     } catch (err) {
-      console.log(err.message || String(err));
-      api.sendMessage(event.chat.id, err.message || String(err));
+      throw err
     }
-
     process.on('unhandledRejection', (reason) => {
-      api.sendMessage(event.chat.id, `Unhandled Rejection: ${reason.message || String(reason)}`);
+      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
     });
   }
 };

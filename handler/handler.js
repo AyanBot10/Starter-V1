@@ -7,8 +7,15 @@ if (admins?.length === 0) {
 }
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
-  const command = match[1];
+  if (msg.from.bot_id) return;
 
+  if (msg.chat.type !== "private" && global.config.chat.level === "private") {
+    if (global.config.chat.message) {
+      bot.sendMessage(msg.chat.id, global.config.chat.message);
+    }
+    return;
+  }
+  const command = match[1];
   const args = msg.text.split(" ").slice(1);
   let commandFound = false;
 
@@ -43,6 +50,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 });
 
 bot.on("message", async msg => {
+  if (msg.from.bot_id) return;
   for (const x of global.cmds.values()) {
     const args = msg?.text?.split(" ")
     const { username, id } = msg.from;

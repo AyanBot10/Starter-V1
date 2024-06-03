@@ -6,5 +6,10 @@
   },
   "handler": {
     "skip": []
+  },
+  "chat": {
+    "level": "private",
+    "message": "",
+    "note": "This bot is primarily made for private inbox use. changing the this.level might break some commands"
   }
 }

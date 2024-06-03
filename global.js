@@ -1,7 +1,14 @@
 const axios = require("axios");
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
+const path = require("path");
+const crypto = require("crypto");
 
+global.module = {}
+global.module.path = path;
+
+global.tmp = new Map()
+global.tmp_path = path.join(__dirname, "tmp");
 global.cmds = new Map();
 global.utils = {};
 global.log = log;
@@ -71,4 +78,8 @@ if (!global.react_emojis) {
   })
 }
 
-module.exports = null;
+global.uuid = async function() {
+  return crypto.randomUUID();
+}
+
+module.exports = null;  
