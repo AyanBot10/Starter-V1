@@ -47,14 +47,14 @@ module.exports = {
         return
       }
       case 'view': {
-        if (!args[0]) return message.Syntax(cmd)
+        if (!args[1]) return message.Syntax(cmd)
         try {
           api.sendChatAction(event.chat.id, 'upload_photo')
-          const userId = await getUserId(args[0]);
+          const userId = await getUserId(args[1]);
           const recentActivity = await getUserRecentActivity(userId);
           const metaImageUrl = `https://img.anili.st/user/${userId}`;
 
-          let message = `❏ Recent activity of \`${args[0]}\`:\n\n`;
+          let message = `❏ Recent activity of \`${args[1]}\`:\n\n`;
           recentActivity.forEach((activity) => {
             if (activity.media) {
               const { romaji, english, native } = activity.media.title;
@@ -94,12 +94,12 @@ module.exports = {
         }
         try {
           api.sendChatAction(event.chat.id, 'typing')
-          const userId = await getUserId(user.anilistUsername);
+          const userId = await getUserId(user.anilist_username);
           const recentActivity = await getUserRecentActivity(userId);
           const stats = await getUserStats(userId);
           const metaImageUrl = `https://img.anili.st/user/${userId}`;
 
-          let message = `❏ Recent activity of \`${user.anilistUsername}\`:\n\n`;
+          let message = `❏ Recent activity of \`${user.anilist_username}\`:\n\n`;
           message += `*Anime Stats:*\n➤ Total Anime: ${stats.anime.count}\n➤ Days Watched: ${Math.round(stats.anime.minutesWatched / 60 / 24)}\n➤ Mean Score: ${stats.anime.meanScore}\n\n`;
           message += `*Manga Stats:*\n➤ Total Manga: ${stats.manga.count}\n➤ Chapters Read: ${stats.manga.chaptersRead}\n➤ Mean Score: ${stats.manga.meanScore}\n\n`;
           message += `*Recent Activities:*\n`;
@@ -120,7 +120,7 @@ module.exports = {
                         [
                   {
                     text: "Profile",
-                    url: `https://anilist.co/user/${user.anilistUsername}`,
+                    url: `https://anilist.co/user/${user.anilist_username}`,
                             },
                         ],
                     ],
