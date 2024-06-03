@@ -79,54 +79,12 @@ module.exports = {
     }
   },
   callback: async function({ event, api, ctx, Context }) {
-    const command = Context.cmd_file;
+    const command = ctx.data;
     await api.answerCallbackQuery({ callback_query_id: ctx.id });
     await api.deleteMessage(
       event.chat.id,
       Context.message_id
     );
-    for (const x of global.cmds.values()) {
-      if (
-        x.config.name?.toLowerCase() === command?.toLowerCase() ||
-        (x.config.aliases &&
-          x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase()))
-      ) {
-        let messageContent = "─── NAME ────⭓\n\n";
-        messageContent += `» ${x.config?.name}\n`;
-
-        messageContent += "─── INFO ────⭓\n\n";
-        const { description } = x.config;
-        const descText =
-          description?.short ||
-          description?.long ||
-          (typeof description === "string" ? description : "N/A");
-        messageContent += `» Description: ${descText}\n`;
-        if (x.config.author) {
-          messageContent += `» Author: ${x.config.author}\n`;
-        }
-        let role_config = x.config?.role || 0;
-        if (role_config === 0) role_config = "0 (everyone)"
-        if (role_config === 1) role_config = "0 (admin)"
-        messageContent += `» Role: ${role_config}\n`;
-        if (x.config.aliases && x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase())) {
-          messageContent += `» Aliases: ${x.config?.aliases?.join(" ")}\n`;
-        }
-
-        function regexStr(str, name) {
-          const regex = /{pn}/g;
-          return regex.test(str) ? str.replace(regex, `/${name}`) : str;
-        }
-
-        if (x.config.usage) {
-          messageContent += "─── USAGE ────⭓\n\n";
-          messageContent += `» ${regexStr(x.config?.usage || "N/A", x.config.name)}\n`;
-        }
-
-        messageContent += "───────⭔";
-
-        await api.sendMessage(event.chat.id, messageContent);
-        break;
-      }
-    }
+    return await this.start({ api, event, args: [command] })
   }
 };

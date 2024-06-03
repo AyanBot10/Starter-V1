@@ -143,6 +143,7 @@ module.exports = {
         Context.initials.second
       );
       const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
+      await global.utils.sleep(3500);
       api.sendChatAction(event.chat.id, 'upload_audio')
       downloadResponse = await downloadSong(ctx.data);
       await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {

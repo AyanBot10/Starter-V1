@@ -67,23 +67,25 @@ const handleFunctionalEvent = async (ctx, eventType) => {
   const { message, from } = ctx;
   if (global.bot?.[eventType].has(message?.message_id)) {
     let context = global.bot[eventType].get(message?.message_id);
-    const cmd = Array.from(global.cmds.values()).find(
-      cmd => cmd.config.name === context.cmd
-    );
-    const message_function = create_message(ctx, cmd.config.name);
-    if (cmd && cmd[eventType]) {
-      await cmd[eventType]({
-        event: message,
-        api: bot,
-        ctx,
-        Context: context,
-        message: message_function,
-        cmd: context?.cmd || cmd?.config?.name || null
-      });
-    }
+    for (const cmd of global.cmds.values()) {
+      if (
+        cmd?.config.name?.toLowerCase() === context.cmd) {
+        const message_function = create_message(ctx, cmd.config.name);
+        if (cmd && cmd[eventType]) {
+          await cmd[eventType]({
+            event: message,
+            api: bot,
+            ctx,
+            Context: context,
+            message: message_function,
+            cmd: context?.cmd || cmd?.config?.name || null
+          });
+        }
 
-    const { username, id } = from;
-    logger(username, context.cmd, id, true, eventType);
+        const { username, id } = from;
+        logger(username, context.cmd, id, true, eventType);
+      }
+    }
   }
 };
 
