@@ -81,7 +81,6 @@ const handleFunctionalEvent = async (ctx, eventType) => {
             cmd: context?.cmd || cmd?.config?.name || null
           });
         }
-
         const { username, id } = from;
         logger(username, context.cmd, id, true, eventType);
       }

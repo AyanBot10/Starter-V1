@@ -78,7 +78,7 @@ module.exports = {
       });
     }
   },
-  callback: async function({ event, api, ctx, Context }) {
+  callback_query: async function({ event, api, ctx, Context }) {
     const command = ctx.data;
     await api.answerCallbackQuery({ callback_query_id: ctx.id });
     await api.deleteMessage(

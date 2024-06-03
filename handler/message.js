@@ -44,13 +44,14 @@ function create_message(msg, command) {
           inline_keyboard: [[button]]
         }
       };
-      const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, {
+      const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage`, {
         reply_to_message_id: msg.message_id,
         ...options
       });
       return global.bot.callback_query.set(helpButton.message_id, {
         event: msg,
         ctx: helpButton,
+        cmd: "help",
         message_id: helpButton.message_id,
         cmd_file: cmd.toLowerCase()
       })
