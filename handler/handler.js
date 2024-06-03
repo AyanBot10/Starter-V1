@@ -54,18 +54,30 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 });
 
 bot.on("message", async msg => {
-  if (msg.from.bot_id) return;
+  let event = msg;
+  let api = bot;
   try {
-  for (const x of global.cmds.values()) {
-    const args = msg?.text?.split(" ")
-    const { username, id } = msg.from;
-    if (typeof x.chat === "function") {
-      const message = create_message(msg, x.config.name);
-      await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name });
-      logger(username, x.config.name, id, true, "Chat");
-      break;
+    if (global.config["use_sqlite_on_chat"]) {
+      const check = await global.sqlite.exists(event.from.id);
+      if (!check) {
+        await global.sqlite.create(event.from.id)
+        await global.sqlite.update.force(event.from.id, {
+          ...event.from
+        })
+      }
     }
-  }
+
+    for (const x of global.cmds.values()) {
+      const args = msg?.text?.split(" ")
+      const { username, id } = msg.from;
+      if (typeof x.chat === "function") {
+        const message = create_message(msg, x.config.name);
+        if (msg.from.bot_id) break;
+        await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name });
+        logger(username, x.config.name, id, true, "Chat");
+        break;
+      }
+    }
   } catch (err) {
     throw err
   }
@@ -73,29 +85,29 @@ bot.on("message", async msg => {
 
 const handleFunctionalEvent = async (ctx, eventType) => {
   try {
-  const { message, from } = ctx;
-  if (global.bot?.[eventType].has(message?.message_id)) {
-    let context = global.bot[eventType].get(message?.message_id);
-    for (const cmd of global.cmds.values()) {
-      if (
-        cmd?.config.name?.toLowerCase() === context.cmd) {
-        const message_function = create_message(ctx, cmd.config.name);
-        if (cmd && cmd[eventType]) {
-          await cmd[eventType]({
-            event: message,
-            api: bot,
-            ctx,
-            Context: context,
-            message: message_function,
-            cmd: context?.cmd || cmd?.config?.name || null
-          });
+    const { message, from } = ctx;
+    if (global.bot?.[eventType].has(message?.message_id)) {
+      let context = global.bot[eventType].get(message?.message_id);
+      for (const cmd of global.cmds.values()) {
+        if (
+          cmd?.config.name?.toLowerCase() === context.cmd) {
+          const message_function = create_message(ctx, cmd.config.name);
+          if (cmd && cmd[eventType]) {
+            await cmd[eventType]({
+              event: message,
+              api: bot,
+              ctx,
+              Context: context,
+              message: message_function,
+              cmd: context?.cmd || cmd?.config?.name || null
+            });
+          }
+          const { username, id } = from;
+          logger(username, context.cmd, id, true, eventType);
         }
-        const { username, id } = from;
-        logger(username, context.cmd, id, true, eventType);
       }
     }
-  }
-  } catch (err) {throw err}
+  } catch (err) { throw err }
 };
 
 const handleEvents = async (ctx, eventType) => {
@@ -149,7 +161,7 @@ const chatEvents = [
 
 functionalEvents.forEach(eventType => {
   try {
-  bot.on(eventType, async (ctx) => handleFunctionalEvent(ctx, eventType));
+    bot.on(eventType, async (ctx) => handleFunctionalEvent(ctx, eventType));
   } catch (err) {
     throw err
   }
@@ -157,7 +169,7 @@ functionalEvents.forEach(eventType => {
 
 chatEvents.forEach(eventType => {
   try {
-  bot.on(eventType, async (ctx) => handleEvents(ctx, eventType));
+    bot.on(eventType, async (ctx) => handleEvents(ctx, eventType));
   } catch (err) {
     throw err
   }

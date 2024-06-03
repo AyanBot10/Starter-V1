@@ -5,6 +5,7 @@ process.emitWarning = (warning, type) => {
 };
 
 require("./global");
+const run_sqlite = require("./Database/SQLite/global.js")
 
 var log = global.log;
 
@@ -33,9 +34,7 @@ if (process.env["CONNECT_DB"] == 'true') {
 }
 
 if (process.env['CONNECT_SQLITE'] == 'true') {
-  const { update, retrieve } = require("./Database/SQLite/manager.js")
-  global.sqlite.update = update;
-  global.sqlite.retrieve = retrieve;
+  run_sqlite();
 }
 
 require("./handler/handler.js");
