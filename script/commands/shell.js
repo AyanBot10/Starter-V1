@@ -14,8 +14,7 @@ module.exports = {
     usage: "{pn} <code>"
   },
   start: async function({ message, args, event, api }) {
-    if (!args[0]) return message.Syntax();
-
+    if (!args[0]) return message.Syntax(this.config.name);
     exec(args.join(" "), async (error, stdout, stderr) => {
       if (error) {
         message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" });

@@ -64,8 +64,8 @@ module.exports = {
     usage: "{pn} <post_link>",
     author: "Tanvir"
   },
-  start: async function({ event, args, api, message }) {
-    if (!args[0]) return message.Syntax();
+  start: async function({ event, args, api, message, cmd }) {
+    if (!args[0]) return message.Syntax(cmd);
     try {
       checkLink(args[0]);
       const response = await downloader(args[0]);
