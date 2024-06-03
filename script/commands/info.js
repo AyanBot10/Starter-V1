@@ -4,16 +4,16 @@ module.exports = {
     usage: "{pn}",
     description: "Get your info like user_id and all"
   },
-  start: function({ event, message }) {
+  start: async function({ event, message, usersData }) {
     const { from: { id, is_bot, first_name, username, language_code }, chat } = event;
-    const db = global.sqlite.retrieve(id);
+    const db = await usersData.exists(id);
     const text = `Sender Information
 - ID: ${id}
 - Is Bot: ${is_bot}
 - First Name: ${first_name}
 - Username: ${username}
 - Language Code: ${language_code}
-- In DB: ${db === 200 ? "Yes" : "No"}
+- In DB: ${db ? "Yes" : "No"}
 
 Chat Information
 - ID: ${chat.id}

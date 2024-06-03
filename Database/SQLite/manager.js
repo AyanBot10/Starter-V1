@@ -83,27 +83,39 @@ function exists(userId) {
   });
 }
 
-function createOrUpdateUser(userId, newData) {
-  return getUserData(userId).then(existingData => {
-    if (existingData === 404) {
-      return 404;
-    }
-    const updatedData = { ...existingData, ...newData };
-    return upsertUserData(userId, updatedData);
-  });
+async function createOrUpdateUser(userId, newData) {
+  const existingData = await getUserData(userId);
+  if (existingData === 404) {
+    return 404;
+  }
+  const updatedData = { ...existingData, ...newData };
+  return upsertUserData(userId, updatedData);
 }
 
-createOrUpdateUser.force = function(userId, newData) {
+createOrUpdateUser.force = async function(userId, newData) {
   return upsertUserData(userId, newData);
 };
 
-createOrUpdateUser.reset = function(userId) {
+createOrUpdateUser.empty = async function(userId) {
   return upsertUserData(userId, {});
 };
 
-createOrUpdateUser.refresh = function(userId, event) {
+createOrUpdateUser.refresh = async function(userId, event) {
   return upsertUserData(userId, { ...event.from });
 };
+
+async function removeKey(userId, keys) {
+  try {
+    const existingData = await getUserData(userId);
+    if (existingData === 404) {
+      return 404;
+    }
+    keys.forEach(key => delete existingData[key]);
+    return upsertUserData(userId, existingData);
+  } catch (error) {
+    throw new Error('Failed to remove keys: ' + error.message);
+  }
+}
 
 module.exports = {
   update: createOrUpdateUser,
@@ -113,5 +125,6 @@ module.exports = {
   deleteAll: deleteAllUsers,
   exists,
   create: createOrUpdateUser.reset,
-  refresh: createOrUpdateUser.refresh
+  refresh: createOrUpdateUser.refresh,
+  removeKey
 };

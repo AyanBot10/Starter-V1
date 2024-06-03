@@ -10,7 +10,7 @@ module.exports = {
     role: 1
   },
 
-  start: async function({ api, event, args, message, cmd }) {
+  start: async function({ api, event, args, message, cmd, usersData }) {
     try {
       if (!args[0]) return message.Syntax(cmd);
 

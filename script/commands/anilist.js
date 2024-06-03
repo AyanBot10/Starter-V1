@@ -1,7 +1,4 @@
 const axios = require("axios");
-//const User = require("../../Database/user.js");
-let User = undefined;
-
 const ANILIST_API_URL = "https://graphql.anilist.co";
 
 module.exports = {
@@ -16,14 +13,14 @@ module.exports = {
     usage: "{pn} <username>"
   },
 
-  start: async function({ api, event, args, message, cmd }) {
+  start: async function({ api, event, args, message, cmd, usersData }) {
     const chatId = event.chat.id;
     switch (args[0]) {
       case 'set': {
         return api.sendMessage(event.chat.id, "Unfinished")
         try {
           if (!args[1]) return api.sendMessage(event.chat.id, "Include Username")
-          await User.findOneAndUpdate({ userId: event.from.id }, { anilistUsername: args[1] }, { upsert: true, new: true }, );
+          await usersData.update(event.from.id, { anilist_username: args[1] });
           api.sendMessage(event.chat.id, "Username has been saved.");
         } catch (error) {
           console.error("Error saving username:", error);
@@ -37,7 +34,7 @@ module.exports = {
       case 'del': {
         return api.sendMessage(event.chat.id, "Unfinished")
         try {
-          await User.findOneAndUpdate({ userId: event.from.id }, { $unset: { anilistUsername: "" } }, );
+          await usersData.removeKey(event.from.id, ["anilist_username"])
           api.sendMessage(
             chatId,
             "Your AniList username has been deleted from Database",
@@ -52,14 +49,53 @@ module.exports = {
         return
       }
       case 'view': {
-        return api.sendMessage(event.chat.id, "Unfinished")
-        const user = await User.findOne({ userId: event.from.id });
-        if (!user || !user.anilistUsername) {
-          return await api.sendMessage(event.chat.id, "Couldn't Find your anilist userID, Please set your ID with `/anilist set`")
-        }
-
+        if (!args[0]) return message.Syntax(cmd)
         try {
           api.sendChatAction(event.chat.id, 'upload_photo')
+          const userId = await getUserId(args[0]);
+          const recentActivity = await getUserRecentActivity(userId);
+          const metaImageUrl = `https://img.anili.st/user/${userId}`;
+
+          let message = `❏ Recent activity of \`${args[0]}\`:\n\n`;
+          recentActivity.forEach((activity) => {
+            if (activity.media) {
+              const { romaji, english, native } = activity.media.title;
+              const mediaTitle = english || romaji || native;
+              message += `➤ ${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)} ${activity.progress ? `${activity.progress}` : ""}: \`${mediaTitle}\`\n`;
+            }
+          });
+
+          const response = await axios.get(metaImageUrl, { responseType: 'stream' });
+          api.sendPhoto(chatId, response.data, {
+            caption: message,
+            parse_mode: "Markdown",
+            reply_markup: {
+              inline_keyboard: [
+                        [
+                  {
+                    text: "Profile",
+                    url: `https://anilist.co/user/${args[1]}`,
+                            },
+                        ],
+                    ],
+            },
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          api.sendMessage(
+            chatId,
+            "Error fetching user data. Make sure the username is correct and the privacy is set to public.",
+          );
+        }
+        return;
+      }
+      default: {
+        const user = await usersData.retrieve(event.from.id);
+        if (user !== 200 || !user.anilist_username) {
+          return await api.sendMessage(event.chat.id, "Couldn't Find your anilist userID, Please set your ID with `/anilist set`")
+        }
+        try {
+          api.sendChatAction(event.chat.id, 'typing')
           const userId = await getUserId(user.anilistUsername);
           const recentActivity = await getUserRecentActivity(userId);
           const stats = await getUserStats(userId);
@@ -100,47 +136,6 @@ module.exports = {
           );
         }
         return
-      }
-      default: {
-        if (!args[0]) return message.Syntax(cmd)
-        try {
-          api.sendChatAction(event.chat.id, 'upload_photo')
-          const userId = await getUserId(args[0]);
-          const recentActivity = await getUserRecentActivity(userId);
-          const metaImageUrl = `https://img.anili.st/user/${userId}`;
-
-          let message = `❏ Recent activity of \`${args[0]}\`:\n\n`;
-          recentActivity.forEach((activity) => {
-            if (activity.media) {
-              const { romaji, english, native } = activity.media.title;
-              const mediaTitle = english || romaji || native;
-              message += `➤ ${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)} ${activity.progress ? `${activity.progress}` : ""}: \`${mediaTitle}\`\n`;
-            }
-          });
-
-          const response = await axios.get(metaImageUrl, { responseType: 'stream' });
-          api.sendPhoto(chatId, response.data, {
-            caption: message,
-            parse_mode: "Markdown",
-            reply_markup: {
-              inline_keyboard: [
-                        [
-                  {
-                    text: "Profile",
-                    url: `https://anilist.co/user/${args[1]}`,
-                            },
-                        ],
-                    ],
-            },
-          });
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          api.sendMessage(
-            chatId,
-            "Error fetching user data. Make sure the username is correct and the privacy is set to public.",
-          );
-        }
-        return;
       }
     }
   }

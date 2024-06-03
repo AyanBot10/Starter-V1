@@ -9,10 +9,21 @@ if (admins?.length === 0) {
 bot.onText(/\/(\w+)/, async (msg, match) => {
   try {
     if (msg.from.bot_id) return;
-      if (global.config?.level.some(msg.chat.type)) return
+    if (global.config?.level?.some(msg.chat.type)) return
+
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
+    let check = global.users.has(msg.from.id);
+    if (!check) {
+      check = await global.sqlite.exists(msg.from.id);
+    }
+    if (!check) {
+      await global.sqlite.create(msg.from.id)
+      await global.sqlite.update.force(msg.from.id, {
+        ...msg.from
+      })
+    }
 
     for (const x of global.cmds.values()) {
       if (
