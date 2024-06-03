@@ -94,5 +94,8 @@ module.exports = {
     } catch (err) {
       message.reply(err.message);
     }
+    process.on('unhandledRejection', (reason) => {
+      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
+    });
   }
 };

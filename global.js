@@ -77,6 +77,9 @@ if (!global.react_emojis) {
   })
 }
 
+global.mongo = {};
+global.sqlite = {};
+
 global.uuid = async function() {
   return crypto.randomUUID();
 }

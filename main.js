@@ -29,7 +29,13 @@ if (process.env["CONNECT_DB"] == 'true') {
   userModel = require("./Database/user.js");
   DB = require("./Database/DB.js");
   update = require("./Database/updateDB.js");
-  global.update = update;
+  global.mongo.update = update;
+}
+
+if (process.env['CONNECT_SQLITE'] == 'true') {
+  const { update, retrieve } = require("./Database/SQLite/manager.js")
+  global.sqlite.update = update;
+  global.sqlite.retrieve = retrive;
 }
 
 require("./handler/handler.js");

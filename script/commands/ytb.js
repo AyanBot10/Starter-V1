@@ -22,6 +22,57 @@ module.exports = {
     let query = args.join(" ");
     if (!query)
       return message.Syntax(cmd);
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(\S*)?$/;
+    if (youtubeRegex.test(args[0])) {
+      const processingMessage = await api.sendMessage(
+        event.chat.id,
+        "⏳ Downloading..."
+      );
+      let dir;
+      try {
+        function checkSize(filePath) {
+          if (fs.statSync(filePath).size > 49.5 * 1024 * 1024) {
+            throw new Error('Media Size exceeds 50MB size limit');
+          }
+        }
+        const link = args[0]
+
+        function checkTime(duration_ms) {
+          const ms10M = 10 * 60 * 1000
+          return duration_ms > ms10M;
+        }
+        const valueTime = checkTime(Number(ms))
+        if (valueTime) {
+          return await message.reply("Video is over 10 Mins")
+        }
+        dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
+        api.sendChatAction(event.chat.id, 'upload_video')
+        await downloadVID(link, dir)
+        checkSize(dir)
+        const stream = fs.createReadStream(dir);
+        await api.sendVideo(event.chat.id, stream);
+        if (fs.existsSync(dir)) {
+          fs.unlinkSync(dir);
+        }
+      } catch (err) {
+        console.error(err);
+        await api.sendMessage(event.chat.id, err.message);
+        if (fs.existsSync(dir)) {
+          fs.unlinkSync(dir);
+        }
+      } finally {
+        if (fs.existsSync(dir)) {
+          fs.unlinkSync(dir);
+        }
+        if (processingMessage.message_id) {
+          await api.deleteMessage(
+            event.chat.id,
+            processingMessage.message_id
+          );
+        }
+      }
+      return
+    }
 
     const processingMessage = await api.sendMessage(
       event.chat.id,
@@ -74,6 +125,9 @@ module.exports = {
       );
       await api.sendMessage(event.chat.id, "Exception Occurred");
     }
+        process.on('unhandledRejection', (reason) => {
+      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
+    });
   },
 
   callback_query: async function({ api, event, ctx, message }) {
@@ -81,7 +135,6 @@ module.exports = {
       event.chat.id,
       "⏳ Downloading..."
     );
-    api.sendChatAction(event.chat.id, 'upload_video')
     let dir;
     try {
       function checkSize(filePath) {
@@ -106,6 +159,7 @@ module.exports = {
         return await message.reply("Video is over 10 Mins")
       }
       dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
+      api.sendChatAction(event.chat.id, 'upload_video')
       await downloadVID(link, dir)
       checkSize(dir)
       const stream = fs.createReadStream(dir);
@@ -130,6 +184,9 @@ module.exports = {
         );
       }
     }
+        process.on('unhandledRejection', (reason) => {
+      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
+    });
   }
 };
 

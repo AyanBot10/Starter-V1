@@ -6,12 +6,14 @@ module.exports = {
   },
   start: function({ event, message }) {
     const { from: { id, is_bot, first_name, username, language_code }, chat } = event;
+    const db = global.sqlite.retrive(id);
     const text = `Sender Information
 - ID: ${id}
 - Is Bot: ${is_bot}
 - First Name: ${first_name}
 - Username: ${username}
 - Language Code: ${language_code}
+- In DB: ${db === 200 ? "Yes" : "No"}
 
 Chat Information
 - ID: ${chat.id}

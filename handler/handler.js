@@ -7,50 +7,55 @@ if (admins?.length === 0) {
 }
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
-  if (msg.from.bot_id) return;
+  try {
+    if (msg.from.bot_id) return;
 
-  if (msg.chat.type !== "private" && global.config.chat.level === "private") {
-    if (global.config.chat.message) {
-      bot.sendMessage(msg.chat.id, global.config.chat.message);
-    }
-    return;
-  }
-  const command = match[1];
-  const args = msg.text.split(" ").slice(1);
-  let commandFound = false;
-
-  for (const x of global.cmds.values()) {
-    if (
-      x.config.name?.toLowerCase() === command?.toLowerCase() ||
-      (x.config?.aliases &&
-        x.config?.aliases.some(
-          alias => alias.toLowerCase() === command.toLowerCase()
-        ))
-    ) {
-
-      if ((x.config?.role && x.config?.role > 0) && !admins.includes(String(msg.from.id))) {
-        return await bot.sendMessage(
-          msg.chat.id,
-          "You don't have perms to use this command"
-        );
+    if (msg.chat.type !== "private" && global.config.chat.level === "private") {
+      if (global.config.chat.message) {
+        bot.sendMessage(msg.chat.id, global.config.chat.message);
       }
-      commandFound = true;
-      const message = create_message(msg, x.config.name);
-      await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
-
-      const { username, id } = msg.from;
-      logger(username, x.config.name, id, true, "Initiation");
-      break;
+      return;
     }
-  }
+    const command = match[1];
+    const args = msg.text.split(" ").slice(1);
+    let commandFound = false;
 
-  if (!commandFound) {
-    await bot.sendMessage(msg.chat.id, "Come Again?");
+    for (const x of global.cmds.values()) {
+      if (
+        x.config.name?.toLowerCase() === command?.toLowerCase() ||
+        (x.config?.aliases &&
+          x.config?.aliases.some(
+            alias => alias.toLowerCase() === command.toLowerCase()
+          ))
+      ) {
+
+        if ((x.config?.role && x.config?.role > 0) && !admins.includes(String(msg.from.id))) {
+          return await bot.sendMessage(
+            msg.chat.id,
+            "You don't have perms to use this command"
+          );
+        }
+        commandFound = true;
+        const message = create_message(msg, x.config.name);
+        await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
+
+        const { username, id } = msg.from;
+        logger(username, x.config.name, id, true, "Initiation");
+        break;
+      }
+    }
+
+    if (!commandFound) {
+      await bot.sendMessage(msg.chat.id, "Come Again?");
+    }
+  } catch (err) {
+    throw err
   }
 });
 
 bot.on("message", async msg => {
   if (msg.from.bot_id) return;
+  try {
   for (const x of global.cmds.values()) {
     const args = msg?.text?.split(" ")
     const { username, id } = msg.from;
@@ -61,9 +66,13 @@ bot.on("message", async msg => {
       break;
     }
   }
+  } catch (err) {
+    throw err
+  }
 })
 
 const handleFunctionalEvent = async (ctx, eventType) => {
+  try {
   const { message, from } = ctx;
   if (global.bot?.[eventType].has(message?.message_id)) {
     let context = global.bot[eventType].get(message?.message_id);
@@ -86,6 +95,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
       }
     }
   }
+  } catch (err) {throw err}
 };
 
 const handleEvents = async (ctx, eventType) => {
@@ -138,11 +148,19 @@ const chatEvents = [
 ];
 
 functionalEvents.forEach(eventType => {
+  try {
   bot.on(eventType, async (ctx) => handleFunctionalEvent(ctx, eventType));
+  } catch (err) {
+    throw err
+  }
 });
 
 chatEvents.forEach(eventType => {
+  try {
   bot.on(eventType, async (ctx) => handleEvents(ctx, eventType));
+  } catch (err) {
+    throw err
+  }
 });
 
 module.exports = bot;
