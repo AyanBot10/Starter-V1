@@ -17,11 +17,13 @@
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "form-data": "^4.0.0",
     "fs-extra": "^11.2.0",
     "kleur": "^4.1.5",
     "mongodb": "^6.7.0",
     "mongoose": "^8.4.0",
     "node-telegram-bot-api": "^0.66.0",
+    "sqlite3": "^5.1.7",
     "ytsr": "^3.8.4"
   }
 }

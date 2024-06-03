@@ -37,7 +37,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         }
         commandFound = true;
         const message = create_message(msg, x.config.name);
-        await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name });
+        await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
 
         const { username, id } = msg.from;
         logger(username, x.config.name, id, true, "Initiation");
@@ -73,7 +73,7 @@ bot.on("message", async msg => {
       if (typeof x.chat === "function") {
         const message = create_message(msg, x.config.name);
         if (msg.from.bot_id) break;
-        await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name });
+        await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
         logger(username, x.config.name, id, true, "Chat");
         break;
       }
@@ -99,7 +99,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               ctx,
               Context: context,
               message: message_function,
-              cmd: context?.cmd || cmd?.config?.name || null
+              cmd: context?.cmd || cmd?.config?.name || null,
+              usersData: global.sqlite
             });
           }
           const { username, id } = from;

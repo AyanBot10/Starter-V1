@@ -33,6 +33,7 @@ function create_message(msg, command) {
         return null;
       }
     },
+    delete: this.unsend,
     handleText: async function(text = null, msg) {
       let cmd = text || "help";
       const button = {
@@ -59,10 +60,13 @@ function create_message(msg, command) {
     Syntax: async function(text = null) {
       this.handleText(text, msg)
     },
-    react: async function(emoji, message_id, is_big = false) {
+    react: async function(emoji="🤡", message_id, is_big = false) {
       let to_react = [{ type: 'emoji', emoji }]
       if (global.react_emojis.some(emoji)) to_react.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
       return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big })
+    },
+    indicator: async function(text="typing") {
+      return await api.sendChatAction(msg.chat.id, text)
     }
   };
 }
