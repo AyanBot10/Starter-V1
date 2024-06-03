@@ -89,7 +89,7 @@ module.exports = {
       }
       default: {
         const user = await usersData.retrieve(event.from.id);
-        if (user !== 200 || !user.anilist_username) {
+        if (!user.anilist_username) {
           return await api.sendMessage(event.chat.id, "Couldn't Find your anilist userID, Please set your ID with `/anilist set`")
         }
         try {
