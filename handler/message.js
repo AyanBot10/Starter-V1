@@ -33,7 +33,8 @@ function create_message(msg, command) {
         return null;
       }
     },
-    Syntax: async function(cmd = null) {
+    Syntax: async function(text = null) {
+      let cmd = text;
       if (cmd) {
         const button = {
           text: cmd?.toUpperCase(),
