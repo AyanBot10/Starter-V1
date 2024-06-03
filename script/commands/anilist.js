@@ -17,7 +17,6 @@ module.exports = {
     const chatId = event.chat.id;
     switch (args[0]) {
       case 'set': {
-        return api.sendMessage(event.chat.id, "Unfinished")
         try {
           if (!args[1]) return api.sendMessage(event.chat.id, "Include Username")
           await usersData.update(event.from.id, { anilist_username: args[1] });
@@ -32,7 +31,6 @@ module.exports = {
         return;
       }
       case 'del': {
-        return api.sendMessage(event.chat.id, "Unfinished")
         try {
           await usersData.removeKey(event.from.id, ["anilist_username"])
           api.sendMessage(
