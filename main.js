@@ -35,7 +35,7 @@ if (process.env["CONNECT_DB"] == 'true') {
 if (process.env['CONNECT_SQLITE'] == 'true') {
   const { update, retrieve } = require("./Database/SQLite/manager.js")
   global.sqlite.update = update;
-  global.sqlite.retrieve = retrive;
+  global.sqlite.retrieve = retrieve;
 }
 
 require("./handler/handler.js");

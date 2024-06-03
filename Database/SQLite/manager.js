@@ -1,43 +1,41 @@
 const db = require('./index');
 
-function upsertUserData(userId, data) {
+function upsertUserData(userId, data, callback) {
   const jsonData = JSON.stringify(data);
   db.run(
     `INSERT INTO users (id, data) VALUES (?, ?)
-         ON CONFLICT(id) DO UPDATE SET data=excluded.data`,
-        [userId, jsonData],
+     ON CONFLICT(id) DO UPDATE SET data = excluded.data`,
+    [userId, jsonData],
     function(err) {
       if (err) {
-        return console.log(err.message);
+        return callback(err);
       }
-      return 200
+      callback(null);
     }
   );
 }
 
-function createOrUpdateUser(userId, newData) {
-  try {
-    getUserData(userId, (existingData) => {
-      if (existingData) {
-        const updatedData = { ...existingData, ...newData };
-        upsertUserData(userId, updatedData);
-      } else {
-        return 404
-      }
-    });
-  } catch (err) {
-    throw err
-  }
+function createOrUpdateUser(userId, newData, callback) {
+  getUserData(userId, (err, existingData) => {
+    if (err) {
+      return callback(err);
+    }
+    if (existingData === 404) {
+      return callback(null, 404);
+    }
+    const updatedData = { ...existingData, ...newData };
+    upsertUserData(userId, updatedData, callback);
+  });
 }
 
-createOrUpdateUser.force = function(userId, newData) {
-  upsertUserData(userId, newData);
+createOrUpdateUser.force = function(userId, newData, callback) {
+  upsertUserData(userId, newData, callback);
 };
 
 function getUserData(userId, callback) {
   db.get(`SELECT data FROM users WHERE id = ?`, [userId], (err, row) => {
     if (err) {
-      return callback(new Error('Database error'), null);
+      return callback(new Error('Database error'));
     }
     if (!row) {
       return callback(null, 404);
@@ -48,5 +46,5 @@ function getUserData(userId, callback) {
 
 module.exports = {
   update: createOrUpdateUser,
-  retrive: getUserData
+  retrieve: getUserData
 };
