@@ -24,37 +24,39 @@ function create_message(msg, command) {
         return null;
       }
     },
-    unsend: async function(options) {
+    unsend: async function(text) {
       try {
-        if (!options.message_id) throw new Error("Include message_id");
-        return await api.deleteMessage(msg.chat.id, options.message_id);
+        if (!text) throw new Error("Include message_id");
+        return await api.deleteMessage(msg.chat.id, text);
       } catch (err) {
         await bot.sendMessage(msg.chat.id, err.message);
         return null;
       }
     },
-    Syntax: async function(text = null) {
-      let cmd = text;
-      if (cmd) {
-        const button = {
-          text: cmd?.toUpperCase(),
-          callback_data: cmd.toLowerCase()
-        };
-        options = {
-          reply_markup: {
-            inline_keyboard: [[button]]
-          }
+    handleText: async function(text = null, msg) {
+      let cmd = text || "help";
+      const button = {
+        text: cmd.toUpperCase(),
+        callback_data: cmd.toLowerCase()
+      };
+      const options = {
+        reply_markup: {
+          inline_keyboard: [[button]]
         }
-        const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, { reply_to_message_id: msg.message_id, options });
-        return global.bot.callback_query.set(helpButton.message_id, {
-          event: msg,
-          ctx: helpButton,
-          message_id: helpButton.message_id,
-          cmd_file: cmd.toLowerCase()
-        });
-      } else {
-        return await bot.sendMessage(msg.chat.id, "Invalid Usage, see /help");
-      }
+      };
+      const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, {
+        reply_to_message_id: msg.message_id,
+        ...options
+      });
+      return global.bot.callback_query.set(helpButton.message_id, {
+        event: msg,
+        ctx: helpButton,
+        message_id: helpButton.message_id,
+        cmd_file: cmd.toLowerCase()
+      })
+    },
+    Syntax: async function(text = null) {
+      this.handleText(text, msg)
     },
     react: async function(emoji, message_id, is_big = false) {
       let to_react = [{ type: 'emoji', emoji }]
