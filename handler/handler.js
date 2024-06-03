@@ -9,13 +9,7 @@ if (admins?.length === 0) {
 bot.onText(/\/(\w+)/, async (msg, match) => {
   try {
     if (msg.from.bot_id) return;
-
-    if (msg.chat.type !== "private" && global.config.chat.level === "private") {
-      if (global.config.chat.message) {
-        bot.sendMessage(msg.chat.id, global.config.chat.message);
-      }
-      return;
-    }
+      if (global.config?.level.some(msg.chat.type)) return
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
@@ -32,7 +26,10 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         if ((x.config?.role && x.config?.role > 0) && !admins.includes(String(msg.from.id))) {
           return await bot.sendMessage(
             msg.chat.id,
-            "You don't have perms to use this command"
+            "You don't have perms to use this command",
+            {
+              reply_to_message_id: msg.message_id
+            }
           );
         }
         commandFound = true;
@@ -127,8 +124,6 @@ const functionalEvents = [
 ];
 
 const chatEvents = [
-  //"message",
-  // `message` logs every event
   "text",
   "edited_message",
   "channel_post",
