@@ -33,22 +33,32 @@ function create_message(msg, command) {
         return null;
       }
     },
-    Syntax: async function() {
-      return await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, { reply_to_message_id: msg.message_id });
-    },
-    react: async function(emoji_array, message_id, is_big = false) {
-      // [{ type: 'emoji', emoji: '👍' }];
-      if (typeof emoji_array != "object") {
-        emoji_array = [{ type: 'emoji', emoji: emoji_array }];
-      }
-      if (emoji_array instanceof Array) {
-        emoji_array.forEach(item => {
-          if (global.react_emojis.some(emoji => emoji == item.emoji)) {
-            item.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
+    Syntax: async function(cmd = null) {
+      if (cmd) {
+        const button = {
+          text: cmd?.toUpperCase(),
+          callback_data: cmd.toLowerCase()
+        };
+        options = {
+          reply_markup: {
+            inline_keyboard: [[button]]
           }
+        }
+        const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage, Check usage from help command`, { reply_to_message_id: msg.message_id, options });
+        return global.bot.callback_query.set(helpButton.message_id, {
+          event: msg,
+          ctx: helpButton,
+          message_id: helpButton.message_id,
+          cmd_file: cmd.toLowerCase()
         });
+      } else {
+        return await bot.sendMessage(msg.chat.id, "Invalid Usage, see /help");
       }
-      return await api.setMessageReaction(msg.from.id, message_id, { reaction: emoji_array, is_big })
+    },
+    react: async function(emoji, message_id, is_big = false) {
+      let to_react = [{ type: 'emoji', emoji }]
+      if (global.react_emojis.some(emoji)) to_react.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
+      return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big })
     }
   };
 }
