@@ -124,7 +124,7 @@ module.exports = {
   getAll: getAllUsers,
   deleteAll: deleteAllUsers,
   exists,
-  create: createOrUpdateUser.reset,
+  create: createOrUpdateUser.empty,
   refresh: createOrUpdateUser.refresh,
   removeKey
 };
