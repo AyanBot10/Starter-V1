@@ -9,7 +9,12 @@ if (admins?.length === 0) {
 bot.onText(/\/(\w+)/, async (msg, match) => {
   try {
     if (msg.from.bot_id) return;
-    if (!global.config?.chat?.level.includes(msg.chat.type)) return
+    if (!global.config?.chat?.level.includes(msg.chat.type)) {
+      if (global.config.chat.message) {
+        await bot.sendMessage(msg.chat.id, global.config.chat.message, { reply_to_message_id: msg.message_id })
+      }
+      return
+    }
 
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
