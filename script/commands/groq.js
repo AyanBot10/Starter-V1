@@ -106,9 +106,10 @@ async function main(history, message, event) {
   };
   try {
     message.react("👍", event.message_id);
+    message.indicator()
     const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", requestData, { headers: requestHeaders });
     history[event.from.id].push({ role: 'assistant', content: response.data.choices[0].message.content })
-    message.reaction("💯", event.message_id);
+    message.react("💯", event.message_id);
     const reply = await message.reply(response.data.choices[0].message.content, { parse_mode: "MarkdownV2" })
     global.bot.reply.set(reply.message_id, {
       cmd: "ai",
