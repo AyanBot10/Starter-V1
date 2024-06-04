@@ -53,24 +53,26 @@ module.exports = {
   },
 
   chat: async function({ event, message, api, args }) {
-    if (!global.bot.use_groq_on_chat) return
+    if (global.config.use_groq_on_chat) return
     let prompt = args.join(' ')
     if (!prompt || prompt.length <= 4) return
     if (!history[event.from.id]) {
       history[event.from.id] = [];
       history[event.from.id].push({
         role: 'user',
-        content: `Hello, My name is ${event?.from?.first_name || "Telegram User"}. Nice to Meet You`
+        content: `My name is ${event?.from?.first_name || "Telegram User"}`
       })
     }
     try {
       history[event.from.id].push({ role: 'user', content: prompt });
-      await main(history[event.from.id], message, event);
-    } catch (e) {}
+      await main(history[event.from.id], message, event, true);
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
 
-async function main(history, message, event) {
+async function main(history, message, event, chatType) {
   if (!global.config.groq.groq_api_key) {
     throw new Error("Get your ApiKey from console.groq.com/keys and place it in the config.json")
   }
@@ -107,6 +109,7 @@ async function main(history, message, event) {
     const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", requestData, { headers: requestHeaders });
     history[event.from.id].push({ role: 'assistant', content: response.data.choices[0].message.content })
     const reply = await message.reply(response.data.choices[0].message.content, { parse_mode: "Markdown" })
+    if (chatType) return
     global.bot.reply.set(reply.message_id, {
       cmd: "ai",
       ctx: reply,
