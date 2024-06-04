@@ -13,7 +13,7 @@ module.exports = {
     usage: "{pn} <anime_name>"
   },
 
-  start: async function({ api, event, args, cmd }) {
+  start: async function({ api, event, args, cmd, message }) {
     if (!args[0]) return message.Syntax(cmd)
     try {
       api.sendChatAction(event.chat.id, 'upload_document');
