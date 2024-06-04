@@ -61,7 +61,7 @@ function create_message(msg, command) {
       this.handleText(text, msg, options)
     },
     react: async function(text, message_id, is_big = false) {
-      let emoji = text || "🤡";
+      let emoji = text || "👍";
       let to_react = [{ type: 'emoji', emoji }];
       if (!global.react_emojis.includes(emoji)) {
         emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis.length)];
