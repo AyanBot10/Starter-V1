@@ -34,7 +34,7 @@ function create_message(msg, command) {
       }
     },
     delete: this.unsend,
-    handleText: async function(text = null, msg) {
+    handleText: async function(text = null, msg, body="Invalid Usage") {
       let cmd = text || "help";
       const button = {
         text: cmd.toUpperCase(),
@@ -45,7 +45,7 @@ function create_message(msg, command) {
           inline_keyboard: [[button]]
         }
       };
-      const helpButton = await bot.sendMessage(msg.chat.id, `Invalid Usage`, {
+      const helpButton = await bot.sendMessage(msg.chat.id, body, {
         reply_to_message_id: msg.message_id,
         ...options
       });
@@ -57,8 +57,8 @@ function create_message(msg, command) {
         cmd_file: cmd.toLowerCase()
       })
     },
-    Syntax: async function(text = null) {
-      this.handleText(text, msg)
+    Syntax: async function(text = null, options) {
+      this.handleText(text, msg, options)
     },
     react: async function(text, message_id, is_big = false) {
       let emoji = text || "🤡";
