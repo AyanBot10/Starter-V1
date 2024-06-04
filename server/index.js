@@ -21,7 +21,7 @@ app.get('*', (req, res) => {
       free: os.freemem()
     },
     uptime: {
-      os: "Device",
+      os: os.platform(),
       uptime_readable: formatUptime(os.uptime()),
       uptime: os.uptime()
     },

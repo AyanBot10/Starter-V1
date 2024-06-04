@@ -10,7 +10,7 @@ if (!token) {
   process.exit(3)
 }
 log("Logging In")
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token, { polling: global.config?.poling || true });
 log("Logged In")
 
 module.exports = bot
