@@ -8,7 +8,7 @@ module.exports = {
     usage: "{pn} - Logs all commands\n" +
       "{pn} <cmd> - Logs the command's info"
   },
-  start: async ({ api, event, args }) => {
+  start: async ({ api, event, args, message }) => {
     if (args[0]) {
       let command = args[0];
       let commandFound = false;
@@ -72,10 +72,7 @@ module.exports = {
           (typeof description === "string" ? description : "N/A");
         responseText += `${name.toUpperCase()} -- <b>${descText}</b>\n\n`;
       });
-
-      api.sendMessage(event.chat.id, responseText, {
-        parse_mode: "HTML"
-      });
+      message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" })
     }
   },
   callback_query: async function({ event, api, ctx, Context }) {
