@@ -25,7 +25,7 @@ const commandList = Object.keys(global.cmds);
 const array = commandList.map(command => {
   const { name, description } = global.cmds[command].config;
   return {
-    command: name,
+    command: `/${name}`,
     description: description?.short || description?.long || (typeof description === 'string' ? description : 'N/A')
   };
 });
