@@ -68,7 +68,7 @@ bot.on("message", async msg => {
   let api = bot;
   if (msg?.text?.startsWith("/")) return
   try {
-    if (reply_to_message) {
+    if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
         const replyCTX = global.bot.reply.get(msg.reply_to_message.message_id)
         for (const x of global.cmds.values()) {
