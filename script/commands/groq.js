@@ -39,13 +39,14 @@ module.exports = {
     let { author, cmd, messageID } = Context;
     if (event.from.id != author) return;
     const prompt = args.join(" ");
-    global.bot.reply.delete(messageID);
     history[event.from.id].push({ role: 'user', content: prompt })
     try {
-      if (args[0].toLowerCase() == "clear") {
+      if (args[0].toLowerCase() === "clear") {
         history[event.from.id] = [];
+        global.bot.reply.delete(messageID);
         return message.reply("Our conversation has been Cleared.")
       }
+      global.bot.reply.delete(messageID);
       await main(history[event.from.id], message, event);
     } catch (e) {
       message.reply(e.message);
