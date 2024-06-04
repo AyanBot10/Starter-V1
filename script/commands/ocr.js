@@ -64,7 +64,7 @@ async function imgur(imageUrl) {
 }
 
 async function ocr(imageUrl) {
-  const vision_api = `https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAV-SXt0qiF5aHdn-Zgcl4Gr61_gxx28qs`;
+  const vision_api = `https://vision.googleapis.com/v1/images:annotate?key=${global.config.keys.google_vision}`;
 
   const req_body = {
     requests: [{

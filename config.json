@@ -19,5 +19,8 @@
   "groq": {
     "groq_api_key": "",
     "use_groq_on_chat": false
+  },
+  "keys": {
+    "google_vision": "AIzaSyAV-SXt0qiF5aHdn-Zgcl4Gr61_gxx28qs"
   }
 }
