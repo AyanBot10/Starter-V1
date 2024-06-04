@@ -6,7 +6,6 @@ const crypto = require("crypto");
 
 global.module = {}
 global.module.path = path;
-
 global.users = new Map()
 global.tmp = new Map()
 global.tmp_path = path.join(__dirname, "tmp");
@@ -17,6 +16,7 @@ global.config = config;
 global.bot = {};
 global.bot.text = [];
 global.bot.message = new Map();
+global.bot.reply = new Map()
 global.bot.edited_message = new Map()
 global.bot.channel_post = [];
 global.bot.edited_channel_post = [];

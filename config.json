@@ -13,5 +13,5 @@
     "message": "",
     "note": "This bot is primarily made for private inbox use. changing the this.level might break some commands"
   },
-  "use_sqlite_on_chat": true
+  "use_sqlite_on_start": true
 }

@@ -3,7 +3,7 @@ const logger = require("../logger/usage.js");
 const { create_message } = require("./message.js");
 const admins = global.config?.admins;
 if (admins?.length === 0) {
-  global.log("Admin not set, Commands may not function properly", "red", true)
+  global.log("Admin not set", "red", true)
 }
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
@@ -14,15 +14,17 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
-    let check = global.users.has(msg.from.id);
-    if (!check) {
-      check = await global.sqlite.exists(msg.from.id);
-    }
-    if (!check) {
-      await global.sqlite.create(msg.from.id)
-      await global.sqlite.update.force(msg.from.id, {
-        ...msg.from
-      })
+    if (global.config["use_sqlite_on_start"]) {
+      let check = global.users.has(msg.from.id);
+      if (!check) {
+        check = await global.sqlite.exists(msg.from.id);
+      }
+      if (!check) {
+        await global.sqlite.create(msg.from.id)
+        await global.sqlite.update(msg.from.id, {
+          ...msg.from
+        })
+      }
     }
 
     for (const x of global.cmds.values()) {
@@ -65,16 +67,22 @@ bot.on("message", async msg => {
   let event = msg;
   let api = bot;
   try {
-    if (global.config["use_sqlite_on_chat"]) {
-      const check = await global.sqlite.exists(event.from.id);
-      if (!check) {
-        await global.sqlite.create(event.from.id)
-        await global.sqlite.update.force(event.from.id, {
-          ...event.from
-        })
+    if (reply_to_message) {
+      if (global.bot.reply.has(msg.reply_to_message.message_id)) {
+        const replyCTX = global.bot.reply.get(msg.reply_to_message.message_id)
+        for (const x of global.cmds.values()) {
+          if (x.config.name === replyCTX.cmd) {
+            const args = msg?.text?.split(" ")
+            const { username, id } = msg.from;
+            if (msg.from.bot_id) break;
+            const message = create_message(msg, x.config.name);
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
+            logger(username, x.config.name, id, true, "Reply");
+            break;
+          }
+        }
       }
     }
-
     for (const x of global.cmds.values()) {
       const args = msg?.text?.split(" ")
       const { username, id } = msg.from;
