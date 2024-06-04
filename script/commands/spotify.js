@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { search } = require("@nechlophomeriaa/spotifydl");
-const { downloadTrack2: downloadTrack } = require("@nechlophomeriaa/spotifydl");
+const { downloadTrack2: downloadTrack, downloadAlbum2 } = require("@nechlophomeriaa/spotifydl");
 const { v4: uuid } = require("uuid");
 
 async function searchTrack(query, limit) {
@@ -86,6 +86,28 @@ module.exports = {
         console.error(error);
         message.reply(`Error: ${error?.message || "Occurred"}`);
       }
+    } else if (query.match(/^https:\/\/open\.spotify\.com\/(album|playlist)\/[a-zA-Z0-9]+$/)) {
+      const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading Playlist...");
+      try {
+        const downAlbums = await downloadAlbum2(query)
+        const mediaAudio = downAlbums.trackList.map(x => ({
+          type: 'audio',
+          media: {
+            source: x.audioBuffer,
+            filename: x.metadata?.title
+          },
+          caption: x.metadata?.title
+        }));
+
+        api.sendMediaGroup(chatId, [mediaGroup])
+        api.deleteMessage(event.chat.id, prmsg.message_id);
+      } catch (error) {
+        console.error(error);
+        message.reply(`Error: ${error?.message || "Occurred"}`);
+        if (prmsg.message_id) {
+          api.deleteMessage(event.chat.id, prmsg.message_id)
+        }
+      }
     } else {
       try {
         api.sendChatAction(event.chat.id, 'upload_document');
@@ -101,7 +123,8 @@ module.exports = {
             ]);
         const media = tracks.map(item => ({
           type: "photo",
-          media: item.thumbnail
+          media: item.thumbnail,
+          performer: item.artist_name
         }));
         const x = await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,
@@ -143,13 +166,13 @@ module.exports = {
         Context.initials.second
       );
       const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
-      await global.utils.sleep(3500);
       api.sendChatAction(event.chat.id, 'upload_audio')
       downloadResponse = await downloadSong(ctx.data);
       await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {
         caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,
         thumb: downloadResponse.thumbnail,
-        title: downloadResponse.title
+        title: downloadResponse.title,
+        performer: downloadResponse.artist
       });
 
       api.deleteMessage(event.chat.id, prmsg.message_id);
