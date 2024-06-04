@@ -55,7 +55,7 @@ module.exports = {
 
   chat: async function({ event, message, api, args }) {
     if (global.config.use_groq_on_chat) return
-    let prompt = args.join(' ')
+    let prompt = args?.join(" ");
     if (!prompt || prompt.length <= 4) return
     if (!history[event.from.id]) {
       history[event.from.id] = [];
