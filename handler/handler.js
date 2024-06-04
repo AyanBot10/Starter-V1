@@ -77,7 +77,7 @@ bot.on("message", async msg => {
             const { username, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite, Context: replyCTX });
             logger(username, x.config.name, id, true, "Reply");
             break;
           }
