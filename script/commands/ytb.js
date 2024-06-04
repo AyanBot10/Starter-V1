@@ -125,9 +125,6 @@ module.exports = {
       );
       await api.sendMessage(event.chat.id, "Exception Occurred");
     }
-        process.on('unhandledRejection', (reason) => {
-      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
-    });
   },
 
   callback_query: async function({ api, event, ctx, message }) {
@@ -184,9 +181,6 @@ module.exports = {
         );
       }
     }
-        process.on('unhandledRejection', (reason) => {
-      message.reply(`<pre><b>Unhandled Rejection: ${reason.message || String(reason)}</b></pre>`, { parse_mode: "HTML" });
-    });
   }
 };
 

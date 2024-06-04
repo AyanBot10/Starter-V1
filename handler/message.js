@@ -60,12 +60,17 @@ function create_message(msg, command) {
     Syntax: async function(text = null) {
       this.handleText(text, msg)
     },
-    react: async function(emoji="🤡", message_id, is_big = false) {
-      let to_react = [{ type: 'emoji', emoji }]
-      if (global.react_emojis.some(emoji)) to_react.emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis)]
-      return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big })
+    react: async function(text, message_id, is_big = false) {
+      let emoji = text || "🤡";
+      let to_react = [{ type: 'emoji', emoji }];
+      if (!global.react_emojis.includes(emoji)) {
+        emoji = global.react_emojis[Math.floor(Math.random() * global.react_emojis.length)];
+        to_react = [{ type: 'emoji', emoji }];
+      }
+
+      return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big });
     },
-    indicator: async function(text="typing") {
+    indicator: async function(text = "typing") {
       return await api.sendChatAction(msg.chat.id, text)
     }
   };

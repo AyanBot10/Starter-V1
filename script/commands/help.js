@@ -26,8 +26,8 @@ module.exports = {
           messageContent += "─── INFO ────⭓\n\n";
           const { description } = x.config;
           const descText =
-            description?.short ||
             description?.long ||
+            description?.short ||
             (typeof description === "string" ? description : "N/A");
           messageContent += `» Description: ${descText}\n`;
           if (x.config.author) {
