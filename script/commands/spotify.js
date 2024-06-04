@@ -3,6 +3,8 @@ const { search } = require("@nechlophomeriaa/spotifydl");
 const { downloadTrack2: downloadTrack, downloadAlbum2 } = require("@nechlophomeriaa/spotifydl");
 const { v4: uuid } = require("uuid");
 
+if (!global.tmp.spotify) global.tmp.spotify = new Set();
+
 async function searchTrack(query, limit) {
   try {
     const searchResult = await search(query, limit);
@@ -14,7 +16,7 @@ async function searchTrack(query, limit) {
       return {
         track_url: item.external_urls.spotify,
         track_name: item.name,
-        artist_name: item.artists[0].name,
+        artist_names: item.artists.map(artist => artist.name).join(", "),
         duration: `${duration_hours}:${duration_minutes}:${duration_seconds}`,
         thumbnail: item.album.images.reduce((prev, current) => {
           if (current.height > prev.height && current.width > prev.width) {
@@ -87,37 +89,41 @@ module.exports = {
         message.reply(`Error: ${error?.message || "Occurred"}`);
       }
     } else if (query.match(/^https:\/\/open\.spotify\.com\/(album|playlist)\/[a-zA-Z0-9]+$/)) {
-      const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading Playlist...");
+      if (global.tmp.spotify.has(event.from.id)) return await message.reply("You Already have a playlist actively being downloaded. Have patience")
+      const prmsg = await api.sendMessage(event.chat.id, "Downloading Playlist. May take a long while");
+      global.tmp.spotify.add(event.from.id)
       try {
         const downAlbums = await downloadAlbum2(query)
-        const mediaAudio = downAlbums.trackList.map(x => ({
-          type: 'audio',
-          media: {
-            source: x.audioBuffer,
-            filename: x.metadata?.title
-          },
-          caption: x.metadata?.title
-        }));
-
-        api.sendMediaGroup(event.chat.id, [mediaAudio])
         api.deleteMessage(event.chat.id, prmsg.message_id);
+        const chunkSize = 6;
+        const mediaChunks = [];
+        for (let i = 0; i < mediaAudio.length; i += chunkSize) {
+          mediaChunks.push(mediaAudio.slice(i, i + chunkSize));
+        }
+        mediaChunks.forEach(chunk => {
+          api.sendMediaGroup(event.chat.id, chunk);
+        });
       } catch (error) {
         console.error(error);
         message.reply(`Error: ${error?.message || "Occurred"}`);
         if (prmsg.message_id) {
           api.deleteMessage(event.chat.id, prmsg.message_id)
         }
+      } finally {
+        if (global.tmp.spotify.has(event.from.id)) {
+          global.tmp.spotify.remove(event.from.id)
+        }
       }
     } else {
       try {
         api.sendChatAction(event.chat.id, 'upload_document');
-        const tracks = await searchTrack(query, 4);
+        const tracks = await searchTrack(query, 6);
         if (tracks.length === 0) {
           return message.reply("⚠ | No tracks found for the given query.");
         }
         const inline_data = tracks.map(track => [
           {
-            text: `${track.duration} : ${track.track_name}`,
+            text: track.track_name,
             callback_data: track.track_url
                 }
             ]);
