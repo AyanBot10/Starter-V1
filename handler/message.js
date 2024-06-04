@@ -72,6 +72,9 @@ function create_message(msg, command) {
     },
     indicator: async function(text = "typing") {
       return await api.sendChatAction(msg.chat.id, text)
+    },
+    edit: async function(text, message_id, options) {
+      return api.editMessageText(text, { chat_id: msg.chat.id, message_id, ...options})
     }
   };
 }

@@ -99,7 +99,7 @@ module.exports = {
           caption: x.metadata?.title
         }));
 
-        api.sendMediaGroup(chatId, [mediaGroup])
+        api.sendMediaGroup(event.chat.id, [mediaAudio])
         api.deleteMessage(event.chat.id, prmsg.message_id);
       } catch (error) {
         console.error(error);
