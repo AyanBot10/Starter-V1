@@ -1,10 +1,10 @@
 const axios = require("axios");
 const maxStorageMessage = 10
 
-if (!global.tmp.history)
-  global.tmp.history = {};
+global.tmp.groq = global.tmp?.groq || {}
+global.tmp.groq.history = global.tmp.groq.history || {}
 
-const { history } = global.tmp;
+const { history } = global.tmp.groq;
 
 module.exports = {
   config: {

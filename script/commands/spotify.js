@@ -3,7 +3,7 @@ const { search } = require("@nechlophomeriaa/spotifydl");
 const { downloadTrack2: downloadTrack, downloadAlbum2 } = require("@nechlophomeriaa/spotifydl");
 const { v4: uuid } = require("uuid");
 
-if (!global.tmp.spotify) global.tmp.spotify = new Set();
+global.tmp.spotify = global.tmp?.spotify || new Set();
 
 async function searchTrack(query, limit) {
   try {
