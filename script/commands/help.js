@@ -72,7 +72,7 @@ module.exports = {
           (typeof description === "string" ? description : "N/A");
         responseText += `${name.toUpperCase()} -- <b>${descText}</b>\n\n`;
       });
-      message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" })
+      message.reply(`<pre><b>${responseText}</b></pre>`, { parse_mode: "HTML" })
     }
   },
   callback_query: async function({ event, api, ctx, Context }) {
