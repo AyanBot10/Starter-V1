@@ -130,7 +130,7 @@ module.exports = {
         const media = tracks.map(item => ({
           type: "photo",
           media: item.thumbnail,
-          performer: item.artist_name
+          performer: item.artist_names
         }));
         const x = await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,
@@ -139,7 +139,7 @@ module.exports = {
 
         let Artists = '';
         tracks.forEach(item => {
-          Artists += `${item.artist_name}, `
+          Artists += `${item.artist_names}, `
         });
         const sent = await api.sendMessage(
           event.chat.id,
