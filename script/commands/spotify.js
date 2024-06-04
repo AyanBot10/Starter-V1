@@ -128,7 +128,7 @@ module.exports = {
                 }
             ]);
         const media = tracks.map(item => ({
-          type: "photo",
+          type: "audio",
           media: item.thumbnail,
           performer: item.artist_names
         }));

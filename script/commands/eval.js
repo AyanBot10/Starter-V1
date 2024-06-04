@@ -55,7 +55,7 @@ module.exports = {
         output(err.message || String(err));
       }
     } catch (err) {
-      throw err
+      message.reply(err.message)
     }
   }
 };
