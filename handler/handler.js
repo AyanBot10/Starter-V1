@@ -175,13 +175,15 @@ const chatEvents = [
   "pinned_message"
 ];
 
-functionalEvents.forEach(eventType => {
+/*functionalEvents.forEach(eventType => {
   try {
     bot.on(eventType, async (ctx) => handleFunctionalEvent(ctx, eventType));
   } catch (err) {
     throw err
   }
-});
+});*/
+
+// Buggy, Not Recommended
 
 chatEvents.forEach(eventType => {
   try {

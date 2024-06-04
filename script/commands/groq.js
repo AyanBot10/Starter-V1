@@ -24,7 +24,7 @@ module.exports = {
         return message.reply("Our conversation has been Cleared.");
       }
       default: {
-        const prompt = args.join(" ");
+        const prompt = args?.join(" ");
         try {
           history[event.from.id].push({ role: 'user', content: prompt });
           await main(history[event.from.id], message, event);
