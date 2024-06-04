@@ -14,5 +14,10 @@
     "note": "This bot is primarily made for private inbox use. changing the this.level might break some commands"
   },
   "use_sqlite_on_start": true,
-  "polling": true
+  "use_sqlite_on_chat": false,
+  "polling": true,
+  "groq": {
+    "groq_api_key": "",
+    "use_groq_on_chat": false
+  }
 }

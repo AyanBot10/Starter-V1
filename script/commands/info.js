@@ -8,7 +8,7 @@ module.exports = {
     const { from: { id, is_bot, first_name, username, language_code }, chat } = event;
     const db = await usersData.exists(id);
     const text = `Sender Information
-- ID: ${id}
+- ID: \`${id}\`
 - Is Bot: ${is_bot}
 - First Name: ${first_name}
 - Username: ${username}

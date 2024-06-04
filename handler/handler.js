@@ -66,6 +66,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 bot.on("message", async msg => {
   let event = msg;
   let api = bot;
+  if (msg?.text?.startsWith("/")) return
   try {
     if (reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
