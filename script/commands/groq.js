@@ -36,7 +36,7 @@ module.exports = {
   },
 
   reply: async function({ message, event, args, Context }) {
-    let { author, cmd, messageID } = Reply;
+    let { author, cmd, messageID } = Context;
     if (event.from.id != author) return;
     const prompt = args.join(" ");
     global.bot.reply.delete(messageID);
