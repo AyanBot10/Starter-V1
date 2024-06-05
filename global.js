@@ -5,7 +5,6 @@ const config_handler = require("./config_handler.json")
 const path = require("path");
 const crypto = require("crypto");
 const fs = require('fs');
-const _ = require('lodash');
 
 global.config_handler = config_handler
 global.module = {}
@@ -92,8 +91,8 @@ global.uuid = function() {
 
 global.utils.configSync = function(json) {
   let currentConfig = fs.existsSync("config_handler.json") ? JSON.parse(fs.readFileSync("config_handler.json", 'utf8')) : {};
-  const updatedConfig = _.merge({}, currentConfig, json);
-  fs.writeFileSync("config_handler.json", JSON.stringify(updatedConfig, null, 2), 'utf8');
+  fs.writeFileSync("config_handler.json", JSON.stringify({ ...currentConfig, ...json }, null, 2), 'utf8');
+  return true;
 };
 
 

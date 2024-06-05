@@ -15,9 +15,13 @@ module.exports = {
           .then(chat => {
             const username = chat.username;
             if (username) {
-              global.config_handler.admins.push(args[1]);
-              global.utils.configSync(global.config_handler.admins);
-              message.reply(`Added @${username} (${args[1]}) as admin`);
+              if (!global.config_handler.admins.includes(args[1])) {
+                global.config_handler.admins.push(args[1]);
+                global.utils.configSync({ admins: global.config_handler.admins });
+                message.reply(`Added @${username} (${args[1]}) as admin`);
+              } else {
+                message.reply("User is already an admin");
+              }
             } else {
               return message.reply("Couldn't find user with such userID");
             }
@@ -34,7 +38,7 @@ module.exports = {
         const index = global.config_handler.admins.indexOf(args[1]);
         if (index > -1) {
           global.config_handler.admins.splice(index, 1);
-          global.utils.configSync(global.config_handler.admins);
+          global.utils.configSync({ admins: global.config_handler.admins });
           message.reply(`Removed user with ID ${args[1]} from admins`);
         } else {
           message.reply("User ID not found in admin list");
@@ -59,7 +63,7 @@ module.exports = {
 
         Promise.all(adminPromises)
           .then(admins => {
-            const adminList = admins.map(admin => `@${admin.username} (${admin.uid})`).join(", ");
+            const adminList = admins.map(admin => `@${admin.username} (${admin.uid})`).join("\n");
             message.reply(`Current admins: ${adminList}`);
           })
           .catch(err => {

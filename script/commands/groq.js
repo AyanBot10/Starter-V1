@@ -55,15 +55,14 @@ module.exports = {
 
   chat: async function({ event, message, api, args }) {
     let prompt = null;
-    if (global.config.use_groq_on_chat) return
-    if (!args[0]) return
+    if (!global.config.use_groq_on_chat) return
+    if (!event.text) return
     prompt = args?.join(' ');
-    if (!prompt || prompt.length <= 4) return
     if (!history[event.from.id]) {
       history[event.from.id] = [];
       history[event.from.id].push({
         role: 'user',
-        content: `My name is ${event?.from?.first_name || "Telegram User"}`
+        content: `My name is ${event?.from?.first_name || event?.from?.username || "Telegram User"}`
       })
     }
     try {
