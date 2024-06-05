@@ -17,6 +17,9 @@ commandFiles.forEach((file) => {
   if (file.endsWith(".js")) {
     try {
       const command = require(path.join(commandsPath, file));
+      if (!command.config || ! command.config.name) {
+        throw new Error("config and/or config.name not set")
+      }
       global.cmds.set(file, command);
       loaded++;
       process.stdout.clearLine();
