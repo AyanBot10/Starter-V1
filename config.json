@@ -1,11 +1,7 @@
 {
-  "admins": [],
   "server": {
     "toggle": true,
     "port": 3000
-  },
-  "handler": {
-    "skip": ["groq.js"]
   },
   "chat": {
     "level": ["private"],

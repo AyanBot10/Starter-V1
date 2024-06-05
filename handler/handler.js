@@ -1,7 +1,7 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 const { create_message } = require("./message.js");
-const admins = global.config?.admins;
+const admins = global.config_handler?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set", "red", true)
 }
@@ -52,6 +52,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         }
         commandFound = true;
         const message = create_message(msg, x.config.name);
+        if (global.config_handler.skip.includes(x.config.name)) return
         await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
 
         const { username, id } = msg.from;

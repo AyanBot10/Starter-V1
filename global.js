@@ -1,9 +1,13 @@
 const axios = require("axios");
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
+const config_handler = require("./config_handler.json")
 const path = require("path");
 const crypto = require("crypto");
+const fs = require('fs');
+const _ = require('lodash');
 
+global.config_handler = config_handler
 global.module = {}
 global.module.path = path;
 global.users = new Map()
@@ -24,6 +28,7 @@ global.bot.inline_query = new Map();
 global.bot.chosen_inline_result = new Map();
 global.bot.callback_query = new Map();
 global.bot.shipping_query = new Map();
+/*
 global.bot.pre_checkout_query = new Map();
 global.bot.poll = new Map();
 global.bot.poll_answer = new Map();
@@ -51,7 +56,7 @@ global.bot.channel_chat_created = new Map();
 global.bot.migrate_to_chat_id = new Map();
 global.bot.migrate_from_chat_id = new Map();
 global.bot.pinned_message = new Map();
-
+*/
 global.utils.getStream = async function(link) {
   try {
     const response = await axios.get(link, { responseType: 'stream' });
@@ -85,4 +90,11 @@ global.uuid = function() {
   return crypto.randomUUID();
 }
 
-module.exports = null;  
+global.utils.configSync = function(json) {
+  let currentConfig = fs.existsSync("config_handler.json") ? JSON.parse(fs.readFileSync("config_handler.json", 'utf8')) : {};
+  const updatedConfig = _.merge({}, currentConfig, json);
+  fs.writeFileSync("config_handler.json", JSON.stringify(updatedConfig, null, 2), 'utf8');
+};
+
+
+module.exports = null;

@@ -12,7 +12,7 @@ const commandsPath = path.join(__dirname, "commands");
 const commandFiles = readdirSync(commandsPath);
 
 commandFiles.forEach((file) => {
-  if (global.config?.handler?.skip?.includes(file)) return;
+  if (global.config_handler?.skip?.includes(file)) return;
 
   if (file.endsWith(".js")) {
     try {
