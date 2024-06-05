@@ -5,8 +5,6 @@ const admins = global.config_handler?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set", "red", true)
 }
-const fs = require("fs");
-const { restart } = require("../script/commands/tmp/restart.json");
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   try {
@@ -78,7 +76,6 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         break;
       }
     }
-
     if (!commandFound) {
       await bot.sendMessage(msg.chat.id, "Come Again?");
     }
@@ -217,16 +214,5 @@ chatEvents.forEach(eventType => {
     throw err
   }
 });
-
-if (restart.legit) {
-  const delaySecs = ((Date.now() - restart.time) / 1000).toFixed(1);
-  bot.sendMessage(restart.chat_id, `Restarted. Time Taken: ${delaySecs}s`, { reply_to_message_id: restart.message_id })
-  fs.writeFileSync("../script/commands/tmp/restart.json", JSON.stringify({
-    restart: {
-      legit: false
-    }
-  }, null, 2))
-}
-
 
 module.exports = bot;

@@ -33,8 +33,6 @@ function handle_code(code) {
       break;
     case 4:
       log("Restarting Project", "cyan", true);
-      clearDirectorySync("script/commands/tmp");
-      log("Cleared Cache", "cyan");
       startProject();
       break;
     default:
@@ -43,23 +41,5 @@ function handle_code(code) {
   }
 }
 
-function clearDirectorySync(directory) {
-  try {
-    const files = fs.readdirSync(directory);
-    for (const file of files) {
-      if (file == "restart.json") continue
-      const filePath = path.join(directory, file);
-      const stat = fs.statSync(filePath);
-      if (stat.isDirectory()) {
-        clearDirectorySync(filePath);
-        fs.rmdirSync(filePath);
-      } else {
-        fs.unlinkSync(filePath);
-      }
-    }
-  } catch (err) {
-    console.error(`Error clearing directory ${directory}:`, err);
-  }
-}
 
 startProject();
