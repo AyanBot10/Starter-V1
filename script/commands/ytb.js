@@ -35,16 +35,7 @@ module.exports = {
             throw new Error('Media Size exceeds 50MB size limit');
           }
         }
-        const link = args[0]
-
-        function checkTime(duration_ms) {
-          const ms10M = 10 * 60 * 1000
-          return duration_ms > ms10M;
-        }
-        const valueTime = checkTime(Number(ms))
-        if (valueTime) {
-          return await message.reply("Video is over 10 Mins")
-        }
+        const link = args[0];
         dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
         api.sendChatAction(event.chat.id, 'upload_video')
         await downloadVID(link, dir)
