@@ -56,6 +56,8 @@ global.bot.migrate_to_chat_id = new Map();
 global.bot.migrate_from_chat_id = new Map();
 global.bot.pinned_message = new Map();
 */
+
+global.cooldown = new Map()
 global.utils.getStream = async function(link) {
   try {
     const response = await axios.get(link, { responseType: 'stream' });

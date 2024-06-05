@@ -67,7 +67,8 @@ module.exports = {
     aliases: ["music", "play", "sing"],
     description: "Search for songs on Spotify",
     usage: "{pn} <song_name or song_link>",
-    author: "Tanvir"
+    author: "Tanvir",
+    cooldown: 25
   },
   start: async function({ event, api, args, message }) {
     const query = args.join(" ");

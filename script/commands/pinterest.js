@@ -5,7 +5,8 @@ module.exports = {
     name: "pinterest",
     aliases: ["pin"],
     usage: "{pn} <query>",
-    description: "Search for Images on Pinterest"
+    description: "Search for Images on Pinterest",
+    cooldown: 20
   },
 
   start: async function({ message, args, event, api }) {

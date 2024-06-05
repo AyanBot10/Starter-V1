@@ -53,6 +53,27 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         commandFound = true;
         const message = create_message(msg, x.config.name);
         if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
+
+        if (!x.config.cooldown || isNaN(x.config.cooldown)) {
+          x.config.cooldown = 5 * 1000;
+        }
+        const userId = msg.from.id;
+        const commandName = x.config.name;
+        const cooldown = x.config.cooldown;
+
+        if (!global.cooldown.has(userId)) {
+          global.cooldown.set(userId, new Map());
+        }
+        const userCooldowns = global.cooldown.get(userId);
+        if (userCooldowns.has(commandName)) {
+          const lastUsed = userCooldowns.get(commandName);
+          const now = Date.now();
+          if (now < lastUsed + cooldown) {
+            const remainingTime = ((lastUsed + cooldown - now) / 1000).toFixed(1);
+            return bot.sendMessage(msg.chat.id, `Cooldown: ${remainingTime}s Remaining`, { reply_to_message_id: msg.message_id });
+          }
+        }
+        userCooldowns.set(commandName, Date.now());
         await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
 
         const { username, id } = msg.from;

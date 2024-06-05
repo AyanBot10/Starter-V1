@@ -22,14 +22,6 @@ async function formatsave(filename, link) {
   }
 }
 
-const options = {
-  reply_markup: {
-    inline_keyboard: [
-      [{ text: 'Confirm', callback_data: 'confirm' }, { text: 'Cancel', callback_data: 'cancel' }]
-    ]
-  }
-};
-
 module.exports = {
   config: {
     name: "command",
@@ -71,7 +63,13 @@ module.exports = {
           if (!args[2] || !args[2].startsWith("http")) return message.reply("Include a valid raw link");
           await message.indicator()
             .then(async () => {
-              const sent = await message.reply("Confirm Your Choice", options);
+              const sent = await message.reply("Confirm Your Choice", {
+                reply_markup: {
+                  inline_keyboard: [
+      [{ text: 'Confirm', callback_data: 'confirm' }, { text: 'Cancel', callback_data: 'cancel' }]
+    ]
+                }
+              });
               global.bot.callback_query.set(sent.message_id, {
                 cmd,
                 author: event.from.id,
@@ -91,34 +89,32 @@ module.exports = {
       message.reply(err.message);
     }
   },
-  callback_query: async function({ event, message, api, ctx, Context }) {
+  callback_query: async function({ event, message, api, ctx, Context, cmd }) {
     try {
-      const { link, file } = Context;
+      const { link, file, author, messageID, chat } = Context;
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      if (event.reply_to_message.from.id != Context.author) return message.send("Unauthorized")
-      console.log(ctx.data)
-      switch (ctx.data) {
+      if (event.reply_to_message.from.id != author) return message.send("Unauthorized");
+      const { data } = ctx;
+      switch (data) {
         case 'confirm': {
-          await message.edit("Confirmed", Context.messageID, Context.chat);
-          api.editMessageReplyMarkup({ inline_keyboard: [] }, {
-            chat_id: Context.chat,
-            message_id: Context.messageID
-          });
-          formatsave(file, link).then(() => {
-            message.edit(`Downloaded and required ${file} successfully`, Context.messageID, Context.chat);
-          });
+          await message.edit("Confirmed", messageID, chat, {
+            reply_markup: { inline_keyboard: [] }
+          })
+          await formatsave(file, link);
+          message.edit(`Downloaded and acquired ${file} successfully`, messageID, chat);
           break;
         }
         case 'cancel': {
-          await message.edit("Cancelled", Context.messageID, Context.chat);
-          api.editMessageReplyMarkup({ inline_keyboard: [] }, {
-            chat_id: Context.chat,
-            message_id: Context.messageID
+          await message.edit("Cancelled", messageID, chat, {
+            reply_markup: { inline_keyboard: [] }
           });
           break;
         }
+        default:
+          message.Syntax(cmd)
       }
-    } catch (err) {
+    }
+    catch (err) {
       message.reply(err.message);
     }
   }

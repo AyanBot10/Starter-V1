@@ -8,7 +8,8 @@ module.exports = {
     name: "nude",
     aliases: ["nudify"],
     usage: "{pn} image_reply",
-    description: "Nudify images of people although the results would be blurred"
+    description: "Nudify images of people although the results would be blurred",
+    cooldown: 15
   },
   start: async function({ api, message, event, cmd }) {
     const fileId = event?.reply_to_message?.photo?.slice(-1)[0]?.file_id;

@@ -1,11 +1,12 @@
 const path = require("path");
 const { readdirSync } = require("fs");
 
-global.log("Binding Commands...", "yellow", false);
+global.log("Loading Commands...", "yellow", false);
 
 let errors = 0;
 let loaded = 0;
 let failedFiles = [];
+let loadedFiles = [];
 global.cmds = new Map();
 
 const commandsPath = path.join(__dirname, "commands");
@@ -17,11 +18,15 @@ commandFiles.forEach((file) => {
   if (file.endsWith(".js")) {
     try {
       const command = require(path.join(commandsPath, file));
-      if (!command.config || ! command.config.name) {
+      if (!command.config || !command.config.name) {
         throw new Error("config and/or config.name not set")
+      }
+      if (loadedFiles.includes(command.config.name)) {
+        throw new Error(`${command.config.name} Already Exists`)
       }
       global.cmds.set(file, command);
       loaded++;
+      loadedFiles.push(command.config.name)
       process.stdout.clearLine();
       process.stdout.cursorTo(0);
       process.stdout.write(`Loaded ${loaded} commands`);
@@ -29,7 +34,7 @@ commandFiles.forEach((file) => {
       errors++;
       failedFiles.push(file);
       process.stdout.write("\n");
-      global.log(`Error loading command '${file}': ${error.message}`, "blue", true);
+      global.log(`'${file}': ${error.message}`, "red", true);
     }
   }
 });
