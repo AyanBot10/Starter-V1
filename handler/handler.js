@@ -54,8 +54,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         const message = create_message(msg, x.config.name);
         if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
 
-        if (!x.config.cooldown || isNaN(x.config.cooldown)) {
-          x.config.cooldown = 5 * 1000;
+        if (!x.config.cooldown) {
+          x.config.cooldown = 10 * 1000;
         }
         const userId = msg.from.id;
         const commandName = x.config.name;
