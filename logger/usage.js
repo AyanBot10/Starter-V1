@@ -1,6 +1,7 @@
 const kleur = require('kleur');
 
 function logger(username, commandName, userId, type, cmd, event) {
+  if (commandName === "ai" && (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false)) return
   let log = `${kleur.bold().bgBlack().white('[')}${kleur.bold().magenta(username)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${type ? kleur.cyan(commandName) : kleur.yellow(commandName)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${kleur.grey(userId)}${kleur.bold().bgBlack().white(']')}`;

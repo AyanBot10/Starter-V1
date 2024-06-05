@@ -55,5 +55,3 @@ To interact with the bot, users must initiate a command to add themselves to the
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## Starter-V1 Project Is Fully Open Source
-
-### README.md template copied from [samirxpikachuio](https://github.com/samirxpikachuio)

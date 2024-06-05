@@ -34,7 +34,7 @@ function create_message(msg, command) {
       }
     },
     delete: this.unsend,
-    handleText: async function(text = null, msg, body="Invalid Usage") {
+    handleText: async function(text = null, msg, body = "Invalid Usage") {
       let cmd = text || "help";
       const button = {
         text: cmd.toUpperCase(),
@@ -60,7 +60,7 @@ function create_message(msg, command) {
     Syntax: async function(text = null, options) {
       this.handleText(text, msg, options)
     },
-    react: async function(text, message_id, is_big = false) {
+    react: async function(text, message_id = msg.message_id, is_big = false) {
       let emoji = text || "👍";
       let to_react = [{ type: 'emoji', emoji }];
       if (!global.react_emojis.includes(emoji)) {
@@ -73,8 +73,8 @@ function create_message(msg, command) {
     indicator: async function(text = "typing") {
       return await api.sendChatAction(msg.chat.id, text)
     },
-    edit: async function(text, message_id, options) {
-      return api.editMessageText(text, { chat_id: msg.chat.id, message_id, ...options})
+    edit: async function(text, message_id, chat_id = msg.chat.id, options) {
+      return api.editMessageText(text, { chat_id, message_id, ...options })
     }
   };
 }

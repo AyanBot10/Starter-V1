@@ -13,7 +13,11 @@ module.exports = {
   start: async function({ api, event, args, message, cmd, usersData }) {
     try {
       if (!args[0]) return message.Syntax(cmd);
-
+      
+      // Miscellaneous Constants
+      const bot = api;
+      const chatId = event.chat.id;
+      
       function output(msg) {
         if (typeof msg == "number" || typeof msg == "boolean" || typeof msg == "function") {
           msg = msg.toString();

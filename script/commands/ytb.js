@@ -37,9 +37,9 @@ module.exports = {
         }
         const link = args[0];
         dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-        api.sendChatAction(event.chat.id, 'upload_video')
         await downloadVID(link, dir)
         checkSize(dir)
+        api.sendChatAction(event.chat.id, 'upload_video')
         const stream = fs.createReadStream(dir);
         await api.sendVideo(event.chat.id, stream);
         if (fs.existsSync(dir)) {
@@ -47,7 +47,7 @@ module.exports = {
         }
       } catch (err) {
         console.error(err);
-        await api.sendMessage(event.chat.id, err.message);
+        await message.reply(err.message)
         if (fs.existsSync(dir)) {
           fs.unlinkSync(dir);
         }

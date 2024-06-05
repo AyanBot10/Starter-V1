@@ -105,8 +105,8 @@ module.exports = {
   callback_query: async function({ event, api, message, ctx, Context }) {
     let directory;
     try {
-      //if (Context.author != event.from.id) return
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
+      if (event.reply_to_message.from.id != Context.author) return message.send("Unauthorized")
       await api.deleteMessage(
         ctx.message.chat.id,
         ctx.message.message_id

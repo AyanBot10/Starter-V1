@@ -96,6 +96,7 @@ bot.on("message", async msg => {
       if (typeof x.chat === "function") {
         const message = create_message(msg, x.config.name);
         if (msg.from.bot_id) break;
+        if (x.config.name === "groq" && (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false)) return
         await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
         logger(username, x.config.name, id, true, "Chat");
         break;

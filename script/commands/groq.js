@@ -21,7 +21,7 @@ module.exports = {
     switch (args[0].toLowerCase()) {
       case 'clear': {
         history[event.from.id] = [];
-        return message.reply("Our conversation has been Cleared.");
+        return message.reply("Started a new session");
       }
       default: {
         const prompt = args?.join(" ");
@@ -41,11 +41,6 @@ module.exports = {
     const prompt = args.join(" ");
     history[event.from.id].push({ role: 'user', content: prompt })
     try {
-      if (args[0].toLowerCase() === "clear") {
-        history[event.from.id] = [];
-        global.bot.reply.delete(messageID);
-        return message.reply("Our conversation has been Cleared.")
-      }
       global.bot.reply.delete(messageID);
       await main(history[event.from.id], message, event);
     } catch (e) {
@@ -55,7 +50,7 @@ module.exports = {
 
   chat: async function({ event, message, api, args }) {
     let prompt = null;
-    if (!global.config.use_groq_on_chat) return
+    if (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false) return
     if (!event.text) return
     prompt = args?.join(' ');
     if (!history[event.from.id]) {
