@@ -26,7 +26,7 @@ module.exports = {
       const ram_usage = total_ram - free_ram;
       let infoText = `• uptime: ${uptimeString}\n\n• ping: ${ping - 179}ms\n\n• memory usage: ${ram_usage.toFixed(2)} MB`;
       infoText = `<pre><b>${infoText}</b></pre>`
-      message.edit(infoText, testMsg.message_id, { parse_mode: "HTML" });
+      message.edit(infoText, testMsg.message_id, event.chat.id, { parse_mode: "HTML" });
     } catch (error) {
       console.error(error);
       message.reply(error.message);

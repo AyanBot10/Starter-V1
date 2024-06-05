@@ -5,6 +5,8 @@ const admins = global.config_handler?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set", "red", true)
 }
+const fs = require("fs");
+const { restart } = require("../script/commands/tmp/restart.json");
 
 bot.onText(/\/(\w+)/, async (msg, match) => {
   try {
@@ -55,8 +57,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
         const userId = msg.from.id;
         const commandName = x.config.name;
-        const cooldown = x.config.cooldown || 5000;
-
+        const cooldown = x.config?.cooldown * 1000 || 5000;
         if (!global.cooldown.has(userId)) {
           global.cooldown.set(userId, new Map());
         }
@@ -216,5 +217,16 @@ chatEvents.forEach(eventType => {
     throw err
   }
 });
+
+if (restart.legit) {
+  const delaySecs = ((Date.now() - restart.time) / 1000).toFixed(1);
+  bot.sendMessage(restart.chat_id, `Restarted. Time Taken: ${delaySecs}s`, { reply_to_message_id: restart.message_id })
+  fs.writeFileSync("../script/commands/tmp/restart.json", JSON.stringify({
+    restart: {
+      legit: false
+    }
+  }, null, 2))
+}
+
 
 module.exports = bot;

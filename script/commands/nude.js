@@ -23,7 +23,7 @@ module.exports = {
       await api.sendPhoto(event.chat.id, stream.data, { reply_to_message_id: event.message_id })
       fs.unlinkSync(stream.path);
     } catch (error) {
-      message.edit(error.message, confirm.message_id);
+      message.edit(error.message, confirm.message_id, event.chat.id);
     }
   }
 };

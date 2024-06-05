@@ -131,7 +131,8 @@ module.exports = {
         const media = tracks.map(item => ({
           type: "audio",
           media: item.thumbnail,
-          performer: item.artist_names
+          performer: item.artist_names,
+          caption: item.track_name
         }));
         const x = await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,
