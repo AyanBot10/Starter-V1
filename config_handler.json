@@ -1,4 +1,5 @@
 {
   "admins": [],
-  "skip": []
+  "skip": [],
+  "skip_message": "Command is Unloaded"
 }

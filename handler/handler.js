@@ -52,7 +52,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         }
         commandFound = true;
         const message = create_message(msg, x.config.name);
-        if (global.config_handler.skip.includes(x.config.name)) return
+        if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
         await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
 
         const { username, id } = msg.from;
@@ -72,7 +72,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 bot.on("message", async msg => {
   let event = msg;
   let api = bot;
-  if (msg?.text?.startsWith("/")) return
+  if (msg.text && msg.text.startsWith("/")) return
   try {
     if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {

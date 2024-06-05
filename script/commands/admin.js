@@ -2,7 +2,7 @@ module.exports = {
   config: {
     name: "admin",
     description: "Admin Panel",
-    usage: "{pn} list - {pn} add uid - {pn} remove uid",
+    usage: "{pn} list\n{pn} add uid\n{pn} remove uid",
     role: 1
   },
   start: async function({ event, args, api, message, cmd }) {
@@ -37,9 +37,10 @@ module.exports = {
         if (!args[1]) return message.Syntax(cmd);
         const index = global.config_handler.admins.indexOf(args[1]);
         if (index > -1) {
+          const data = await api.getChat(args[1]);
           global.config_handler.admins.splice(index, 1);
           global.utils.configSync({ admins: global.config_handler.admins });
-          message.reply(`Removed user with ID ${args[1]} from admins`);
+          message.reply(`Removed Admin: ${data.username} (${args[1]})`);
         } else {
           message.reply("User ID not found in admin list");
         }
