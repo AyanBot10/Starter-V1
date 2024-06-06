@@ -67,7 +67,7 @@ module.exports = {
     const query = args.join(" ");
     if (!query || query.length < 3) return message.Syntax(cmd);
     try {
-      message.indicator('upload_photo')
+      message.indicator('upload_document')
       let search = await scrapeXnxx(query);
       search = search.slice(0, 6);
 
@@ -95,8 +95,7 @@ module.exports = {
       global.bot.callback_query.set(sent.message_id, {
         event,
         ctx: sent,
-        cmd: this.config.name,
-        author: event.from.id
+        cmd: this.config.name
       });
     } catch (err) {
       console.log(err);
@@ -107,7 +106,6 @@ module.exports = {
     let directory;
     try {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      if (event.reply_to_message.from.id != Context.author) return message.send("Unauthorized")
       await api.deleteMessage(
         ctx.message.chat.id,
         ctx.message.message_id
