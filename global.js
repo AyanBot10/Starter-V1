@@ -10,8 +10,8 @@ global.config_handler = config_handler
 global.module = {}
 global.module.path = path;
 global.users = new Map()
-global.tmp = new Map()
-global.tmp_path = path.join(__dirname, "tmp");
+global.tmp = {}
+
 global.cmds = new Map();
 global.utils = {};
 global.log = log;

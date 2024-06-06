@@ -93,7 +93,7 @@ module.exports = {
     try {
       const { link, file, author, messageID, chat } = Context;
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      if (event.reply_to_message.from.id != author) return message.send("Unauthorized");
+      if (author != ctx.from.id) return message.send("Unauthorized");
       const { data } = ctx;
       switch (data) {
         case 'confirm': {

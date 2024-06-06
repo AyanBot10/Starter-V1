@@ -24,15 +24,16 @@ function create_message(msg) {
         return null;
       }
     },
-    unsend: async function(text) {
+    unsend: async function(text, tid) {
       try {
         if (!text) throw new Error("Include message_id");
-        return await api.deleteMessage(msg.chat.id, text);
+        return await api.deleteMessage(tid || msg.chat.id, text);
       } catch (err) {
         await bot.sendMessage(msg.chat.id, err.message);
         return null;
       }
     },
+    delete: this.unsend,
     handleText: async function(text = false, msg, body = "Invalid Usage") {
       let cmd = text || "help";
       const button = {
@@ -69,9 +70,9 @@ function create_message(msg) {
 
       return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big });
     },
-    indicator: async function(text = "typing") {
+    indicator: async function(text = "typing", tid) {
       try {
-        return await api.sendChatAction(msg.chat.id, text)
+        return await api.sendChatAction(tid || msg?.chat?.id, text)
       } catch (error) {}
     },
     edit: async function(text, message_id, chat_id = msg.chat.id, options) {
