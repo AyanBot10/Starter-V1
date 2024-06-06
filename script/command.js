@@ -7,6 +7,7 @@ let errors = 0;
 let loaded = 0;
 let failedFiles = [];
 let loadedFiles = [];
+const commandsNamesAndAliases = new Set()
 global.cmds = new Map();
 
 const commandsPath = path.join(__dirname, "commands");
@@ -24,8 +25,16 @@ commandFiles.forEach((file) => {
       if (loadedFiles.includes(command.config.name)) {
         throw new Error(`${command.config.name} Already Exists`)
       }
+      if (commandsNamesAndAliases.has(command.config.name) || commandsNamesAndAliases.has(command.config.aliases)) {
+        throw new Error(`${command.config.aliases.join(", ")} Already Exists in other files`)
+      }
+
       global.cmds.set(file, command);
       loaded++;
+      commandsNamesAndAliases.add(command.config.name)
+      if (command.config.aliases) {
+        commandsNamesAndAliases.add(command.config.aliases)
+      }
       loadedFiles.push(command.config.name)
       process.stdout.clearLine();
       process.stdout.cursorTo(0);

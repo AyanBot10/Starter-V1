@@ -33,6 +33,9 @@ module.exports = {
           if (x.config.author) {
             messageContent += `» Author: ${x.config.author}\n`;
           }
+          if (x.config.cooldown) {
+            messageContent += `» Cooldown: ${x.config.cooldown}s\n`;
+          }
           let role_config = x.config?.role || 0;
           if (role_config === 0) role_config = "0 (everyone)"
           if (role_config === 1) role_config = "1 (admin)"
