@@ -10,10 +10,9 @@ async function stream(link) {
   return videoSrc;
 }
 
-async function process(pageNumber, items = 10) {
+async function process(search, items = 6) {
   try {
-    const baseURL = 'https://seegore.com/gore/page/';
-    const link = pageNumber ? `${baseURL}${pageNumber}` : 'https://seegore.com/gore/';
+    const link = search[0] ? `https://seegore.com/?s=${search.join("+")}` : ['https://seegore.com/gore/', `https://seegore.com/gore/page/${Math.floor(Math.random() * 185) + 1}`][Math.floor(Math.random() * 2)];
     const response = await axios.get(link);
     const $ = cheerio.load(response.data);
     let links = [];
@@ -28,7 +27,7 @@ async function process(pageNumber, items = 10) {
 
     links = links.slice(0, items);
 
-    const batchSize = 5;
+    const batchSize = 4;
     let postDetails = [];
 
     for (let i = 0; i < links.length; i += batchSize) {
@@ -62,15 +61,16 @@ module.exports = {
   config: {
     name: "seegore",
     aliases: ["gore"],
-    usage: "{pn}",
+    usage: "{pn} <query>",
     description: "A simple seegore.com scrapper command",
     cooldown: 10
   },
-  start: async function({ event, api, message, cmd }) {
+  start: async function({ event, api, message, cmd, args }) {
     try {
       if (!global.tmp.gore) global.tmp.gore = new Map()
       message.indicator();
-      let response = await process();
+      let response = await process(args);
+      if (response.length === 0) return message.reply(`No results found`)
       const media = response.map((item) => ({
         type: "photo",
         media: item.image,
@@ -104,11 +104,15 @@ module.exports = {
     }
   },
   callback_query: async function({ event, api, ctx, Context, message }) {
+    try {
     await api.answerCallbackQuery({ callback_query_id: ctx.id });
     if (Context.author != ctx.from.id) return message.reply("Unauthorized");
     await message.edit("Scrapping the selected video...", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } })
     await api.sendChatAction(event.chat?.id, "upload_video")
     await api.deleteMessage(event.chat.id, ctx.message.message_id);
     await api.sendVideo(event.chat.id, global.tmp.gore.get(ctx.data))
+  } catch (err) {
+    api.sendMessage(event.chat.id, `${err.message}\nAPI only allows MP4 links ;(`)
+  }
   }
 }
