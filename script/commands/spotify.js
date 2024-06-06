@@ -118,13 +118,13 @@ module.exports = {
     } else {
       try {
         api.sendChatAction(event.chat.id, 'upload_document');
-        const tracks = await searchTrack(query, 6);
+        const tracks = await searchTrack(query, 4);
         if (tracks.length === 0) {
           return message.reply("⚠ | No tracks found for the given query.");
         }
         const inline_data = tracks.map(track => [
           {
-            text: track.track_name,
+            text: `${track.artist_names} - ${track.track_name}`,
             callback_data: track.track_url
                 }
             ]);
@@ -132,7 +132,7 @@ module.exports = {
           type: "audio",
           media: item.thumbnail,
           performer: item.artist_names,
-          caption: item.track_name
+          file_name: item.track_name
         }));
         const x = await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,

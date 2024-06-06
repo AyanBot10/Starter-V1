@@ -19,7 +19,7 @@ module.exports = {
     try {
       const stream = await process(image_link);
       await message.indicator("upload_photo")
-      message.delete(confirm.message_id)
+      message.unsend(confirm.message_id)
       await api.sendPhoto(event.chat.id, stream.data, { reply_to_message_id: event.message_id })
       fs.unlinkSync(stream.path);
     } catch (error) {

@@ -8,7 +8,7 @@ module.exports = {
     usage: "{pn} - Logs all commands\n" +
       "{pn} <cmd> - Logs the command's info"
   },
-  start: async ({ api, event, args, message, looking }) => {
+  start: async function({ api, event, args, message, looking }) {
     if (args[0]) {
       let command = args[0];
       let commandFound = false;
@@ -51,14 +51,14 @@ module.exports = {
 
           if (x.config.usage) {
             messageContent += "─── USAGE ────⭓\n";
-            messageContent += `» ${regexStr(x.config?.usage || "N/A", x.config.name)}\n`;
+            messageContent += `${regexStr(x.config?.usage || "N/A", x.config.name)}\n`;
           }
 
           messageContent += "───────⭔";
-          if (looking.message_id) {
-            await api.editMessageText(`<pre><b>${messageContent}</b></pre>`, { chat_id: looking.chat.id, message_id: looking.message_id, parse_mode: "HTML" })
+          if (looking?.message_id) {
+            await api.editMessageText(messageContent, { chat_id: event.chat.id, message_id: looking.message_id })
           } else {
-            await api.sendMessage(event.chat.id, `<pre><b>${messageContent}</b></pre>`, { parse_mode: "HTML" });
+            message.reply(messageContent)
           }
           break;
         }

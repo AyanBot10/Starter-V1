@@ -33,7 +33,6 @@ function create_message(msg) {
         return null;
       }
     },
-    delete: this.unsend,
     handleText: async function(text = false, msg, body = "Invalid Usage") {
       let cmd = text || "help";
       const button = {

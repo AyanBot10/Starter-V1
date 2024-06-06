@@ -8,7 +8,7 @@ module.exports = {
     usage: "{pn} <image_reply>",
     description: "Image Synthesis"
   },
-  start: async function({ event, message, cmd }) {
+  start: async function({ event, message, cmd, api }) {
     const initial = await message.reply("Processing...")
     try {
       const fileId = event?.reply_to_message?.photo?.slice(-1)[0]?.file_id;
@@ -22,7 +22,7 @@ module.exports = {
       message.reply("Exception Occurrd")
     } finally {
       if (initial?.message_id) {
-        await message.delete(initial.message_id)
+        await message.unsend(initial.message_id)
       } 
     }
   }

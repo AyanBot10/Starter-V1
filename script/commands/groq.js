@@ -38,6 +38,7 @@ module.exports = {
   reply: async function({ message, event, args, Context }) {
     let { author, cmd, messageID } = Context;
     if (event.from.id != author) return;
+    if (!event.text) return
     const prompt = args.join(" ");
     history[event.from.id].push({ role: 'user', content: prompt })
     try {

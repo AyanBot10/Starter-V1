@@ -24,6 +24,7 @@ module.exports = {
       message.reply(`✅ | Text Extracted:\n\n<pre><b>${text}</b></pre>`, { parse_mode: "HTML" });
       message.react("💯", event.message_id);
     } catch (error) {
+      console.error(error)
       message.react("👎", event.message_id);
       message.reply("❌ | An error occurred while performing OCR.");
     }
@@ -64,7 +65,7 @@ async function imgur(imageUrl) {
 }
 
 async function ocr(imageUrl) {
-  const vision_api = `https://vision.googleapis.com/v1/images:annotate?key=${global.config.keys.google_vision}`;
+  const vision_api = `https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAV-SXt0qiF5aHdn-Zgcl4Gr61_gxx28qs`;
 
   const req_body = {
     requests: [{

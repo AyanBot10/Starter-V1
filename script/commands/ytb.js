@@ -103,7 +103,8 @@ module.exports = {
       global.bot.callback_query.set(sent.message_id, {
         event,
         ctx: sent,
-        cmd: this.config.name
+        cmd: this.config.name,
+        me: event.message_id
       });
       await api.deleteMessage(
         event.chat.id,
@@ -119,7 +120,7 @@ module.exports = {
     }
   },
 
-  callback_query: async function({ api, event, ctx, message }) {
+  callback_query: async function({ api, event, ctx, message, Context }) {
     const processingMessage = await api.sendMessage(
       event.chat.id,
       "⏳ Downloading..."
@@ -148,11 +149,11 @@ module.exports = {
         return await message.reply("Video is over 10 Mins")
       }
       dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-      api.sendChatAction(event.chat.id, 'upload_video')
       await downloadVID(link, dir)
       checkSize(dir)
+      api.sendChatAction(event.chat.id, 'upload_video')
       const stream = fs.createReadStream(dir);
-      await api.sendVideo(event.chat.id, stream);
+      await api.sendVideo(event.chat.id, stream, { reply_to_message_id: Context?.me });
       if (fs.existsSync(dir)) {
         fs.unlinkSync(dir);
       }
