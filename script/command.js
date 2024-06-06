@@ -7,7 +7,7 @@ let errors = 0;
 let loaded = 0;
 let failedFiles = [];
 let loadedFiles = [];
-const commandsNamesAndAliases = new Set()
+const commandsNamesAndAliases = new Set();
 global.cmds = new Map();
 
 const commandsPath = path.join(__dirname, "commands");
@@ -20,22 +20,26 @@ commandFiles.forEach((file) => {
     try {
       const command = require(path.join(commandsPath, file));
       if (!command.config || !command.config.name) {
-        throw new Error("config and/or config.name not set")
+        throw new Error("config and/or config.name not set");
       }
       if (loadedFiles.includes(command.config.name)) {
-        throw new Error(`${command.config.name} Already Exists`)
+        throw new Error(`${command.config.name} Already Exists`);
       }
-      if (commandsNamesAndAliases.has(command.config.name) || commandsNamesAndAliases.has(command.config.aliases)) {
-        throw new Error(`${command.config.aliases.join(", ")} Already Exists in other files`)
+
+      if (command.config.aliases) {
+        const aliases = command.config.aliases;
+        if (commandsNamesAndAliases.has(command.config.name) || aliases.some(alias => commandsNamesAndAliases.has(alias))) {
+          throw new Error(`${[command.config.name, ...aliases].join(", ")} Already Exists in other files`);
+        }
+
+        aliases.forEach(alias => commandsNamesAndAliases.add(alias));
       }
 
       global.cmds.set(file, command);
       loaded++;
-      commandsNamesAndAliases.add(command.config.name)
-      if (command.config.aliases) {
-        commandsNamesAndAliases.add(command.config.aliases)
-      }
-      loadedFiles.push(command.config.name)
+      commandsNamesAndAliases.add(command.config.name);
+      loadedFiles.push(command.config.name);
+
       process.stdout.clearLine();
       process.stdout.cursorTo(0);
       process.stdout.write(`Loaded ${loaded} commands`);
