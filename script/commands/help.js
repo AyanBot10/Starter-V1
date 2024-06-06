@@ -8,7 +8,7 @@ module.exports = {
     usage: "{pn} - Logs all commands\n" +
       "{pn} <cmd> - Logs the command's info"
   },
-  start: async ({ api, event, args, message }) => {
+  start: async ({ api, event, args, message, looking }) => {
     if (args[0]) {
       let command = args[0];
       let commandFound = false;
@@ -52,8 +52,11 @@ module.exports = {
           }
 
           messageContent += "───────⭔";
-
-          await api.sendMessage(event.chat.id, messageContent);
+          if (looking.message_id) {
+            await api.editMessageText(messageContent, { chat_id: looking.chat.id, message_id: looking.message_id })
+          } else {
+            await api.sendMessage(event.chat.id, messageContent);
+          }
           break;
         }
       }
@@ -75,13 +78,11 @@ module.exports = {
       message.reply(`<pre><b>${responseText}</b></pre>`, { parse_mode: "HTML" })
     }
   },
-  callback_query: async function({ event, api, ctx, Context }) {
+  callback_query: async function({ event, api, ctx, Context, message }) {
     const command = ctx.data;
     await api.answerCallbackQuery({ callback_query_id: ctx.id });
-    await api.deleteMessage(
-      event.chat.id,
-      Context.message_id
-    );
-    return await this.start({ api, event, args: [command] })
+    const lookUp = await message.edit("Looking up 🔎", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } })
+
+    return await this.start({ api, event, args: [command], looking: lookUp })
   }
 };

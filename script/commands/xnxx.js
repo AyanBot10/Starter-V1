@@ -77,7 +77,7 @@ module.exports = {
       }));
       const inline_data = search.map(item => [
         {
-          text: item.title.substring(0, 25),
+          text: item.title.substring(0, 55),
           callback_data: item.linkId
         }
       ]);
@@ -95,7 +95,9 @@ module.exports = {
       global.bot.callback_query.set(sent.message_id, {
         event,
         ctx: sent,
-        cmd: this.config.name
+        cmd: this.config.name,
+        chat: event.chat.id,
+        msG: sent.message_id
       });
     } catch (err) {
       console.log(err);
@@ -106,10 +108,9 @@ module.exports = {
     let directory;
     try {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      await api.deleteMessage(
-        ctx.message.chat.id,
-        ctx.message.message_id
-      );
+      await message.edit("Downloading...", Context.msG, Context.chat, {
+        reply_markup: { inline_keyboard: [] }
+      });
       const linkId = ctx.data;
       if (global.tmp.xnxx.has(linkId)) {
         const full_link = global.tmp.xnxx.get(linkId);
@@ -118,7 +119,7 @@ module.exports = {
         message.indicator('upload_document');
         directory = path.join(__dirname, "tmp", `${global.uuid()}.mp4`)
         const buffer = await download(response.cdn, directory)
-        await api.sendVideo(event.chat.id, buffer, {
+        await api.sendVideo(Context.chat, buffer, {
           thumb: full_link.image,
           caption: full_link.title
         });
