@@ -127,7 +127,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
       for (const cmd of global.cmds.values()) {
         if (
           cmd?.config.name?.toLowerCase() === context.cmd) {
-          const message_function = create_message(ctx, cmd.config.name);
+          const message_function = create_message(ctx);
           if (cmd && cmd[eventType]) {
             await cmd[eventType]({
               event: message,

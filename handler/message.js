@@ -70,7 +70,9 @@ function create_message(msg) {
       return await api.setMessageReaction(msg.from.id, message_id, { reaction: to_react, is_big });
     },
     indicator: async function(text = "typing") {
-      return await api.sendChatAction(msg.chat.id, text)
+      try {
+        return await api.sendChatAction(msg.chat.id, text)
+      } catch (error) {}
     },
     edit: async function(text, message_id, chat_id = msg.chat.id, options) {
       return api.editMessageText(text, { chat_id, message_id, ...options })
