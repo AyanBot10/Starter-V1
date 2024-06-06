@@ -20,10 +20,10 @@ module.exports = {
             x.config.aliases.some(alias => alias.toLowerCase() === command.toLowerCase()))
         ) {
           commandFound = true;
-          let messageContent = "─── NAME ────⭓\n\n";
+          let messageContent = "─── NAME ────⭓\n";
           messageContent += `» ${x.config?.name}\n`;
 
-          messageContent += "─── INFO ────⭓\n\n";
+          messageContent += "─── INFO ────⭓\n";
           const { description } = x.config;
           const descText =
             description?.long ||
@@ -47,15 +47,15 @@ module.exports = {
           }
 
           if (x.config.usage) {
-            messageContent += "─── USAGE ────⭓\n\n";
+            messageContent += "─── USAGE ────⭓\n";
             messageContent += `» ${regexStr(x.config?.usage || "N/A", x.config.name)}\n`;
           }
 
           messageContent += "───────⭔";
           if (looking.message_id) {
-            await api.editMessageText(messageContent, { chat_id: looking.chat.id, message_id: looking.message_id })
+            await api.editMessageText(`<pre><b>${messageContent}</b></pre>`, { chat_id: looking.chat.id, message_id: looking.message_id, parse_mode: "HTML" })
           } else {
-            await api.sendMessage(event.chat.id, messageContent);
+            await api.sendMessage(event.chat.id, `<pre><b>${messageContent}</b></pre>`, { parse_mode: "HTML" });
           }
           break;
         }

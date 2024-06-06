@@ -17,7 +17,7 @@ module.exports = {
     if (!args[0]) return message.Syntax(this.config.name);
     exec(args.join(" "), async (error, stdout, stderr) => {
       if (error) {
-        message.reply("```shell" + `\n${error.message}\n` + "```", { parse_mode: "Markdown" });
+        message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" });
       } else {
         if (stdout.length > 1500) {
           const filename = uuidv4();
@@ -36,7 +36,7 @@ module.exports = {
             fs.unlinkSync(file);
           });
         } else {
-          message.reply(stdout);
+          message.reply("```shell" + `\n${stdout}\n` + "```", { parse_mode: "Markdown" });
         }
       }
     });
