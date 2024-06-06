@@ -20,8 +20,7 @@ module.exports = {
   },
 
   start: async function({ api, event, args, message, cmd }) {
-    let query = args.join(" ");
-    if (!query)
+    if (!args[0])
       return message.Syntax(cmd);
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(\S*)?$/;
     if (youtubeRegex.test(args[0])) {
@@ -65,7 +64,25 @@ module.exports = {
       }
       return
     }
-
+    let query;
+    let type;
+    switch (args[0]) {
+      case 'video':
+      case '-v': {
+        query = args.slice(1).join(' ')
+        type = "video"
+        break
+      }
+      case 'audio':
+      case '-a': {
+        query = args.slice(1).join(' ')
+        type = "audio"
+        break
+      }
+      default:
+        query = args.join(" ");
+        type = "video"
+    }
     const processingMessage = await api.sendMessage(
       event.chat.id,
       `Searching: ${query}`
@@ -104,7 +121,8 @@ module.exports = {
         event,
         ctx: sent,
         cmd: this.config.name,
-        me: event.message_id
+        me: event.message_id,
+        type
       });
       await api.deleteMessage(
         event.chat.id,
@@ -148,12 +166,21 @@ module.exports = {
       if (valueTime) {
         return await message.reply("Video is over 10 Mins")
       }
-      dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-      await downloadVID(link, dir)
+      if (Context.type === "video") {
+        dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
+        await downloadVID(link, dir)
+      } else if (Context.type === "audio") {
+        dir = path.join(__dirname, "tmp", `${uuid()}.mp3`);
+        await downloadMP3(link, dir)
+      }
       checkSize(dir)
-      api.sendChatAction(event.chat.id, 'upload_video')
+      Context.type === "video" ? api.sendChatAction(event.chat.id, 'upload_video') : api.sendChatAction(event.chat.id, 'upload_audio')
       const stream = fs.createReadStream(dir);
-      await api.sendVideo(event.chat.id, stream, { reply_to_message_id: Context?.me });
+      if (Context.type === "video") {
+        await api.sendVideo(event.chat.id, stream, { reply_to_message_id: Context?.me });
+      } else {
+        await api.sendAudio(event.chat.id, stream, { reply_to_message_id: Context?.me });
+      }
       if (fs.existsSync(dir)) {
         fs.unlinkSync(dir);
       }
@@ -242,6 +269,37 @@ async function downloadVID(videoLink, savePath) {
     });
   } catch (error) {
     console.error("Error downloading video:", error.message);
+    throw error;
+  }
+}
+
+async function downloadMP3(videoLink, savePath) {
+  try {
+    const videoId = ytdl.getURLVideoID(videoLink);
+    const info = await ytdl.getInfo(videoId);
+
+    const format = ytdl.chooseFormat(info.formats, {
+      quality: "highestaudio",
+      filter: format =>
+        format.container === "webm" &&
+        format.audioBitrate
+    });
+
+    if (!format) {
+      throw new Error("No suitable format found");
+    }
+
+    const readableStream = ytdl(videoLink, { format });
+    const writeStream = fs.createWriteStream(savePath);
+
+    await new Promise((resolve, reject) => {
+      readableStream.pipe(writeStream);
+      writeStream.on("finish", resolve);
+      writeStream.on("error", reject);
+      readableStream.on("error", reject);
+    });
+  } catch (error) {
+    console.error("Error downloading audio:", error.message);
     throw error;
   }
 }
