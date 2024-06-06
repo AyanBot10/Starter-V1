@@ -1,7 +1,7 @@
 const bot = require("./login.js");
 let api = bot;
 
-function create_message(msg, command) {
+function create_message(msg) {
   return {
     send: async function(text, options = {}) {
       try {
@@ -33,7 +33,7 @@ function create_message(msg, command) {
         return null;
       }
     },
-    handleText: async function(text = null, msg, body = "Invalid Usage") {
+    handleText: async function(text = false, msg, body = "Invalid Usage") {
       let cmd = text || "help";
       const button = {
         text: cmd.toUpperCase(),

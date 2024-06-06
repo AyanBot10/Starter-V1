@@ -15,7 +15,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       }
       return
     }
-
+    const message = create_message(msg);
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
@@ -31,7 +31,6 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         })
       }
     }
-
     for (const x of global.cmds.values()) {
       if (
         x.config.name?.toLowerCase() === command?.toLowerCase() ||
@@ -40,7 +39,6 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
             alias => alias.toLowerCase() === command.toLowerCase()
           ))
       ) {
-
         if ((x.config?.role && x.config?.role > 0) && !admins.includes(String(msg.from.id))) {
           return await bot.sendMessage(
             msg.chat.id,
@@ -51,7 +49,6 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           );
         }
         commandFound = true;
-        const message = create_message(msg, x.config.name);
         if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
         const userId = msg.from.id;
         const commandName = x.config.name;
@@ -77,7 +74,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       }
     }
     if (!commandFound) {
-      await bot.sendMessage(msg.chat.id, "Come Again?", { reply_to_message_id: msg.message_id });
+      message.reply("Command Not Found")
     }
   } catch (err) {
     throw err
