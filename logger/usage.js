@@ -21,7 +21,9 @@ function logger({ name, command, uid, type, event }) {
     `${kleur.bold().bgBlack().white('[')}${type ? kleur.cyan(command) : kleur.yellow(command)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${kleur.grey(uid)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${kleur.red(event.toUpperCase())}${kleur.bold().bgBlack().white(']')}`;
+  //Console
   console.log(log);
+
   if (global.config["save_logs_in_server"]) {
     const log = {
       timestamp: Date.now(),
@@ -31,7 +33,13 @@ function logger({ name, command, uid, type, event }) {
       id: uid,
       event_in: type
     };
-    global.server.logs.push(log);
+
+    if (global.server.logs) {
+      if (global.server.logs.length > 25) {
+        global.server.logs = global.server.logs.slice(20);
+      }
+      global.server.logs.push(log);
+    }
   }
 }
 

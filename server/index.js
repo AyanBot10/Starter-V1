@@ -10,7 +10,14 @@ function formatUptime(uptimeInSeconds) {
   return `${hours}H, ${minutes}M, ${seconds}S`;
 }
 
-app.use("/logs", require("./routes/logs.js"));
+app.get("/logs", (req, res) => {
+  const response = {
+    status: true,
+    logs: [...global.server?.logs] || []
+  };
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(response, null, 2));
+});
 
 app.get('*', (req, res) => {
   const systemInfo = {

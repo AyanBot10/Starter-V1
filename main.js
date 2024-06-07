@@ -3,7 +3,7 @@ process.emitWarning = (warning, type) => {
     console.warn(warning);
   }
 };
-
+const config = require("./config.json");
 require("./global");
 const run_sqlite = require("./Database/SQLite/global.js")
 
@@ -63,6 +63,8 @@ log("Started Bot", "cyan", true);
 if (config?.server?.toggle && config?.server?.port) {
   log("Starting Express Server", "green")
   try {
+    global.server = {};
+    global.server.logs = [];
     require("./server/index.js");
   } catch (err) {
     log("Failed to start server", "red", true)
