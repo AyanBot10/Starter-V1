@@ -9,10 +9,11 @@ module.exports = {
     description: "Image Synthesis"
   },
   start: async function({ event, message, cmd, api }) {
-    const initial = await message.reply("Processing...")
+    let initial
     try {
       const fileId = event?.reply_to_message?.photo?.slice(-1)[0]?.file_id;
       if (!fileId) return message.Syntax(cmd);
+      initial = await message.reply("Processing...")
       const stream = await axios.get(await api.getFileLink(fileId), { responseType: 'arraybuffer' })
       message.indicator()
       process(Buffer.from(stream.data)).then(x => {
@@ -23,7 +24,7 @@ module.exports = {
     } finally {
       if (initial?.message_id) {
         await message.unsend(initial.message_id)
-      } 
+      }
     }
   }
 }
