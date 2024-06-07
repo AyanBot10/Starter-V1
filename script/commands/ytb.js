@@ -6,7 +6,7 @@ const path = require("path");
 const axios = require("axios");
 
 const safe_mode = false;
-// Change this to true if you keep getting error woth thumbnails
+// Change this to true if you keep getting thumbnail related errors
 
 module.exports = {
   config: {
