@@ -5,7 +5,8 @@ const { v4: uuid } = require("uuid");
 const path = require("path");
 const axios = require("axios");
 
-const safe_mode = true;
+const safe_mode = false;
+// Change this to true if you keep getting error woth thumbnails
 
 module.exports = {
   config: {
@@ -22,8 +23,26 @@ module.exports = {
   start: async function({ api, event, args, message, cmd }) {
     if (!args[0])
       return message.Syntax(cmd);
+    let typeDL;
+    let linkYtb;
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})(\S*)?$/;
-    if (youtubeRegex.test(args[0])) {
+    switch (args[0]) {
+      case '-v':
+      case 'video':
+        typeDL = "video"
+        linkYtb = args.slice(1).join(' ');
+        break
+      case '-a':
+      case 'audio':
+        typeDL = "audio";
+        linkYtb = args.slice(1).join(' ');
+        break
+      default: {
+        typeDL = "video"
+        linkYtb = args[0]
+      }
+    }
+    if (youtubeRegex.test(linkYtb)) {
       const processingMessage = await api.sendMessage(
         event.chat.id,
         "⏳ Downloading..."
@@ -35,13 +54,35 @@ module.exports = {
             throw new Error('Media Size exceeds 50MB size limit');
           }
         }
-        const link = args[0];
+        const link = linkYtb;
         dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-        await downloadVID(link, dir)
+        var author, thumbnail, title
+        if (typeDL === "video") {
+          const info = await downloadVID(link, dir);
+          var { author, thumbnail, title } = info
+        } else if (typeDL === "audio") {
+          const info = await downloadMP3(link, dir);
+          var { author, thumbnail, title } = info
+        }
         checkSize(dir)
-        api.sendChatAction(event.chat.id, 'upload_video')
-        const stream = fs.createReadStream(dir);
-        await api.sendVideo(event.chat.id, stream);
+        if (typeDL === "video") {
+          api.sendChatAction(event.chat.id, 'upload_video')
+          const stream = fs.createReadStream(dir);
+          await api.sendVideo(event.chat.id, stream, {
+            caption: title,
+            performer: author,
+            reply_to_message_id: event.message_id
+          });
+        } else {
+          api.sendChatAction(event.chat.id, 'upload_audio')
+          const stream = fs.createReadStream(dir);
+          await api.sendAudio(event.chat.id, stream, {
+            title,
+            thumb: thumbnail,
+            performer: author,
+            reply_to_message_id: event.message_id
+          });
+        }
         if (fs.existsSync(dir)) {
           fs.unlinkSync(dir);
         }
@@ -134,7 +175,7 @@ module.exports = {
         event.chat.id,
         processingMessage.message_id
       );
-      await api.sendMessage(event.chat.id, "Exception Occurred");
+      await api.sendMessage(event.chat.id, err.message || "Exception Occured");
     }
   },
 
@@ -166,20 +207,30 @@ module.exports = {
       if (valueTime) {
         return await message.reply("Video is over 10 Mins")
       }
+      let info;
       if (Context.type === "video") {
         dir = path.join(__dirname, "tmp", `${uuid()}.mp4`);
-        await downloadVID(link, dir)
+        info = await downloadVID(link, dir);
       } else if (Context.type === "audio") {
         dir = path.join(__dirname, "tmp", `${uuid()}.mp3`);
-        await downloadMP3(link, dir)
+        info = await downloadMP3(link, dir)
       }
       checkSize(dir)
       Context.type === "video" ? api.sendChatAction(event.chat.id, 'upload_video') : api.sendChatAction(event.chat.id, 'upload_audio')
       const stream = fs.createReadStream(dir);
       if (Context.type === "video") {
-        await api.sendVideo(event.chat.id, stream, { reply_to_message_id: Context?.me });
+        await api.sendVideo(event.chat.id, stream, {
+          caption: info.title,
+          performer: info.author,
+          reply_to_message_id: Context?.me
+        });
       } else {
-        await api.sendAudio(event.chat.id, stream, { reply_to_message_id: Context?.me });
+        await api.sendAudio(event.chat.id, stream, {
+          title: info.title,
+          thumb: info.thumbnail,
+          performer: info.author,
+          reply_to_message_id: Context?.me
+        });
       }
       if (fs.existsSync(dir)) {
         fs.unlinkSync(dir);
@@ -267,6 +318,8 @@ async function downloadVID(videoLink, savePath) {
       writeStream.on("error", reject);
       readableStream.on("error", reject);
     });
+    const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url;
+    return { title: info.videoDetails.title, author: info.videoDetails.author.name, thumbnail }
   } catch (error) {
     console.error("Error downloading video:", error.message);
     throw error;
@@ -277,7 +330,6 @@ async function downloadMP3(videoLink, savePath) {
   try {
     const videoId = ytdl.getURLVideoID(videoLink);
     const info = await ytdl.getInfo(videoId);
-
     const format = ytdl.chooseFormat(info.formats, {
       quality: "highestaudio",
       filter: format =>
@@ -298,6 +350,9 @@ async function downloadMP3(videoLink, savePath) {
       writeStream.on("error", reject);
       readableStream.on("error", reject);
     });
+    const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url;
+    return { title: info.videoDetails.title, author: info.videoDetails.author.name, thumbnail }
+    // I have no idea why the thumbnail isn't working with audio files
   } catch (error) {
     console.error("Error downloading audio:", error.message);
     throw error;
