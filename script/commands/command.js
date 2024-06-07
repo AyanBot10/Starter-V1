@@ -16,7 +16,7 @@ async function formatsave(filename, link) {
     const filePath = path.join(__dirname, filename);
     fs.writeFileSync(filePath, jsCode, 'utf8');
     const requiredCode = require(filePath);
-    global.cmds.set(filename, requiredCode);
+    global.cmds.set(requiredCode.config.name, requiredCode);
   } catch (error) {
     throw error;
   }
