@@ -24,10 +24,10 @@ function create_message(msg) {
         return null;
       }
     },
-    unsend: async function(text, tid) {
+    unsend: async function(textID, tid) {
       try {
-        if (!text) throw new Error("Include message_id");
-        return await api.deleteMessage(tid || msg.chat.id, text);
+        if (!textID) throw new Error("Include message_id");
+        return await api.deleteMessage(tid || msg.chat.id, textID);
       } catch (err) {
         await bot.sendMessage(msg.chat.id, err.message);
         return null;

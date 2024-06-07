@@ -6,7 +6,8 @@ module.exports = {
     role: 1
   },
   start: async function({ event, api }) {
-    await api.sendMessage(event.chat.id, "Exiting");
+    api.sendMessage(event.chat.id, "Exiting");
+    await message.unsend(event.message_id)
     api.stopPolling()
       .then(() => {
         global.log("Exited Process", "red", true)
