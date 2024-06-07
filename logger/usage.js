@@ -1,18 +1,28 @@
 const kleur = require('kleur');
 
-function logger(username, commandName, userId, type, cmd, event) {
-  if (commandName === "ai" && (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false)) return
-  let log = `${kleur.bold().bgBlack().white('[')}${kleur.bold().magenta(username)}${kleur.bold().bgBlack().white(']')} ` +
-    `${kleur.bold().bgBlack().white('[')}${type ? kleur.cyan(commandName) : kleur.yellow(commandName)}${kleur.bold().bgBlack().white(']')} ` +
-    `${kleur.bold().bgBlack().white('[')}${kleur.grey(userId)}${kleur.bold().bgBlack().white(']')}`;
+function logger({ name, command, uid, type, event }) {
+  let use24HourFormat = false
 
-  if (cmd) {
-    if (event) {
-      log += ` ${kleur.bold().bgBlack().white('[')}${kleur.red(cmd.toUpperCase())}${kleur.bold().bgBlack().white(']')} ${kleur.bold().bgBlack().white('(CMD)')}`;
-    } else {
-      log += ` ${kleur.bold().bgBlack().white('[')}${kleur.red(cmd.toUpperCase())}${kleur.bold().bgBlack().white(']')} ${kleur.bold().bgBlack().white('(Event)')}`;
-    }
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const month = now.toLocaleString('default', { month: 'short' });
+  const day = now.getDate();
+  const year = now.getFullYear();
+
+  if (!use24HourFormat) {
+    hours = hours % 12 || 12;
   }
+  const timeString = use24HourFormat ? `${hours}:${minutes}` : `${hours}:${minutes} ${ampm}`;
+  const timestamp = `${kleur.bold().bgBlack().white('[')}${kleur.green(timeString)}${kleur.bold().bgBlack().white(' : ')}${kleur.blue(month + ' ' + day + ', ' + year)}${kleur.bold().bgBlack().white(']')}`;
+
+  let log = `${timestamp} ` +
+    `${kleur.bold().bgBlack().white('[')}${kleur.bold().magenta(name)}${kleur.bold().bgBlack().white(']')} ` +
+    `${kleur.bold().bgBlack().white('[')}${type ? kleur.cyan(command) : kleur.yellow(command)}${kleur.bold().bgBlack().white(']')} ` +
+    `${kleur.bold().bgBlack().white('[')}${kleur.grey(uid)}${kleur.bold().bgBlack().white(']')} ` +
+    `${kleur.bold().bgBlack().white('[')}${kleur.red(event.toUpperCase())}${kleur.bold().bgBlack().white(']')}`;
+
   console.log(log);
 }
 

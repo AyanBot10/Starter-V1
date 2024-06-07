@@ -4,14 +4,6 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-process.on('uncaughtException', (err) => {
-  log(`Uncaught Exception: ${err.message}`, "red");
-});
-
-process.on('unhandledRejection', (reason) => {
-  log(`Unhandled Rejection: ${reason.message}`, 'red');
-});
-
 function startProject() {
   const child = spawn("node", ["main.js"], {
     cwd: __dirname,

@@ -47,26 +47,6 @@ module.exports = {
     } catch (e) {
       message.reply(e.message);
     }
-  },
-
-  chat: async function({ event, message, api, args }) {
-    let prompt = null;
-    if (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false) return
-    if (!event.text) return
-    prompt = args?.join(' ');
-    if (!history[event.from.id]) {
-      history[event.from.id] = [];
-      history[event.from.id].push({
-        role: 'user',
-        content: `My name is ${event?.from?.first_name || event?.from?.username || "Telegram User"}`
-      })
-    }
-    try {
-      history[event.from.id].push({ role: 'user', content: prompt });
-      await main(history[event.from.id], message, event, true);
-    } catch (e) {
-      console.log(e)
-    }
   }
 }
 

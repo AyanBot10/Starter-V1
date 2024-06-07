@@ -1,6 +1,24 @@
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 const { create_message } = require("./message.js");
+const fs = require("fs");
+const restartJson = require("./restart.json");
+const path = require("path");
+
+function ms_difference(startTime, endTime) {
+  return ((endTime - startTime) / 1000).toFixed(1);
+}
+
+if (restartJson.legit) {
+  const { time_ms, chat_id, author_message } = restartJson.event;
+  const secondsTook = ms_difference(time_ms, Date.now());
+  bot.sendMessage(chat_id, `Restarted. Time Taken: ${secondsTook}s`, { reply_to_message_id: author_message, disable_notification: false })
+  fs.writeFileSync(path.join(__dirname, "restart.json"), JSON.stringify({
+    legit: false,
+    event: {}
+  }, null, 2))
+}
+
 const admins = global.config_handler?.admins;
 if (admins?.length === 0) {
   global.log("Admin not set", "red", true)
@@ -66,10 +84,9 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           }
         }
         userCooldowns.set(commandName, Date.now());
-        await x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
-
+        x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
         const { username, id } = msg.from;
-        logger(username, x.config.name, id, true, "Initiation");
+        logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "initiation" });
         break;
       }
     }
@@ -85,33 +102,42 @@ bot.on("message", async msg => {
   let event = msg;
   let api = bot;
   if (msg.text && msg.text.startsWith("/")) return
+  let replied = false;
   try {
     if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
         const replyCTX = global.bot.reply.get(msg.reply_to_message.message_id)
         for (const x of global.cmds.values()) {
           if (x.config.name === replyCTX.cmd) {
+            replied = true;
             const args = msg?.text?.split(" ")
             const { username, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
             await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite, Context: replyCTX });
-            logger(username, x.config.name, id, true, "Reply");
+            logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
         }
       }
     }
-    for (const x of global.cmds.values()) {
-      const args = msg?.text?.split(" ")
-      const { username, id } = msg.from;
-      if (typeof x.chat === "function") {
-        const message = create_message(msg, x.config.name);
-        if (msg.from.bot_id) break;
-        if (x.config.name === "groq" && (!global.config.use_groq_on_chat || global.config.use_groq_on_chat === false)) return
-        await x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
-        logger(username, x.config.name, id, true, "Chat");
-        break;
+    if (!replied) {
+      for (const x of global.cmds.values()) {
+        const args = msg?.text?.split(" ")
+        const { username, id } = msg.from;
+        if (typeof x.chat === "function") {
+          const message = create_message(msg, x.config.name);
+          if (msg.from.bot_id) break;
+          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
+          logger({
+            name: username,
+            command: x.config.name,
+            uid: id,
+            type: msg.chat.type,
+            event: "message"
+          });
+          break;
+        }
       }
     }
   } catch (err) {
@@ -129,7 +155,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
           cmd?.config.name?.toLowerCase() === context.cmd) {
           const message_function = create_message(ctx);
           if (cmd && cmd[eventType]) {
-            await cmd[eventType]({
+            cmd[eventType]({
               event: message,
               api: bot,
               ctx,
@@ -140,7 +166,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
             });
           }
           const { username, id } = from;
-          logger(username, context.cmd, id, true, eventType);
+          logger({ name: username, command: context.cmd, uid: id, type: ctx?.chat?.type || null, event: eventType });
         }
       }
     }
@@ -150,7 +176,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
 const handleEvents = async (ctx, eventType) => {
   const { username, id } = ctx?.from;
   if (ctx?.text?.startsWith("/")) return
-  logger(username, "EVENT", id, true, eventType);
+  logger({ name: username, command: null, uid: id, type: ctx?.chat?.type || null, event: eventType });
 }
 
 const functionalEvents = [
