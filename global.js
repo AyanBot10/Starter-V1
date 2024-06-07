@@ -11,7 +11,7 @@ global.module = {}
 global.module.path = path;
 global.users = new Map()
 global.tmp = {}
-
+global.server = {}
 global.cmds = new Map();
 global.utils = {};
 global.log = log;

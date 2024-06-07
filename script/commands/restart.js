@@ -20,9 +20,9 @@ module.exports = {
   },
   start: async function({ event, api, message }) {
     await api.clearTextListeners()
-    message.react("👍");
+    message.send("Restarting Bot")
     restart_log(event);
-    await global.utils.sleep(500)
+    await global.utils.sleep(3000)
     global.log("Exiting Process", "red", true)
     process.exit(4);
   }

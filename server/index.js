@@ -1,6 +1,5 @@
 const express = require('express');
 const os = require('os');
-
 const app = express();
 const port = global?.config?.server?.port || 3000;
 
@@ -10,6 +9,8 @@ function formatUptime(uptimeInSeconds) {
   const seconds = Math.floor(uptimeInSeconds % 60);
   return `${hours}H, ${minutes}M, ${seconds}S`;
 }
+
+app.use("/logs", require("./routes/logs.js"));
 
 app.get('*', (req, res) => {
   const systemInfo = {
