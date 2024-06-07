@@ -19,7 +19,7 @@ module.exports = {
       if (error) {
         message.reply(`<pre><b>${error.message}</b></pre>`, { parse_mode: "HTML" });
       } else {
-        if (stdout.length > 1500) {
+        if (stdout.length > 500) {
           const filename = uuidv4();
           const file = path.join(tmp_dir, `${filename}.txt`);
           fs.writeFileSync(file, stdout);
