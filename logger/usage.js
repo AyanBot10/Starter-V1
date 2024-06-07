@@ -31,6 +31,7 @@ function logger({ name, command, uid, type, event }) {
       event,
       author: name,
       id: uid,
+      command,
       event_in: type
     };
 
