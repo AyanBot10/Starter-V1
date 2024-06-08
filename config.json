@@ -17,5 +17,6 @@
     "groq_api_key": "",
     "use_groq_on_chat": false
   },
-  "save_logs_in_server": true
+  "save_logs_in_server": true,
+  "timeZone": ""
 }
