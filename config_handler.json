@@ -1,5 +1,9 @@
 {
   "admins": [],
   "skip": [],
+  "adminOnly": {
+    "toggle": false,
+    "toggle_message": "Only the administrator can use the bot now"
+  },
   "skip_message": "Command is Unloaded"
 }

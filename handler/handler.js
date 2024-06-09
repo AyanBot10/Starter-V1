@@ -33,6 +33,11 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       }
       return
     }
+    if (global.config_handler.adminOnly.toggle) {
+      if (!admins.includes(msg.from.id)) {
+        return global.config_handler.adminOnly.toggle_message.length > 2 ? bot.sendMessage(msg.chat.id, global.config_handler.adminOnly.toggle_message, { reply_to_message_id: msg.message_id }) : null
+      }
+    }
     const message = create_message(msg);
     const command = match[1];
     const args = msg.text.split(" ").slice(1);

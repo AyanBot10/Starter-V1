@@ -22,6 +22,9 @@ commandFiles.forEach((file) => {
       if (!command.config || !command.config.name) {
         throw new Error("config and/or config.name not set");
       }
+      if (!command.start || typeof command.start !== "function") {
+        throw new Error("function start not set")
+      }
       if (loadedFiles.includes(command.config.name)) {
         throw new Error(`${command.config.name} Already Exists`);
       }
@@ -31,7 +34,6 @@ commandFiles.forEach((file) => {
         if (commandsNamesAndAliases.has(command.config.name) || aliases.some(alias => commandsNamesAndAliases.has(alias))) {
           throw new Error(`${[command.config.name, ...aliases].join(", ")} Already Exists in other files`);
         }
-
         aliases.forEach(alias => commandsNamesAndAliases.add(alias));
       }
 
