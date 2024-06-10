@@ -766,4 +766,4 @@
 }
 ```
 
-### Briefed by GPT 4o
+### Briefed by GPT-4o
