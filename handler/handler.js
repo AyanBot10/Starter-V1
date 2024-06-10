@@ -9,7 +9,7 @@ function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
 
-if (restartJson.legit) {
+if (restartJson?.legit) {
   const { time_ms, chat_id, author_message } = restartJson.event;
   const secondsTook = ms_difference(time_ms, Date.now());
   bot.sendMessage(chat_id, `Restarted. Time Taken: ${secondsTook}s`, { reply_to_message_id: author_message, disable_notification: false })
@@ -43,16 +43,9 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
     if (global.config["use_sqlite_on_start"]) {
-      let check = global.users.has(msg.from.id);
-      if (!check) {
-        check = await global.sqlite.exists(msg.from.id);
-      }
-      if (!check) {
-        await global.sqlite.create(msg.from.id)
-        await global.sqlite.update(msg.from.id, {
-          ...msg.from
-        })
-      }
+      let check = await global.sqlite.exists(msg.from.id)
+      if (!check)
+        global.sqlite.refresh(msg.from.id, msg)
     }
     for (const x of global.cmds.values()) {
       if (
