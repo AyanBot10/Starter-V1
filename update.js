@@ -9,7 +9,7 @@ const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 let log = global.log;
 
-const token = global.config.BOT['BOT_TOKEN'];
+const token = global.config.BOT['token'];
 if (!token) {
   log("Include Bot Token", 'red', true)
   process.exit(1);

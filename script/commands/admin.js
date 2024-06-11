@@ -64,7 +64,7 @@ module.exports = {
 
         Promise.all(adminPromises)
           .then(admins => {
-            const adminList = admins.map(admin => `@${admin.username} (${admin.uid})`).join("\n");
+            const adminList = admins.map(admin => `\n@${admin.username} (${admin.uid})`).join(' ');
             message.reply(`Current admins: ${adminList}`);
           })
           .catch(err => {

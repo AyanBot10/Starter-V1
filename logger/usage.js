@@ -2,7 +2,7 @@ const kleur = require('kleur');
 
 function logger({ name, command, uid, type, event }) {
   const use24HourFormat = false;
-  let timeZone = global.config?.timeZone
+  let timeZone = global.config?.timeZone;
   const now = new Date();
   const options = {
     timeZone: timeZone,
@@ -28,13 +28,15 @@ function logger({ name, command, uid, type, event }) {
     `${kleur.bold().bgBlack().white('[')}${type ? kleur.cyan(command) : kleur.yellow(command)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${kleur.grey(uid)}${kleur.bold().bgBlack().white(']')} ` +
     `${kleur.bold().bgBlack().white('[')}${kleur.red(event.toUpperCase())}${kleur.bold().bgBlack().white(']')}`;
+
   // Console
   console.log(log);
 
   if (global.config.server["save_logs_in_server"]) {
-    const log = {
+    const logEntry = {
       timestamp: now.getTime(),
       readable_time: timeString,
+      readable_date: dateString,
       event,
       author: name,
       id: uid,
@@ -46,7 +48,7 @@ function logger({ name, command, uid, type, event }) {
       if (global.server.logs.length > 25) {
         global.server.logs = global.server.logs.slice(20);
       }
-      global.server.logs.push(log);
+      global.server.logs.push(logEntry);
     }
   }
 }

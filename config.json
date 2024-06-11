@@ -23,7 +23,7 @@
     "groq_api_key": "",
     "use_groq_on_chat": false
   },
-  "timeZone": "",
+  "timeZone": "Asia/Shanghai",
   "DATABASE": {
     "sqlite": {
       "CONNECT_SQLITE": true
