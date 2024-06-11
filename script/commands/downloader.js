@@ -8,9 +8,9 @@ function checkLink(url) {
 }
 
 async function downloader(url) {
-  const link = process.env.DOWNLOADER;
+  const link = global.config.BOT.DOWNLOADER;
   if (!link) {
-    throw new Error("Include the API URI in .env file of the key 'DOWNLOADER'");
+    throw new Error("Include the API URI in config. 'DOWNLOADER'");
   }
   try {
     const response = await axios.get(`${link}/media/parse?address=${url}`, {

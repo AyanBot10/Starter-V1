@@ -2,31 +2,40 @@ const axios = require("axios");
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
 const config_handler = require("./config_handler.json")
-const path = require("path");
 const crypto = require("crypto");
 const fs = require('fs');
 
+
+// Configs
 global.config_handler = config_handler
-global.module = {}
-global.module.path = path;
-global.users = new Map()
+global.config = config;
+
+
 global.tmp = {}
-global.cmds = new Map();
 global.utils = {};
 global.log = log;
-global.config = config;
 global.bot = {};
 global.bot.text = [];
 global.bot.message = new Map();
 global.bot.reply = new Map()
-global.bot.edited_message = new Map()
-global.bot.channel_post = [];
-global.bot.edited_channel_post = [];
 global.bot.inline_query = new Map();
 global.bot.chosen_inline_result = new Map();
 global.bot.callback_query = new Map();
 global.bot.shipping_query = new Map();
+
+// Cooldown
+global.cooldown = new Map()
+
+
+// Databases
+global.mongo = {};
+global.sqlite = {};
+
 /*
+Unnecessary Stuff
+global.bot.edited_message = new Map()
+global.bot.channel_post = [];
+global.bot.edited_channel_post = [];
 global.bot.pre_checkout_query = new Map();
 global.bot.poll = new Map();
 global.bot.poll_answer = new Map();
@@ -56,7 +65,8 @@ global.bot.migrate_from_chat_id = new Map();
 global.bot.pinned_message = new Map();
 */
 
-global.cooldown = new Map()
+
+// Utils
 global.utils.getStream = async function(link) {
   try {
     const response = await axios.get(link, { responseType: 'stream' });
@@ -82,9 +92,6 @@ if (!global.react_emojis) {
     global.react_emojis = []
   })
 }
-
-global.mongo = {};
-global.sqlite = {};
 
 global.uuid = function() {
   return crypto.randomUUID();

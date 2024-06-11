@@ -26,21 +26,21 @@ let userModel = undefined;
 let DB = undefined;
 let update = undefined;
 
-if (process.env["CONNECT_MONGODB"] == 'true') {
+if (global.config.mongodb["CONNECT_MONGODB"]) {
   userModel = require("./Database/MongoDB/user.js");
   DB = require("./Database/MongoDB/DB.js");
   update = require("./Database/MongoDB/updateDB.js");
   global.mongo.update = update;
 }
 
-if (process.env['CONNECT_SQLITE'] == 'true') {
+if (global.config.DATABASE.sqlite['CONNECT_SQLITE']) {
   run_sqlite();
 }
 
 require("./handler/handler.js");
 
 async function connectDB() {
-  if (!process.env["CONNECT_MONGODB"]) return false
+  if (!global.config.DATABASE.mongodb["CONNECT_MONGODB"]) return false
   try {
     log("Connecting To MongoDB", "red", false);
     await DB();
@@ -52,7 +52,7 @@ async function connectDB() {
   }
 }
 
-if (process.env["CONNECT_MONGODB"] == 'true') {
+if (global.config.DATABASE.mongodb["CONNECT_MONGODB"]) {
   connectDB().then((x) => {
     log("Logged in with DB", "green", false)
   });

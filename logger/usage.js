@@ -31,7 +31,7 @@ function logger({ name, command, uid, type, event }) {
   // Console
   console.log(log);
 
-  if (global.config["save_logs_in_server"]) {
+  if (global.config.server["save_logs_in_server"]) {
     const log = {
       timestamp: now.getTime(),
       readable_time: timeString,

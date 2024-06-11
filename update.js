@@ -7,12 +7,9 @@ process.emitWarning = (warning, type) => {
 require("./global");
 const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
-const log = require("./logger/chalk.js")
-global.log = log;
+let log = global.log;
 
-require('dotenv').config();
-
-const token = process.env['BOT_TOKEN'];
+const token = global.config.BOT['BOT_TOKEN'];
 if (!token) {
   log("Include Bot Token", 'red', true)
   process.exit(1);
@@ -27,7 +24,7 @@ const array = commandList.map(command => {
   const { name, description } = global.cmds[command].config;
   return {
     command: name,
-    description: description?.short || description?.long || (typeof description === 'string' ? description : 'N/A')
+    description: description?.long || description?.short || (typeof description === 'string' ? description : 'N/A')
   };
 });
 
