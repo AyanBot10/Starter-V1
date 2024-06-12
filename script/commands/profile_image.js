@@ -25,7 +25,7 @@ module.exports = {
       }
 
       const fileId = photos.photos[0][0].file_id;
-      await bot.sendPhoto(chatId, fileId, { caption: `Profile image of ${username}` });
+      await bot.sendPhoto(chatId, fileId, { caption: `Profile image of ${username.username}` });
     } catch (error) {
       try {
         const fallbackPhotos = await bot.getUserProfilePhotos(msg.from.id);
