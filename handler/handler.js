@@ -43,10 +43,20 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
     if (global.config["use_sqlite_on_start"]) {
-      let check = await global.sqlite.exists(msg.from.id)
-      if (!check)
-        global.sqlite.refresh(msg.from.id, msg)
+      let check = await global.sqlite.usersData.exists(msg.from.id)
+      let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
+      if (!check) {
+        global.sqlite.usersData.refresh(msg.from.id, msg)
+      }
+      if (!threadCheck) {
+        global.sqlite.threadsData.refresh(msg.chat.id, msg)
+      }
+      const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
+      if (userIsBanned?.isBanned) return message.reply(userIsBanned?.ban_message || "You have been banned from the system.")
+      //   const bannedThread = (await global.sqlite.threadsData.retrieve(msg.chat.id))?.isBanned || false;
     }
+    const bannedThread = global.config_handler.banned_threads.chats.includes(msg.chat.id)
+    return bannedThread ? message.reply(global.config_handler.banned_threads.message) : null
     for (const x of global.cmds.values()) {
       if (
         x.config.name?.toLowerCase() === command?.toLowerCase() ||
@@ -82,7 +92,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           }
         }
         userCooldowns.set(commandName, Date.now());
-        x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite });
+        x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData });
         const { username, id } = msg.from;
         logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "initiation" });
         break;
@@ -112,7 +122,7 @@ bot.on("message", async msg => {
             const { username, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite, Context: replyCTX });
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, threadsData: global.sqlite.threadsData });
             logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
@@ -126,7 +136,7 @@ bot.on("message", async msg => {
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
-          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite });
+          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData });
           logger({
             name: username,
             command: x.config.name,
@@ -160,7 +170,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               Context: context,
               message: message_function,
               cmd: context?.cmd || cmd?.config?.name || null,
-              usersData: global.sqlite
+              usersData: global.sqlite.usersData,
+              threadsData: global.sqlite.threadsData
             });
           }
           const { username, id } = from;

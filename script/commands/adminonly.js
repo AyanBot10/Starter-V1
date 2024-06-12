@@ -13,11 +13,15 @@ module.exports = {
         let text = args.slice(1).join(' ');
         global.utils.configSync({ adminOnly: { toggle: true, toggle_message: text || false } });
         message.reply("Toggled the setting on");
+        const config = require("./config_handler.json");
+        global.config_handler = config
         break;
       }
       case 'off': {
         global.utils.configSync({ adminOnly: { toggle: false } });
         message.reply("Toggled the setting off");
+        const config = require("./config_handler.json");
+        global.config_handler = config
         break;
       }
       default: {

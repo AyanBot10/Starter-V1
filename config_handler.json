@@ -5,5 +5,9 @@
     "toggle": false,
     "toggle_message": "Only the administrator can use the bot now"
   },
+  "banned_threads": {
+    "chats": [],
+    "message": "This chat is banned"
+  },
   "skip_message": "Command is Unloaded"
 }
