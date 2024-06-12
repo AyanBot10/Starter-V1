@@ -98,10 +98,10 @@ global.uuid = function() {
 }
 
 global.utils.configSync = function(json) {
-  let currentConfig = fs.existsSync("config_handler.json") ? JSON.parse(fs.readFileSync("config_handler.json", 'utf8')) : {};
+  const currentConfig = fs.existsSync("config_handler.json") ? JSON.parse(fs.readFileSync("config_handler.json", 'utf8')) : {};
   fs.writeFileSync("config_handler.json", JSON.stringify({ ...currentConfig, ...json }, null, 2), 'utf8');
+  global.config_handler = require("./config_handler.json");
   return true;
 };
-
 
 module.exports = null;
