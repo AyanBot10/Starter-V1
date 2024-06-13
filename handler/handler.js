@@ -44,19 +44,19 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     let commandFound = false;
     if (global.config["use_sqlite_on_start"]) {
       let check = await global.sqlite.usersData.exists(msg.from.id)
-      let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
       if (!check) {
         global.sqlite.usersData.refresh(msg.from.id, msg)
       }
-      if (!threadCheck) {
-        global.sqlite.threadsData.refresh(msg.chat.id, msg)
-      }
+      //let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
+      /*  if (!threadCheck) {
+          global.sqlite.threadsData.refresh(msg.chat.id, msg, bot)
+        }*/
       const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
       if (userIsBanned?.isBanned) return message.reply(userIsBanned?.ban_message || "You have been banned from the system.")
       //   const bannedThread = (await global.sqlite.threadsData.retrieve(msg.chat.id))?.isBanned || false;
     }
     const bannedThread = global.config_handler.banned_threads.chats.includes(msg.chat.id)
-    return bannedThread ? message.reply(global.config_handler.banned_threads.message) : null
+    // return bannedThread ? message.reply(global.config_handler.banned_threads.message) : null;
     for (const x of global.cmds.values()) {
       if (
         x.config.name?.toLowerCase() === command?.toLowerCase() ||

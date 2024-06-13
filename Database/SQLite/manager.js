@@ -218,8 +218,8 @@ threadsData.createOrUpdateThread.empty = async function(threadId) {
   return threadsData.upsertThreadData(threadId, {});
 };
 
-threadsData.createOrUpdateThread.refresh = async function(threadId, event) {
-  const admins = await api.getChatAdministrators(event.chat.id).map(x => x.user);
+threadsData.createOrUpdateThread.refresh = async function(threadId, event, api) {
+  const admins = event.chat.type !== "private" ? await api.getChatAdministrators(event.chat.id).map(x => x.user) : [null]
   return threadsData.upsertThreadData(threadId, { ...admins, ...event.chat, isBanned: false });
 };
 
@@ -239,7 +239,7 @@ module.exports = {
     retrieve: getUserData,
     delete: deleteUser,
     getAll: getAllUsers,
-   // deleteAll: deleteAllUsers,
+    // deleteAll: deleteAllUsers,
     exists,
     create: createOrUpdateUser.empty,
     refresh: createOrUpdateUser.refresh,
