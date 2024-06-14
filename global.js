@@ -10,6 +10,9 @@ const fs = require('fs');
 global.config_handler = config_handler
 global.config = config;
 
+// Prefix
+global.prefix = {};
+
 
 global.tmp = {}
 global.utils = {};

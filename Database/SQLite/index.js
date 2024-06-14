@@ -18,12 +18,12 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
   }
 });
 
-db.run(`CREATE TABLE IF NOT EXISTS threads (
+db.run(`CREATE TABLE IF NOT EXISTS Threads (
     id TEXT PRIMARY KEY,
     data TEXT
 )`, (err) => {
   if (err) {
-    console.error('Error creating threads table:', err.message);
+    console.error('Error creating Threads table:', err.message);
   }
 });
 
