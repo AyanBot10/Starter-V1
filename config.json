@@ -1,8 +1,9 @@
 {
+  "prefix": "/",
   "BOT": {
     "token": "",
     "DOWNLOADER": "",
-    "polling":  true
+    "polling": true
   },
   "server": {
     "toggle": true,

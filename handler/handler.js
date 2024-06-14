@@ -24,7 +24,9 @@ if (admins?.length === 0) {
   global.log("Admin not set", "red", true)
 }
 
-bot.onText(/\/(\w+)/, async (msg, match) => {
+const { prefix } = global.config;
+
+bot.onText(new RegExp(`\/(${prefix}\\w+)`), async (msg, match) => {
   try {
     if (msg.from.bot_id) return;
     if (!global.config?.chat?.level.includes(msg.chat.type)) {
