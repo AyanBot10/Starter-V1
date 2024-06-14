@@ -14,7 +14,7 @@ module.exports = {
     if (!query) return message.Syntax();
 
     try {
-      message.react()
+      message.react('', event.message_id)
       const response = await axios.get(`https://www.pinterest.com/resource/BaseSearchResource/get/`, {
         params: {
           source_url: `/search/pins/?rs=ac&len=2&q=${encodeURIComponent(query)}`,

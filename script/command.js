@@ -30,10 +30,14 @@ commandFiles.forEach((file) => {
       }
 
       if (command.config.aliases) {
-        const aliases = command.config.aliases;
+        if (typeof command.config.aliases !== "object") {
+          throw new Error("aliases must be an array")
+        }
+        let aliases = command.config.aliases;
         if (commandsNamesAndAliases.has(command.config.name) || aliases.some(alias => commandsNamesAndAliases.has(alias))) {
           throw new Error(`${[command.config.name, ...aliases].join(", ")} Already Exists in other files`);
         }
+        aliases = aliases.filter(v => v.length === 0)
         aliases.forEach(alias => commandsNamesAndAliases.add(alias));
       }
 
