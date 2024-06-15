@@ -136,7 +136,6 @@ module.exports = {
   sleep,
   uuid,
   configSync,
-  translateAPI,
   translate,
   uploadImgbb
 }
