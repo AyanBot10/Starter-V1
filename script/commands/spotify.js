@@ -2,6 +2,8 @@ const axios = require('axios');
 const { search } = require("@nechlophomeriaa/spotifydl");
 const { downloadTrack2: downloadTrack, downloadAlbum2 } = require("@nechlophomeriaa/spotifydl");
 const { v4: uuid } = require("uuid");
+const fs = require("fs");
+const path = require("path");
 
 global.tmp.spotify = global.tmp?.spotify || new Set();
 
@@ -36,7 +38,8 @@ async function searchTrack(query, limit) {
 async function downloadSong(song) {
   try {
     const downTrack = await downloadTrack(song);
-    const audioBuffer = downTrack.audioBuffer;
+    var dir = path.join(__dirname, "tmp", `${uuid()}.mp3`);
+    await fs.writeFileSync(dir, downTrack.audioBuffer);
     const response = {
       status: "success",
       title: downTrack.title,
@@ -52,7 +55,7 @@ async function downloadSong(song) {
         releaseDate: downTrack.album.releasedDate
       },
       thumbnail: downTrack.imageUrl,
-      audioBuffer,
+      dir
     };
     return response;
   } catch (error) {
@@ -82,7 +85,7 @@ module.exports = {
         api.sendChatAction(event.chat.id, 'upload_audio')
         downloadResponse = await downloadSong(query);
         api.deleteMessage(event.chat.id, prmsg.message_id);
-        await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {
+        await api.sendAudio(event.chat.id, downloadResponse.dir, {
           caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`
         });
       } catch (error) {
@@ -167,6 +170,7 @@ module.exports = {
     }
   },
   callback_query: async function({ event, api, ctx, Context, message }) {
+    let dir;
     try {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
       await api.deleteMessage(
@@ -176,17 +180,20 @@ module.exports = {
       const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
       api.sendChatAction(event.chat.id, 'upload_audio')
       downloadResponse = await downloadSong(ctx.data);
-      await api.sendAudio(event.chat.id, downloadResponse.audioBuffer, {
+      await api.sendAudio(event.chat.id, downloadResponse.dir, {
         caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,
         thumb: downloadResponse.thumbnail,
         title: downloadResponse.title,
         performer: downloadResponse.artist
       });
-
+      dir = downloadResponse.dir
       api.deleteMessage(event.chat.id, prmsg.message_id);
     } catch (error) {
       console.error(error);
       api.sendMessage(event.chat.id, `${error?.message || "Exception Occurred"}`);
+    } finally {
+      if (dir)
+        fs.unlinkSync(dir)
     }
   }
 };
