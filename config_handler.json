@@ -10,5 +10,9 @@
     "message": "This chat is banned"
   },
   "skip_message": "Command is Unloaded",
-  "authorization_prompt": true
+  "authorization_prompt": true,
+  "auto_clean": {
+    "toggle": true,
+    "time": 18500000
+  }
 }

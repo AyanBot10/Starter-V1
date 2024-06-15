@@ -11,6 +11,20 @@ function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
 
+function clearCache() {
+  const dir = path.resolve('script', 'commands', 'tmp');
+  // might need fixing
+  const files = fs.readdirSync(dir);
+  files.forEach(file => fs.unlinkSync(path.join(dir, file)));
+  global.log('Cleared Cache', 'red');
+}
+
+if (global.config_handler.auto_clean.toggle) {
+  const interval = !isNaN(global.config_handler.auto_clean.time) ? global.config_handler.auto_clean.time : 1800000;
+  setInterval(clearCache, interval);
+  global.log(`Cache cleaner in effect, Interval: ${(interval / 1000 / 60).toFixed(2)} minutes`, 'yellow');
+}
+
 if (restartJson?.legit) {
   const { time_ms, chat_id, author_message } = restartJson.event;
   const secondsTook = ms_difference(time_ms, Date.now());
@@ -137,7 +151,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           message,
           cmd: x?.config?.name,
           usersData: global.sqlite.usersData,
-          threadsData: global.sqlite.threadsData,
+          //threadsData: global.sqlite.threadsData,
           role: admins.includes(String(msg.from.id)) ? 1 : 0
         });
         const { username, id } = msg.from;
@@ -169,7 +183,7 @@ bot.on("message", async msg => {
             const { username, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, threadsData: global.sqlite.threadsData });
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, /*threadsData: global.sqlite.threadsData*/ role: admins.includes(String(msg.from.id)) ? 1 : 0 });
             logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
@@ -183,7 +197,7 @@ bot.on("message", async msg => {
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
-          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData });
+          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, /*threadsData: global.sqlite.threadsData*/ role: admins.includes(String(msg.from.id)) ? 1 : 0 });
           logger({
             name: username,
             command: x.config.name,
@@ -218,7 +232,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               message: message_function,
               cmd: context?.cmd || cmd?.config?.name || null,
               usersData: global.sqlite.usersData,
-              threadsData: global.sqlite.threadsData
+              //threadsData: global.sqlite.threadsData
+              role: admins.includes(String(msg.from.id)) ? 1 : 0
             });
           }
           const { username, id } = from;

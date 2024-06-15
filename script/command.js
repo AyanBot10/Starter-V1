@@ -18,6 +18,7 @@ commandFiles.forEach((file) => {
 
   if (file.endsWith(".js")) {
     try {
+      let filePath = `${commandsPath}/${file}`;
       const command = require(path.join(commandsPath, file));
       if (!command.config || !command.config.name) {
         throw new Error("config and/or config.name not set");
@@ -25,10 +26,10 @@ commandFiles.forEach((file) => {
       if (!command.start || typeof command.start !== "function") {
         throw new Error("function start not set")
       }
+      command.config.path = filePath;
       if (loadedFiles.includes(command.config.name)) {
         throw new Error(`${command.config.name} Already Exists`);
       }
-
       if (command.config.aliases) {
         if (typeof command.config.aliases !== "object") {
           throw new Error("aliases must be an array")
