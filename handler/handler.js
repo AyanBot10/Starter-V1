@@ -1,3 +1,5 @@
+"use strict"
+
 const bot = require("./login.js");
 const logger = require("../logger/usage.js");
 const { create_message } = require("./message.js");
@@ -46,12 +48,48 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       let check = await global.sqlite.usersData.exists(msg.from.id)
       if (!check) {
         global.sqlite.usersData.refresh(msg.from.id, msg)
+        global.sqlite.usersData.update(msg.from.id, { authorized: false })
       }
       //let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
       /*  if (!threadCheck) {
           global.sqlite.threadsData.refresh(msg.chat.id, msg, bot)
         }*/
       const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
+
+      if (!userIsBanned.authorized && global.config_handler.authorization_prompt) {
+        const authorizationMessage = await message.reply(`
+  By accessing or using our services, you acknowledge and agree to the following:
+
+  * *Interactions*: Your interactions, including the initialization and execution of commands, may be recorded for analysis and optimization.
+  * *Data Storage*: Any data you provide may be securely stored and processed for record-keeping and future analysis.
+  * *Purpose*: Our services are for entertainment purposes only and should not be relied upon for any other use.
+  * *Privacy*: Group logs may capture metadata (excluding content) for privacy and security reasons.
+  * *Consent*: User consent is required for data sharing beyond stated purposes, as per our privacy policy.
+  * *Data Retention*: We follow data retention policies to comply with regulations and protect user information.
+  * *Enhancements*: Collected data will be used to enhance user experience, improve service quality, and personalize interactions.
+  * *User Rights*: You have the right to request access to, deletion, or modification of your stored data.
+  * *Security*: Measures such as encryption, access controls, and regular audits will be employed to safeguard user data.
+  * *Admin Requests*: Use the \`callad\` command to report or request changes regarding your data.
+  * *Content Storage*: The bot will not store any content sent in chats.
+
+  You will be able to use the commands once you agree to these terms.
+  `, {
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+        [{ text: 'Agree', callback_data: 'confirm' },
+                { text: 'Disagree', callback_data: 'cancel' }]
+      ]
+          }
+        });
+
+        return global.bot.callback_query.set(authorizationMessage.message_id, {
+          cmd: "authorization",
+          author: msg.from.id,
+          messageID: authorizationMessage.message_id
+        });
+      }
+
       if (userIsBanned?.isBanned) return message.reply(userIsBanned?.ban_message || "You have been banned from the system.")
       //   const bannedThread = (await global.sqlite.threadsData.retrieve(msg.chat.id))?.isBanned || false;
     }
@@ -92,7 +130,16 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           }
         }
         userCooldowns.set(commandName, Date.now());
-        x.start({ event: msg, args, api: bot, message, cmd: x?.config?.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData });
+        x.start({
+          event: msg,
+          args,
+          api: bot,
+          message,
+          cmd: x?.config?.name,
+          usersData: global.sqlite.usersData,
+          threadsData: global.sqlite.threadsData,
+          role: admins.includes(String(msg.from.id)) ? 1 : 0
+        });
         const { username, id } = msg.from;
         logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "initiation" });
         break;

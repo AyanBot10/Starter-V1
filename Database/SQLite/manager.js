@@ -46,13 +46,20 @@ function deleteUser(userId) {
   });
 }
 
-function getAllUsers() {
+async function getAllUsers() {
   return new Promise((resolve, reject) => {
-    db.all(`SELECT id FROM users`, (err, rows) => {
+    db.all(`SELECT id FROM users`, async (err, rows) => {
       if (err) {
         reject(new Error('Database error'));
       } else {
-        resolve(rows);
+        try {
+          const accs = await Promise.all(rows.map(async n => {
+            return await getUserData(n.id);
+          }));
+          resolve(accs);
+        } catch (error) {
+          reject(new Error('Error fetching user data'));
+        }
       }
     });
   });

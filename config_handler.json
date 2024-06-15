@@ -9,5 +9,6 @@
     "chats": [],
     "message": "This chat is banned"
   },
-  "skip_message": "Command is Unloaded"
+  "skip_message": "Command is Unloaded",
+  "authorization_prompt": true
 }
