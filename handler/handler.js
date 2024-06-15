@@ -48,6 +48,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       let check = await global.sqlite.usersData.exists(msg.from.id)
       if (!check) {
         global.sqlite.usersData.refresh(msg.from.id, msg)
+        global.log(`New User: @${msg.from.username}`, "yellow")
         global.sqlite.usersData.update(msg.from.id, { authorized: false })
       }
       //let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
@@ -69,7 +70,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
   * *Enhancements*: Collected data will be used to enhance user experience, improve service quality, and personalize interactions.
   * *User Rights*: You have the right to request access to, deletion, or modification of your stored data.
   * *Security*: Measures such as encryption, access controls, and regular audits will be employed to safeguard user data.
-  * *Admin Requests*: Use the \`callad\` command to report or request changes regarding your data.
+  * *Admin Requests*: Use the \`calladmin\` command to report or request changes regarding your data.
   * *Content Storage*: The bot will not store any content sent in chats.
 
   You will be able to use the commands once you agree to these terms.
