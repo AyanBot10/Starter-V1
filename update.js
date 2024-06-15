@@ -4,7 +4,7 @@ process.emitWarning = (warning, type) => {
   }
 };
 
-require("./global");
+require("./starter");
 const fs = require('fs');
 const TelegramBot = require('node-telegram-bot-api');
 let log = global.log;

@@ -1,9 +1,7 @@
-const axios = require("axios");
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
 const config_handler = require("./config_handler.json")
-const crypto = require("crypto");
-const fs = require('fs');
+const utils = require("./utils");
 
 
 // Configs
@@ -29,13 +27,18 @@ global.bot.shipping_query = new Map();
 // Cooldown
 global.cooldown = new Map()
 
-
 // Databases
 global.mongo = {};
-global.sqlite = {};
+global.sqlite = {}
 
-/*
-Unnecessary Stuff
+// Miscellaneous;
+global.react_emojis = axios.get("https://gist.githubusercontent.com/SatoX69/247e9d735a145fc059715a92ccd7b0f6/raw/4d1287c6750d84e55ece9e405ddc988643baf2b9/allowed_emojis.json").then(response => {
+  global.react_emojis = response.data.emojis
+}).catch(err => {
+  global.log("Failed to set global EMOJI", "red")
+  global.react_emojis = []
+});
+
 global.bot.edited_message = new Map()
 global.bot.channel_post = [];
 global.bot.edited_channel_post = [];
@@ -66,45 +69,14 @@ global.bot.channel_chat_created = new Map();
 global.bot.migrate_to_chat_id = new Map();
 global.bot.migrate_from_chat_id = new Map();
 global.bot.pinned_message = new Map();
-*/
-
 
 // Utils
-global.utils.getStream = async function(link) {
+global.log("Loading Utils", "blue")
+for (let util of utils) {
   try {
-    const response = await axios.get(link, { responseType: 'stream' });
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      throw { status: response.status }
-    }
+    global.util[util] = utils[util]
   } catch (err) {
-    return `Response returned status ${err?.status}`;
+    global.log(`Error while loading util ${util} : ${err.message}`)
   }
-};
-
-global.utils.sleep = async function(ms) {
-  return await new Promise(resolve => setTimeout(resolve, ms))
+  global.log("Successfully Loaded Utils")
 }
-
-if (!global.react_emojis) {
-  axios.get("https://gist.githubusercontent.com/SatoX69/247e9d735a145fc059715a92ccd7b0f6/raw/4d1287c6750d84e55ece9e405ddc988643baf2b9/allowed_emojis.json").then(response => {
-    global.react_emojis = response.data.emojis
-  }).catch(err => {
-    global.log("Failed to set global EMOJI", "red")
-    global.react_emojis = []
-  })
-}
-
-global.uuid = function() {
-  return crypto.randomUUID();
-}
-
-global.utils.configSync = function(json) {
-  const currentConfig = fs.existsSync("config_handler.json") ? JSON.parse(fs.readFileSync("config_handler.json", 'utf8')) : {};
-  fs.writeFileSync("config_handler.json", JSON.stringify({ ...currentConfig, ...json }, null, 2), 'utf8');
-  global.config_handler = require("./config_handler.json");
-  return true;
-};
-
-module.exports = null;

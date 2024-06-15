@@ -12,7 +12,7 @@ async function stream(link) {
 
 async function process(search, items = 6) {
   try {
-    const link = search[0] ? `https://seegore.com/?s=${search.join("+")}` : ['https://seegore.com/gore/', `https://seegore.com/gore/page/${Math.floor(Math.random() * 185) + 1}`][Math.floor(Math.random() * 2)];
+    const link = search[0] === "latest" ? 'https://seegore.com/gore/' : search[0] ? `https://seegore.com/?s=${search.join("+")}` : `https://seegore.com/gore/page/${Math.floor(Math.random() * 185) + 1}`;
     const response = await axios.get(link);
     const $ = cheerio.load(response.data);
     let links = [];
@@ -105,14 +105,14 @@ module.exports = {
   },
   callback_query: async function({ event, api, ctx, Context, message }) {
     try {
-    await api.answerCallbackQuery({ callback_query_id: ctx.id });
-    if (Context.author != ctx.from.id) return message.reply("Unauthorized");
-    await message.edit("Scrapping the selected video...", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } })
-    await api.sendChatAction(event.chat?.id, "upload_video")
-    await api.deleteMessage(event.chat.id, ctx.message.message_id);
-    await api.sendVideo(event.chat.id, global.tmp.gore.get(ctx.data))
-  } catch (err) {
-    api.sendMessage(event.chat.id, `${err.message}\nAPI only allows MP4 links ;(`)
-  }
+      await api.answerCallbackQuery({ callback_query_id: ctx.id });
+      if (Context.author != ctx.from.id) return message.reply("Unauthorized");
+      await message.edit("Scrapping the selected video...", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } })
+      await api.sendChatAction(event.chat?.id, "upload_video")
+      await api.deleteMessage(event.chat.id, ctx.message.message_id);
+      await api.sendVideo(event.chat.id, global.tmp.gore.get(ctx.data))
+    } catch (err) {
+      api.sendMessage(event.chat.id, `${err.message}\nAPI only allows MP4 links ;(`)
+    }
   }
 }
