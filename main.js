@@ -6,7 +6,7 @@ process.emitWarning = (warning, type) => {
 
 const config = require("./config.json");
 require("./starter");
-const run_sqlite = require("./Database/SQLite/starter.js");
+const run_sqlite = require("./Database/SQLite/global.js");
 
 var log = global.log;
 

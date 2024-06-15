@@ -1,6 +1,7 @@
 const log = require("./logger/chalk.js");
 const config = require("./config.json");
-const config_handler = require("./config_handler.json")
+const config_handler = require("./config_handler.json");
+const axios = require("axios");
 const utils = require("./utils");
 
 
@@ -72,11 +73,11 @@ global.bot.pinned_message = new Map();
 
 // Utils
 global.log("Loading Utils", "blue")
-for (let util of utils) {
+for (let util of Object.keys(utils)) {
   try {
-    global.util[util] = utils[util]
+    global.utils[util] = utils[util]
   } catch (err) {
     global.log(`Error while loading util ${util} : ${err.message}`)
   }
-  global.log("Successfully Loaded Utils")
 }
+global.log("Successfully Loaded Utils")

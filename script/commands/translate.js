@@ -6,26 +6,24 @@ module.exports = {
     usage: "{pn} text (or reply) | lang_code"
   },
   start: async function({ event, args, message, api, cmd }) {
-    let inputText;
+    let inputText = args.length ? args.join(' ') : event?.reply_to_message?.text;
+    if (!inputText) return message.Syntax(cmd);
 
-    if (args[0]) {
-      inputText = args.join(' ');
-    } else if (event?.reply_to_message?.text) {
-      inputText = event.reply_to_message.text;
+    var text, lang;
+
+    if (inputText.includes('|')) {
+      var [text, lang] = inputText.split("|").map(x => x.trim());
     } else {
-      return message.Syntax(cmd);
+      text = inputText.trim();
+      lang = "en";
     }
-
-    let [text, lang = "en"] = inputText.includes('|') ?
-      inputText.split("|").map(x => x.trim()) : [inputText.trim(), "en"];
-
     message.indicator();
-
     try {
       let translatedText = await global.utils.translate(text, lang);
-      await message.reply(translatedText);
+      message.reply(translatedText);
     } catch (error) {
-      await message.reply("An error occurred while translating the text. Please try again.");
+      console.log(error)
+      await message.reply("Exception Occurred");
     }
   }
 };
