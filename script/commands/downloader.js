@@ -62,8 +62,7 @@ module.exports = {
     aliases: ["fetch", "dl", "media"],
     description: "Fetches media from different sources",
     usage: "{pn} <post_link>",
-    author: "Tanvir",
-    cooldown: 15
+    author: "Tanvir"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd);
