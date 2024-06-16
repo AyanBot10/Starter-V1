@@ -133,28 +133,39 @@ module.exports = {
       const results = await searchYTB(query);
       const media = results.map(item => ({
         type: "photo",
-        media: item.thumbnail_url
+        media: item.thumbnail_url,
+        caption: item.title
       }));
 
-      const inline_data = results.map(item => [
-        {
-          text: `${item.duration} : ${item.title}`,
-          callback_data: `${item.duration_ms}^${item.video_url}`
-                }
-            ]);
+      const inline_data = results.map((item, i) => ({
+        text: `${i + 1} : ${item.duration}`,
+        callback_data: `${item.duration_ms}^${item.video_url}`
+      }));
+
+      const createGrid = (buttons, columns) => {
+        let grid = [];
+        for (let i = 0; i < buttons.length; i += columns) {
+          grid.push(buttons.slice(i, i + columns));
+        }
+        return grid;
+      };
+
+      const inline_keyboard = createGrid(inline_data, 4);
 
       const links = results.map(item => item.video_url);
+
       if (!safe_mode) {
         await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,
           reply_to_message_id: event.message_id
         });
       }
+
       const sent = await api.sendMessage(
         event.chat.id,
         `Found ${inline_data.length} results`,
         {
-          reply_markup: { inline_keyboard: inline_data },
+          reply_markup: { inline_keyboard: inline_keyboard },
           disable_notification: true
         }
       );
@@ -218,16 +229,26 @@ module.exports = {
       checkSize(dir)
       Context.type === "video" ? api.sendChatAction(event.chat.id, 'upload_video') : api.sendChatAction(event.chat.id, 'upload_audio')
       const stream = fs.createReadStream(dir);
+      let intTitle = info.title;
+      if (intTitle.length > 15)
+        intTitle = intTitle.substring(0, 15) + "..."
+      const keyboard = {
+        inline_keyboard: [
+        [
+            { text: intTitle, url: link }
+        ]
+    ]
+      };
       if (Context.type === "video") {
         await api.sendVideo(event.chat.id, stream, {
+          reply_markup: JSON.stringify(keyboard),
           caption: info.title,
           performer: info.author,
           reply_to_message_id: Context?.me
         });
       } else {
         await api.sendAudio(event.chat.id, stream, {
-          title: info.title,
-          thumb: info.thumbnail,
+          reply_markup: JSON.stringify(keyboard),
           performer: info.author,
           reply_to_message_id: Context?.me
         });
@@ -350,9 +371,8 @@ async function downloadMP3(videoLink, savePath) {
       writeStream.on("error", reject);
       readableStream.on("error", reject);
     });
-    const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url;
+    const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url
     return { title: info.videoDetails.title, author: info.videoDetails.author.name, thumbnail }
-    // I have no idea why the thumbnail isn't working with audio files
   } catch (error) {
     console.error("Error downloading audio:", error.message);
     throw error;

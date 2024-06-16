@@ -1,9 +1,10 @@
 const axios = require('axios');
-const { search } = require("@nechlophomeriaa/spotifydl");
-const { downloadTrack2: downloadTrack, downloadAlbum2 } = require("@nechlophomeriaa/spotifydl");
+const { /*downloadTrack2:*/ downloadTrack, downloadAlbum2, search } = require("@nechlophomeriaa/spotifydl");
 const { v4: uuid } = require("uuid");
 const fs = require("fs");
 const path = require("path");
+
+// SpotifyDL Module is very buggy sometimes
 
 global.tmp.spotify = global.tmp?.spotify || new Set();
 
@@ -42,6 +43,7 @@ async function downloadSong(song) {
     await fs.writeFileSync(dir, downTrack.audioBuffer);
     const response = {
       status: "success",
+      buffer: downTrack.audioBuffer,
       title: downTrack.title,
       artist: downTrack.artists,
       duration: downTrack.duration,
@@ -86,7 +88,10 @@ module.exports = {
         downloadResponse = await downloadSong(query);
         api.deleteMessage(event.chat.id, prmsg.message_id);
         await api.sendAudio(event.chat.id, downloadResponse.dir, {
-          caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`
+          caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,
+          title: downloadResponse.title,
+          performer: downloadResponse.artist,
+          thumb: await axios.get(downloadResponse.thumbnail, { responseType: "arraybuffer" })
         });
       } catch (error) {
         console.error(error);
@@ -132,23 +137,20 @@ module.exports = {
                 }
             ]);
         const media = tracks.map(item => ({
-          type: "audio",
+          type: "photo",
           media: item.thumbnail,
           performer: item.artist_names,
-          file_name: item.track_name
+          title: item.track_name,
+          caption: item.track_name
         }));
         const x = await api.sendMediaGroup(event.chat.id, media, {
           disable_notification: true,
           reply_to_message_id: event.message_id
         });
 
-        let Artists = '';
-        tracks.forEach(item => {
-          Artists += `${item.artist_names}, `
-        });
         const sent = await api.sendMessage(
           event.chat.id,
-          Artists,
+          "Here are your results",
           {
             reply_markup: { inline_keyboard: inline_data },
             disable_notification: true
@@ -178,8 +180,8 @@ module.exports = {
         Context.initials.second
       );
       const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
-      api.sendChatAction(event.chat.id, 'upload_audio')
       downloadResponse = await downloadSong(ctx.data);
+      api.sendChatAction(event.chat.id, 'upload_audio')
       await api.sendAudio(event.chat.id, downloadResponse.dir, {
         caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,
         thumb: downloadResponse.thumbnail,
