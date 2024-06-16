@@ -2,33 +2,37 @@ module.exports = {
   config: {
     name: "ban",
     description: "Ban Panel",
-    usage: "{pn} ban uid [reason]\n{pn} unban uid",
+    usage: "{pn} ban user|channel uid [reason]\n{pn} unban user|channel uid",
     role: 1
   },
-  start: async function({ event, args, api, message, cmd, usersData }) {
+  start: async function({ event, args, api, message, cmd, usersData, threadsData }) {
     try {
-      if (!args[0]) return message.Syntax(cmd);
-      if (!args[1] || isNaN(args[1])) return message.Syntax(cmd)
-      const action = args[0].toLowerCase();
-      const userId = parseInt(args[1]);
+      if (args.length < 3) return message.Syntax(cmd);
 
-      if (!userId) return message.Syntax(cmd);
+      const action = args[0].toLowerCase();
+      const targetType = args[1].toLowerCase();
+      const targetId = parseInt(args[2]);
+
+      if (!['ban', 'unban'].includes(action) || !['user', 'channel'].includes(targetType) || isNaN(targetId)) {
+        return message.Syntax(cmd);
+      }
+
+      const dataStore = targetType === 'user' ? usersData : threadsData;
 
       switch (action) {
         case 'ban': {
-          let reason = args.slice(2).join(' ') || null;
-          if (reason.length > 55)
-            reason = `${reason.substring(0, 50)}...`
-          const user = await api.getChat(userId);
+          let reason = args.slice(3).join(' ') || null;
+          if (reason && reason.length > 55) reason = `${reason.substring(0, 50)}...`;
 
+          const entity = await api.getChat(targetId);
           const updateData = {
             isBanned: true,
             ban_message: reason
           };
 
-          await usersData.update(userId, updateData);
+          await dataStore.update(targetId, updateData);
 
-          let responseText = `User @${user.username} has been banned.`;
+          let responseText = `${targetType.charAt(0).toUpperCase() + targetType.slice(1)} @${entity.username || entity.title} has been banned.`;
           if (reason) responseText += `\nReason: ${reason}`;
 
           message.reply(responseText);
@@ -36,15 +40,15 @@ module.exports = {
         }
 
         case 'unban': {
-          const user = await api.getChat(userId);
+          const entity = await api.getChat(targetId);
 
           const updateData = {
             isBanned: false
           };
 
-          await usersData.update(parseInt(userId), updateData);
+          await dataStore.update(targetId, updateData);
 
-          const responseText = `User @${user.username} has been unbanned.`;
+          const responseText = `${targetType.charAt(0).toUpperCase() + targetType.slice(1)} @${entity.username || entity.title} has been unbanned.`;
           message.reply(responseText);
           break;
         }
