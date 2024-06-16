@@ -18,7 +18,7 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
   }
 });
 
-db.run(`CREATE TABLE IF NOT EXISTS Threads (
+db.run(`CREATE TABLE IF NOT EXISTS threads (
     id TEXT PRIMARY KEY,
     data TEXT
 )`, (err) => {

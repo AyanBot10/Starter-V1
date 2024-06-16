@@ -104,7 +104,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         });
       }
 
-      if (userIsBanned?.isBanned) return message.reply(userIsBanned?.ban_message || "You have been banned from the system.")
+      if (userIsBanned?.isBanned) return message.reply(`You have been banned\nReason: ${userIsBanned?.ban_message}` || "You have been banned from the system.")
       //   const bannedThread = (await global.sqlite.threadsData.retrieve(msg.chat.id))?.isBanned || false;
     }
     const bannedThread = global.config_handler.banned_threads.chats.includes(msg.chat.id)

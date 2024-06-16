@@ -2,6 +2,12 @@ const db = require('./index');
 
 function upsertUserData(userId, data) {
   return new Promise((resolve, reject) => {
+    if (typeof userId === "string") {
+      userId = parseInt(userId, 10);
+    }
+    if (isNaN(userId)) {
+      return reject(new Error("UserID must be an integer"));
+    }
     const jsonData = JSON.stringify(data);
     db.run(
       `INSERT INTO users (id, data) VALUES (?, ?)
@@ -11,7 +17,7 @@ function upsertUserData(userId, data) {
         if (err) {
           reject(err);
         } else {
-          resolve(200);
+          resolve({ status: 200, message: "User data upserted successfully" });
         }
       }
     );
@@ -124,18 +130,24 @@ async function removeKey(userId, keys) {
 }
 
 const threadsData = {
-  upsertThreadData(threadId, data) {
+  upsertUserData(threadId, data) {
     return new Promise((resolve, reject) => {
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
+      }
+      if (isNaN(threadId)) {
+        return reject(new Error("threadID must be an integer"));
+      }
       const jsonData = JSON.stringify(data);
       db.run(
-        `INSERT INTO Threads (id, data) VALUES (?, ?)
-         ON CONFLICT(id) DO UPDATE SET data = excluded.data`,
-        [threadId, jsonData],
+        `INSERT INTO threads (id, data) VALUES (?, ?)
+       ON CONFLICT(id) DO UPDATE SET data = excluded.data`,
+      [threadId, jsonData],
         function(err) {
           if (err) {
             reject(err);
           } else {
-            resolve(200);
+            resolve({ status: 200, message: "Thread data upserted successfully" });
           }
         }
       );
@@ -144,7 +156,7 @@ const threadsData = {
 
   getThreadData(threadId) {
     return new Promise((resolve, reject) => {
-      db.get(`SELECT data FROM Threads WHERE id = ?`, [threadId], (err, row) => {
+      db.get(`SELECT data FROM threadId WHERE id = ?`, [threadId], (err, row) => {
         if (err) {
           reject(new Error('Database error'));
         } else if (!row) {
@@ -158,7 +170,7 @@ const threadsData = {
 
   deleteThread(threadId) {
     return new Promise((resolve, reject) => {
-      db.run(`DELETE FROM Threads WHERE id = ?`, [threadId], function(err) {
+      db.run(`DELETE FROM threadId WHERE id = ?`, [threadId], function(err) {
         if (err) {
           reject(err);
         } else if (this.changes === 0) {
@@ -172,7 +184,7 @@ const threadsData = {
 
   getAllThreads() {
     return new Promise((resolve, reject) => {
-      db.all(`SELECT id FROM Threads`, (err, rows) => {
+      db.all(`SELECT id FROM threadId`, (err, rows) => {
         if (err) {
           reject(new Error('Database error'));
         } else {
@@ -184,7 +196,7 @@ const threadsData = {
 
   threadExists(threadId) {
     return new Promise((resolve, reject) => {
-      db.get(`SELECT COUNT(*) as count FROM Threads WHERE id = ?`, [threadId], (err, row) => {
+      db.get(`SELECT COUNT(*) as count FROM threadId WHERE id = ?`, [threadId], (err, row) => {
         if (err) {
           reject(new Error('Database error'));
         } else {
