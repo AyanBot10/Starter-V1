@@ -65,10 +65,6 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         global.log(`New User: @${msg.from.username}`, "yellow")
         global.sqlite.usersData.update(msg.from.id, { authorized: false })
       }
-      //let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
-      /*  if (!threadCheck) {
-          global.sqlite.threadsData.refresh(msg.chat.id, msg, bot)
-        }*/
       const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
 
       if (!userIsBanned.authorized && global.config_handler.authorization_prompt) {
@@ -105,10 +101,17 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       }
 
       if (userIsBanned?.isBanned) return message.reply(`You have been banned\nReason: ${userIsBanned?.ban_message}` || "You have been banned from the system.")
-      //   const bannedThread = (await global.sqlite.threadsData.retrieve(msg.chat.id))?.isBanned || false;
+      if (msg.chat.type !== "private") {
+        let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
+        if (!threadCheck) {
+          global.sqlite.threadsData.refresh(msg.chat.id, msg)
+        }
+        let bannedThread = await global.sqlite.threadsData.retrieve(msg.chat.id)
+        if (bannedThread?.isBanned) {
+          return message.reply(bannedThread?.ban_message ? `Chat is Banned\nReason: ${bannedThread?.ban_message.substring(0, 50)}` : global.config_handler.banned_threads.message)
+        }
+      }
     }
-    const bannedThread = global.config_handler.banned_threads.chats.includes(msg.chat.id)
-    // return bannedThread ? message.reply(global.config_handler.banned_threads.message) : null;
     for (const x of global.cmds.values()) {
       if (
         x.config.name?.toLowerCase() === command?.toLowerCase() ||
@@ -151,7 +154,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           message,
           cmd: x?.config?.name,
           usersData: global.sqlite.usersData,
-          //threadsData: global.sqlite.threadsData,
+          threadsData: global.sqlite.threadsData,
           role: admins.includes(String(msg.from.id)) ? 1 : 0
         });
         const { username, id } = msg.from;
@@ -183,7 +186,7 @@ bot.on("message", async msg => {
             const { username, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, /*threadsData: global.sqlite.threadsData*/ role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
             logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
@@ -197,7 +200,7 @@ bot.on("message", async msg => {
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
-          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, /*threadsData: global.sqlite.threadsData*/ role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
           logger({
             name: username,
             command: x.config.name,
@@ -232,7 +235,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               message: message_function,
               cmd: context?.cmd || cmd?.config?.name || null,
               usersData: global.sqlite.usersData,
-              //threadsData: global.sqlite.threadsData
+              threadsData: global.sqlite.threadsData,
               role: admins.includes(String(from.id)) ? 1 : 0
             });
           }

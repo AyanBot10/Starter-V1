@@ -2,11 +2,11 @@ const db = require('./index');
 
 function upsertUserData(userId, data) {
   return new Promise((resolve, reject) => {
-    if (typeof userId === "string") {
-      userId = parseInt(userId, 10);
-    }
     if (isNaN(userId)) {
       return reject(new Error("UserID must be an integer"));
+    }
+    if (typeof userId === "string") {
+      userId = parseInt(userId, 10);
     }
     const jsonData = JSON.stringify(data);
     db.run(
@@ -26,6 +26,12 @@ function upsertUserData(userId, data) {
 
 function getUserData(userId) {
   return new Promise((resolve, reject) => {
+    if (isNaN(userId)) {
+      return reject(new Error("UserID must be an integer"));
+    }
+    if (typeof userId === "string") {
+      userId = parseInt(userId, 10);
+    }
     db.get(`SELECT data FROM users WHERE id = ?`, [userId], (err, row) => {
       if (err) {
         reject(new Error('Database error'));
@@ -40,6 +46,12 @@ function getUserData(userId) {
 
 function deleteUser(userId) {
   return new Promise((resolve, reject) => {
+    if (isNaN(userId)) {
+      return reject(new Error("UserID must be an integer"));
+    }
+    if (typeof userId === "string") {
+      userId = parseInt(userId, 10);
+    }
     db.run(`DELETE FROM users WHERE id = ?`, [userId], function(err) {
       if (err) {
         reject(err);
@@ -85,6 +97,12 @@ function deleteAllUsers() {
 
 function exists(userId) {
   return new Promise((resolve, reject) => {
+    if (isNaN(userId)) {
+      return reject(new Error("UserID must be an integer"));
+    }
+    if (typeof userId === "string") {
+      userId = parseInt(userId, 10);
+    }
     db.get(`SELECT COUNT(*) as count FROM users WHERE id = ?`, [userId], (err, row) => {
       if (err) {
         reject(new Error('Database error'));
@@ -130,13 +148,13 @@ async function removeKey(userId, keys) {
 }
 
 const threadsData = {
-  upsertUserData(threadId, data) {
+  upsertThreadData(threadId, data) {
     return new Promise((resolve, reject) => {
-      if (typeof threadId === "string") {
-        threadId = parseInt(threadId, 10);
-      }
       if (isNaN(threadId)) {
         return reject(new Error("threadID must be an integer"));
+      }
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
       }
       const jsonData = JSON.stringify(data);
       db.run(
@@ -156,7 +174,13 @@ const threadsData = {
 
   getThreadData(threadId) {
     return new Promise((resolve, reject) => {
-      db.get(`SELECT data FROM threadId WHERE id = ?`, [threadId], (err, row) => {
+      if (isNaN(threadId)) {
+        return reject(new Error("threadID must be an integer"));
+      }
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
+      }
+      db.get(`SELECT data FROM threads WHERE id = ?`, [threadId], (err, row) => {
         if (err) {
           reject(new Error('Database error'));
         } else if (!row) {
@@ -167,10 +191,15 @@ const threadsData = {
       });
     });
   },
-
   deleteThread(threadId) {
     return new Promise((resolve, reject) => {
-      db.run(`DELETE FROM threadId WHERE id = ?`, [threadId], function(err) {
+      if (isNaN(threadId)) {
+        return reject(new Error("threadID must be an integer"));
+      }
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
+      }
+      db.run(`DELETE FROM threads WHERE id = ?`, [threadId], function(err) {
         if (err) {
           reject(err);
         } else if (this.changes === 0) {
@@ -182,21 +211,34 @@ const threadsData = {
     });
   },
 
-  getAllThreads() {
-    return new Promise((resolve, reject) => {
-      db.all(`SELECT id FROM threadId`, (err, rows) => {
-        if (err) {
-          reject(new Error('Database error'));
-        } else {
-          resolve(rows);
-        }
+  async getAllTID() {
+    try {
+      const rows = await new Promise((resolve, reject) => {
+        db.all(`SELECT id FROM threads`, (err, rows) => {
+          if (err) reject(new Error('Database error'));
+          else resolve(rows);
+        });
       });
-    });
+
+      const accs = await Promise.all(
+        rows.map(row => threadsData.getThreadData(row.id))
+      );
+
+      return accs;
+    } catch (error) {
+      throw error;
+    }
   },
 
   threadExists(threadId) {
     return new Promise((resolve, reject) => {
-      db.get(`SELECT COUNT(*) as count FROM threadId WHERE id = ?`, [threadId], (err, row) => {
+      if (isNaN(threadId)) {
+        return reject(new Error("threadID must be an integer"));
+      }
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
+      }
+      db.get(`SELECT COUNT(*) as count FROM threads WHERE id = ?`, [threadId], (err, row) => {
         if (err) {
           reject(new Error('Database error'));
         } else {
@@ -207,22 +249,48 @@ const threadsData = {
   },
 
   async createOrUpdateThread(threadId, newData) {
-    const existingData = await this.getThreadData(threadId);
-    if (existingData === 404) {
-      return 404;
-    }
-    const updatedData = { ...existingData, ...newData };
-    return this.upsertThreadData(threadId, updatedData);
-  },
-
-  async removeKey(threadId, keys) {
     try {
-      const existingData = await this.getThreadData(threadId);
+      if (isNaN(threadId)) {
+        throw new Error("threadID must be an integer")
+      }
+      if (typeof newData !== "object") {
+        throw new Error("Passed item must be an object")
+      }
+      if (typeof threadId === "string") {
+        threadId = parseInt(threadId, 10);
+      }
+      const existingData = await threadsData.getThreadData(threadId);
       if (existingData === 404) {
         return 404;
       }
-      keys.forEach(key => delete existingData[key]);
-      return this.upsertThreadData(threadId, existingData);
+      const updatedData = { ...existingData, ...newData };
+      return threadsData.upsertThreadData(threadId, updatedData);
+    } catch (err) {
+      throw err
+    }
+  },
+  async removeKey(threadId, keys) {
+    try {
+      if (isNaN(threadId)) {
+        throw new Error("threadID must be an integer");
+      }
+
+      if (!Array.isArray(keys) || keys.length === 0) {
+        throw new Error("Keys must be a non-empty array");
+      }
+
+      const existingData = await threadsData.getThreadData(threadId);
+      if (existingData === 404) {
+        return 404;
+      }
+
+      keys.forEach(key => {
+        if (key in existingData) {
+          delete existingData[key];
+        }
+      });
+
+      return await threadsData.upsertThreadData(threadId, existingData);
     } catch (error) {
       throw new Error('Failed to remove keys: ' + error.message);
     }
@@ -237,9 +305,8 @@ threadsData.createOrUpdateThread.empty = async function(threadId) {
   return threadsData.upsertThreadData(threadId, {});
 };
 
-threadsData.createOrUpdateThread.refresh = async function(threadId, event, api) {
-  const admins = event.chat.type !== "private" ? await api.getChatAdministrators(event.chat.id).map(x => x.user) : [null]
-  return threadsData.upsertThreadData(threadId, { ...admins, ...event.chat, isBanned: false });
+threadsData.createOrUpdateThread.refresh = async function(threadId, event) {
+  return threadsData.upsertThreadData(threadId, { ...event.chat, isBanned: false });
 };
 
 module.exports = {
@@ -247,7 +314,7 @@ module.exports = {
     update: threadsData.createOrUpdateThread,
     retrieve: threadsData.getThreadData,
     delete: threadsData.deleteThread,
-    getAll: threadsData.getAllThreads,
+    getAll: threadsData.getAllTID,
     exists: threadsData.threadExists,
     create: threadsData.createOrUpdateThread.empty,
     refresh: threadsData.createOrUpdateThread.refresh,
