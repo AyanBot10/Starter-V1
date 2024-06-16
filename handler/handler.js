@@ -22,7 +22,7 @@ function clearCache() {
 if (global.config_handler.auto_clean.toggle) {
   const interval = !isNaN(global.config_handler.auto_clean.time) ? global.config_handler.auto_clean.time : 1800000;
   setInterval(clearCache, interval);
-  global.log(`Cache cleaner in effect, Interval: ${(interval / 1000 / 60).toFixed(2)} minutes`, 'yellow');
+  global.log(`Cache cleaner in effect, Interval: ${(interval / 1000 / 60).toFixed(0)} minutes`, 'yellow');
 }
 
 if (restartJson?.legit) {
@@ -233,7 +233,7 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               cmd: context?.cmd || cmd?.config?.name || null,
               usersData: global.sqlite.usersData,
               //threadsData: global.sqlite.threadsData
-              role: admins.includes(String(msg.from.id)) ? 1 : 0
+              role: admins.includes(String(from.id)) ? 1 : 0
             });
           }
           const { username, id } = from;
