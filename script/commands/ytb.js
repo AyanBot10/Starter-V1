@@ -138,7 +138,7 @@ module.exports = {
       }));
 
       const inline_data = results.map((item, i) => ({
-        text: `${i + 1} : ${item.duration}`,
+        text: i + 1,
         callback_data: `${item.duration_ms}^${item.video_url}`
       }));
 
