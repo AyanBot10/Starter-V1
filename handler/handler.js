@@ -11,12 +11,30 @@ function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
 
+const fs = require('fs');
+const path = require('path');
+
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
-  // might need fixing
-  const files = fs.readdirSync(dir);
-  files.forEach(file => fs.unlinkSync(path.join(dir, file)));
-  global.log('Cleared Cache', 'red');
+
+  try {
+    const files = fs.readdirSync(dir);
+
+    files.forEach(file => {
+      const filePath = path.join(dir, file);
+      const stats = fs.statSync(filePath);
+
+      if (stats.isFile()) {
+        fs.unlinkSync(filePath);
+      } else if (stats.isDirectory()) {
+        fs.rmSync(filePath, { recursive: true, force: true });
+      }
+    });
+
+    global.log('Cleared Cache: All files and directories in tmp have been removed.', 'red');
+  } catch (err) {
+    global.log(`Failed to clear cache: ${err.message}`, 'red');
+  }
 }
 
 if (global.config_handler.auto_clean.toggle) {
