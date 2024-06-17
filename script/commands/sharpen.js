@@ -6,9 +6,9 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   config: {
-    name: "upscale",
+    name: "sharpen",
     usage: "{pn} <media_reply>",
-    description: "Upscale and enhance an image to 4K resolution using the Sharp module"
+    description: "Sharpen and enhance an image using the Sharp module"
   },
   start: async function({ event, message, cmd, api }) {
     try {
