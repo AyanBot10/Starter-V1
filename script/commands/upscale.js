@@ -38,10 +38,10 @@ module.exports = {
           fit: 'inside',
           withoutEnlargement: true,
         })
-        .sharpen(Math.ceil(Math.random() * 1) + 1, 0.75)
+        .sharpen(Math.floor(Math.random() * 2) + 1, 1)
         .modulate({
-          brightness: 1.45,
-          saturation: 1.25
+          brightness: 1.2,
+          saturation: 1.1
         })
         .toFormat('jpeg', { quality: 100 })
         .toBuffer();
