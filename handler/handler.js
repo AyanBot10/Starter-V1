@@ -77,7 +77,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       let check = await global.sqlite.usersData.exists(msg.from.id)
       if (!check) {
         global.sqlite.usersData.refresh(msg.from.id, msg)
-        global.log(`New User: @${msg.from.username}`, "yellow", true)
+        global.log(`New User: @${msg.from.username || msg.from.first_name}`, "yellow", true)
         global.sqlite.usersData.update(msg.from.id, { authorized: false })
       }
       const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
@@ -172,8 +172,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           threadsData: global.sqlite.threadsData,
           role: admins.includes(String(msg.from.id)) ? 1 : 0
         });
-        const { username, id } = msg.from;
-        logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "initiation" });
+        const { username, first_name, id } = msg.from;
+        logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "initiation" });
         break;
       }
     }
@@ -206,11 +206,11 @@ bot.on("message", async msg => {
           if (x.config.name === replyCTX.cmd) {
             replied = true;
             const args = msg?.text?.split(" ")
-            const { username, id } = msg.from;
+            const { username, first_name, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
             await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
-            logger({ name: username, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
+            logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
         }
@@ -219,14 +219,14 @@ bot.on("message", async msg => {
     if (!replied) {
       for (const x of global.cmds.values()) {
         const args = msg?.text?.split(" ")
-        const { username, id } = msg.from;
+        const { username, id, first_name } = msg.from;
         // chat function, Don't need them in events
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
           x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
           logger({
-            name: username,
+            name: username || first_name,
             command: x.config.name,
             uid: id,
             type: msg.chat.type,
@@ -263,8 +263,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               role: admins.includes(String(from.id)) ? 1 : 0
             });
           }
-          const { username, id } = from;
-          logger({ name: username, command: context.cmd, uid: id, type: ctx?.chat?.type || null, event: eventType });
+          const { username, id, first_name } = from;
+          logger({ name: username || first_name, command: context.cmd, uid: id, type: ctx?.chat?.type || null, event: eventType });
         }
       }
     }
@@ -292,8 +292,8 @@ const handleEvents = async (ctx, eventType) => {
             role: admins.includes(String(from.id)) ? 1 : 0
           });
         }
-        const { username, id } = from;
-        logger({ name: username, command: cmd?.config?.name || null, uid: id, type: ctx?.chat?.type || null, event: eventType, isEvent: true });
+        const { username, id, first_name } = from;
+        logger({ name: username || first_name, command: cmd?.config?.name || null, uid: id, type: ctx?.chat?.type || null, event: eventType, isEvent: true });
       }
     }
   } catch (err) { throw err }

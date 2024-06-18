@@ -24,7 +24,7 @@ module.exports = {
       const message = "Hey guys! [I'm Starter-V1](https://github.com/SatoX69/Starter-V1)\nThanks for adding me";
       await api.sendMessage(chatId, message, { parse_mode: "Markdown" });
     } else {
-      const memberUsernames = newMembers.map(member => `@${member.username}`).join(', ');
+      const memberUsernames = newMembers.map(member => member.username ? "@" + member.username : member.first_name || "User").join(', ');
 
       if (!global.pending[chatId]) {
         global.pending[chatId] = { members: [], timeout: null };

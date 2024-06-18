@@ -12,7 +12,7 @@ module.exports = {
 - ID: ${id}
 - Is Bot: ${is_bot}
 - First Name: ${first_name}
-- Username: ${username}
+- Username: ${username || "Not Specified"}
 - Language Code: ${language_code}
 - In DB: ${db ? "Yes" : "No"}
 

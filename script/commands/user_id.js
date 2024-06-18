@@ -11,7 +11,7 @@ module.exports = {
     let targetUserId, targetUsername;
     if (event.reply_to_message) {
       targetUserId = event.reply_to_message.from.id;
-      targetUsername = event.reply_to_message.from?.username || (await api.getChat(targetUserId)).username
+      targetUsername = event.reply_to_message.from?.username || (await api.getChat(targetUserId)).username || event.reply_to_message.from?.first_name
     } else {
       targetUserId = event.from.id;
       targetUsername = (await api.getChat(event.from.id)).username

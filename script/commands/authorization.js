@@ -30,7 +30,7 @@ module.exports = {
       await api.answerCallbackQuery({ callback_query_id: id });
 
       if (author != from.id) {
-        return api.sendMessage(chat.id, `@${from.username} Unauthorized`);
+        return api.sendMessage(chat.id, `@${from.username || from.first_name} Unauthorized`);
       }
 
       if (global.bot.callback_query && message_id in global.bot.callback_query) {
@@ -38,14 +38,14 @@ module.exports = {
       }
       switch (data) {
         case 'confirm': {
-          await message.edit(`Confirmed Choice. Adding @${from.username} to Database`, message_id, chat.id, {
+          await message.edit(`Confirmed Choice. Adding @${from.username || from.first_name} to Database`, message_id, chat.id, {
             reply_markup: { inline_keyboard: [] }
           });
           global.sqlite.usersData.update(from.id, { authorized: true });
           break;
         }
         case 'cancel': {
-          await message.edit(`Confirmed Choice. @${from.username} cannot use any slash interactions until they agree to the policies`, message_id, chat.id, {
+          await message.edit(`Confirmed Choice. @${from.username || from.first_name} cannot use any slash interactions until they agree to the policies`, message_id, chat.id, {
             reply_markup: { inline_keyboard: [] }
           });
           break;
