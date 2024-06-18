@@ -1,7 +1,9 @@
 const { User, Thread } = require('./schema');
+const initiate = require("./index")
 
 async function upsertUserData(userId, data) {
   try {
+    if (!initiate) await initiate;
     const jsonData = JSON.stringify(data);
     await User.findOneAndUpdate({ id: userId }, { data: jsonData }, { upsert: true, new: true, setDefaultsOnInsert: true });
     return { status: 200, message: "User data upserted successfully" };
@@ -12,6 +14,7 @@ async function upsertUserData(userId, data) {
 
 async function getUserData(userId) {
   try {
+    if (!initiate) await initiate;
     const user = await User.findOne({ id: userId });
     if (user) {
       return JSON.parse(user.data);
@@ -25,6 +28,7 @@ async function getUserData(userId) {
 
 async function deleteUser(userId) {
   try {
+    if (!initiate) await initiate;
     const result = await User.deleteOne({ id: userId });
     return result.deletedCount === 0 ? 404 : 200;
   } catch (err) {
@@ -34,6 +38,7 @@ async function deleteUser(userId) {
 
 async function getAllUsers() {
   try {
+    if (!initiate) await initiate;
     const users = await User.find({});
     return users.map(user => JSON.parse(user.data));
   } catch (err) {
@@ -43,6 +48,7 @@ async function getAllUsers() {
 
 async function exists(userId) {
   try {
+    if (!initiate) await initiate;
     const count = await User.countDocuments({ id: userId });
     return count > 0;
   } catch (err) {
@@ -52,6 +58,7 @@ async function exists(userId) {
 
 async function createOrUpdateUser(userId, newData) {
   try {
+    if (!initiate) await initiate;
     const existingData = await getUserData(userId);
     if (existingData === 404) {
       return 404;
@@ -90,6 +97,7 @@ async function removeKey(userId, keys) {
 
 async function upsertThreadData(threadId, data) {
   try {
+    if (!initiate) await initiate;
     const jsonData = JSON.stringify(data);
     await Thread.findOneAndUpdate({ id: threadId }, { data: jsonData }, { upsert: true, new: true, setDefaultsOnInsert: true });
     return { status: 200, message: "Thread data upserted successfully" };
@@ -100,6 +108,7 @@ async function upsertThreadData(threadId, data) {
 
 async function getThreadData(threadId) {
   try {
+    if (!initiate) await initiate;
     const thread = await Thread.findOne({ id: threadId });
     if (thread) {
       return JSON.parse(thread.data);
@@ -113,6 +122,7 @@ async function getThreadData(threadId) {
 
 async function deleteThread(threadId) {
   try {
+    if (!initiate) await initiate;
     const result = await Thread.deleteOne({ id: threadId });
     return result.deletedCount === 0 ? 404 : 200;
   } catch (err) {
@@ -122,6 +132,7 @@ async function deleteThread(threadId) {
 
 async function getAllThreads() {
   try {
+    if (!initiate) await initiate;
     const threads = await Thread.find({});
     return threads.map(thread => JSON.parse(thread.data));
   } catch (err) {
@@ -131,6 +142,7 @@ async function getAllThreads() {
 
 async function threadExists(threadId) {
   try {
+    if (!initiate) await initiate;
     const count = await Thread.countDocuments({ id: threadId });
     return count > 0;
   } catch (err) {
@@ -140,6 +152,7 @@ async function threadExists(threadId) {
 
 async function createOrUpdateThread(threadId, newData) {
   try {
+    if (!initiate) await initiate;
     const existingData = await getThreadData(threadId);
     if (existingData === 404) {
       return 404;
