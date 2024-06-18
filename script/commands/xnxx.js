@@ -61,7 +61,8 @@ module.exports = {
     aliases: ["porn", "xxx"],
     usage: "{pn} query",
     description: "Xnxx site scrapper. Get porn from xnxx.com",
-    cooldown: 15
+    cooldown: 15,
+    category: "miscellaneous"
   },
   start: async function({ event, args, api, message, cmd }) {
     const query = args.join(" ");

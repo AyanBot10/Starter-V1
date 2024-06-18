@@ -8,7 +8,8 @@ module.exports = {
   config: {
     name: "sharpen",
     usage: "{pn} <media_reply>",
-    description: "Sharpen and enhance an image using the Sharp module"
+    description: "Sharpen and enhance an image using the Sharp module",
+    category: "utility"
   },
   start: async function({ event, message, cmd, api }) {
     try {

@@ -38,7 +38,8 @@ module.exports = {
     aliases: ["cmd"],
     description: "Command Panel",
     role: 1,
-    usage: "{pn} load cmd\n{pn} unload cmd\n{pn} install cmd.js cmd_link"
+    usage: "{pn} load cmd\n{pn} unload cmd\n{pn} install cmd.js cmd_link",
+    category: "system"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd);

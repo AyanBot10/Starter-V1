@@ -219,7 +219,8 @@ module.exports = {
     author: "Tanvir",
     cooldown: 15,
     description: "Use Tensor models with your tokens",
-    usage: "{pn} Params:\n\nprompt\n• description of the image you want to generate.\n\n--ar\n• aspect ratio of the image\n\n--weight\n• weight of niji style, 0.1 - 0.9\n\n--style\n• style of the image.\nAvailable Styles:\n1. Cinematic\n2. Photographic\n3. Anime\n4. Manga\n5. Digital Art\n6. Pixel Art\n7. Fantasy Art\n8. Neon Punk\n9. 3D Model\n\nExample Usage:\n.niji cute girl, smiling --ar 1:1 --weight 0.9\n\n.niji cute girl, smiling --ar 9:16\n\n.niji cute girl, smiling --style 3\n\n.niji cute girl, smiling"
+    usage: "{pn} Params:\n\nprompt\n• description of the image you want to generate.\n\n--ar\n• aspect ratio of the image\n\n--weight\n• weight of niji style, 0.1 - 0.9\n\n--style\n• style of the image.\nAvailable Styles:\n1. Cinematic\n2. Photographic\n3. Anime\n4. Manga\n5. Digital Art\n6. Pixel Art\n7. Fantasy Art\n8. Neon Punk\n9. 3D Model\n\nExample Usage:\n.niji cute girl, smiling --ar 1:1 --weight 0.9\n\n.niji cute girl, smiling --ar 9:16\n\n.niji cute girl, smiling --style 3\n\n.niji cute girl, smiling",
+    category: "ai"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd)

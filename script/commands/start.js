@@ -3,8 +3,9 @@ module.exports = {
     name: "start",
     description: {
       short: "Initiates The Bot",
-      long: this.short
-    }
+      long: "Just a greetings"
+    },
+    category: "system"
   },
 
   start: async function({ api, event }) {

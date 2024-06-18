@@ -4,7 +4,8 @@ module.exports = {
     aliases: ["pfp"],
     description: "Fetches profile image",
     usage: "pfp [username|user_id] (optional, or reply to a user message)",
-    credits: "Samir"
+    credits: "Samir",
+    category: "utility"
   },
   start: async function({ event: msg, args, message, api: bot, cmd }) {
     let targetUserId = msg.from.id;

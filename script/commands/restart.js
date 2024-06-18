@@ -16,7 +16,8 @@ module.exports = {
     name: "restart",
     description: "Restarts the bot",
     role: 1,
-    usage: "{pn}"
+    usage: "{pn}",
+    category: "system"
   },
   start: async function({ event, api, message }) {
     await api.clearTextListeners()

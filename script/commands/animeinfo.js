@@ -11,7 +11,8 @@ module.exports = {
       long: this.short
     },
     usage: "{pn} <anime_name>",
-    cooldown: 10
+    cooldown: 10,
+    category: "anime"
   },
 
   start: async function({ api, event, args, cmd, message }) {

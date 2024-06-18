@@ -77,7 +77,8 @@ module.exports = {
       short: "Google Lens",
       long: "Search for similar images via Google Lens",
     },
-    cooldown: 20
+    cooldown: 10,
+    category: "miscellaneous"
   },
   start: async function({ event, api, message, cmd }) {
     try {

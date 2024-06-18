@@ -6,7 +6,8 @@ module.exports = {
     aliases: ["pin"],
     usage: "{pn} <query>",
     description: "Search for Images on Pinterest",
-    cooldown: 20
+    cooldown: 20,
+    category: "miscellaneous"
   },
 
   start: async function({ message, args, event, api }) {

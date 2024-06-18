@@ -4,10 +4,10 @@ module.exports = {
   config: {
     name: "screenshot",
     aliases: ["ss"],
-    credits: "Siam",
     description: "Take a screenshot of a webpage or Google search results",
     usage: "{pn} query || link",
-    cooldown: 15
+    cooldown: 15,
+    category: "utility"
   },
 
   start: async function({ args, cmd, event, api: bot }) {

@@ -263,7 +263,8 @@ module.exports = {
     aliases: ["prodia"],
     usage: "{pn} <prompt.length >= 5>" +
       ` --v ModelID\nAvailable Models:\n\n${modes.join("\n")}`,
-    description: "Image Generator from Prodia"
+    description: "Image Generator from Prodia",
+    category: "ai"
   },
   start: async function({ event, args, api, message, cmd }) {
     const prompt = args.join(" ");

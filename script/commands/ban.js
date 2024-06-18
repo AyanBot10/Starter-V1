@@ -3,7 +3,8 @@ module.exports = {
     name: "ban",
     description: "Ban Panel",
     usage: "{pn} ban user|channel uid [reason]\n{pn} unban user|channel uid",
-    role: 1
+    role: 1,
+    category: "system"
   },
   start: async function({ event, args, api, message, cmd, usersData, threadsData }) {
     try {

@@ -11,7 +11,8 @@ module.exports = {
     aliases: ["sh"],
     role: 1,
     description: "Quick Terminal Access",
-    usage: "{pn} <code>"
+    usage: "{pn} <code>",
+    category: "system"
   },
   start: async function({ message, args, event, api }) {
     if (!args[0]) return message.Syntax(this.config.name);

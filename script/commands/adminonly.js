@@ -3,7 +3,8 @@ module.exports = {
     name: "adminonly",
     description: "Restrict access to normal users",
     usage: "{pn} [on|off] if on, you can include a message",
-    role: 1
+    role: 1,
+    category: "system"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd);

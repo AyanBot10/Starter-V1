@@ -1,7 +1,8 @@
 module.exports = {
   config: {
     name: "authorization",
-    description: "Authorization Policies Panel"
+    description: "Authorization Policies Panel",
+    category: "system"
   },
   start: async function({ role, event, api, message, cmd, args }) {
     if (role !== 1) return message.reply("Unauthorized");

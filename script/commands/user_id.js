@@ -4,7 +4,8 @@ module.exports = {
     aliases: ["uid"],
     credits: "Samir Œ",
     description: "Retrieve user ID and username",
-    usage: "{pn}"
+    usage: "{pn}",
+    category: "utility"
   },
   start: async function({ api, event, message }) {
     let targetUserId, targetUsername;

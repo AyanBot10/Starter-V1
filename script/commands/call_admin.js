@@ -5,7 +5,8 @@ module.exports = {
     name: "calladmin",
     aliases: ["callad"],
     description: "Call an Admin and have a talk with them",
-    usage: "{pn} <message>"
+    usage: "{pn} <message>",
+    category: "support"
   },
   start: async function({ args, event, api, message, cmd }) {
     if (!config.admins || config.admins.length === 0) return message.reply("No Admins Set");

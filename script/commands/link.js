@@ -2,7 +2,8 @@ module.exports = {
   config: {
     name: "link",
     usage: "{pn} <media_reply>",
-    description: "Get media link"
+    description: "Get media link",
+    category: "utility"
   },
   start: async function({ event, message, cmd, api }) {
     try {

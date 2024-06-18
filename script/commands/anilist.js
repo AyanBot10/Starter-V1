@@ -10,7 +10,8 @@ module.exports = {
       short: "Fetches details on anilist users",
       long: this.short
     },
-    usage: "{pn} <username>"
+    usage: "{pn} <username>",
+    category: "anime"
   },
 
   start: async function({ api, event, args, message, cmd, usersData }) {

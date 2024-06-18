@@ -14,7 +14,8 @@ module.exports = {
       short: "Downloads Manga"
     },
     usage: "1. URL | startCh -> endCh (https://mangapill.com/MANGA_LINK | 1 -> 3)\n2. Search_query",
-    cooldown: 30
+    cooldown: 30,
+    category: "anime"
   },
   start: async function({ event, message, args, api, cmd }) {
     if (!args[0]) return message.Syntax(cmd)

@@ -3,7 +3,8 @@ module.exports = {
     name: "exit",
     aliases: ["kill"],
     description: "Kills Instance gracefully",
-    role: 1
+    role: 1,
+    category: "system"
   },
   start: async function({ event, api, message, cmd }) {
     const sent = await message.reply("Are you sure you want to kill this instance?", {

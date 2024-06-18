@@ -6,7 +6,8 @@ module.exports = {
     name: "prompt",
     aliases: ["describe", "synthesis"],
     usage: "{pn} <image_reply>",
-    description: "Image Synthesis"
+    description: "Image Synthesis",
+    category: "utility"
   },
   start: async function({ event, message, cmd, api }) {
     let initial

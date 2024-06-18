@@ -2,7 +2,8 @@ module.exports = {
   config: {
     name: "info",
     usage: "{pn}",
-    description: "Get your info like user_id and all"
+    description: "Get your info like user_id and all",
+    category: "utility"
   },
   start: async function({ event, message, usersData }) {
     const { from: { id, is_bot, first_name, username, language_code }, chat } = event;

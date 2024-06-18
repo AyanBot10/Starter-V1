@@ -63,7 +63,8 @@ module.exports = {
     aliases: ["gore"],
     usage: "{pn} <query>",
     description: "A simple seegore.com scrapper command",
-    cooldown: 10
+    cooldown: 10,
+    category: "miscellaneous"
   },
   start: async function({ event, api, message, cmd, args }) {
     try {

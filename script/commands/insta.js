@@ -26,7 +26,8 @@ module.exports = {
     name: "insta",
     description: "Download Insta Vids",
     usage: "{pn} <insta_link>",
-    author: "Tanvir"
+    author: "Tanvir",
+    category: "downloader"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!DLuri) return message.reply("Set Insta URI in config")

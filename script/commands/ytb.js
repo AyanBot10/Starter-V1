@@ -17,7 +17,8 @@ module.exports = {
       long: "Search and download videos from YouTube. Results will include thumbnails along with titles and durations."
     },
     usage: "{pn} <search_query>",
-    cooldown: 15
+    cooldown: 15,
+    category: "media"
   },
 
   start: async function({ api, event, args, message, cmd }) {

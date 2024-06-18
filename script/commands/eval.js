@@ -7,7 +7,8 @@ module.exports = {
     },
     usage: "{pn} code",
     credits: "Ntkhang",
-    role: 1
+    role: 1,
+    category: "system"
   },
 
   start: async function({ api, event, args, message, cmd, usersData, threadsData, role }) {

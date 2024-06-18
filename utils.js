@@ -144,6 +144,19 @@ async function downloadFile(url = "", path = "") {
   return path;
 }
 
+downloadFile.stream = async function(url, path) {
+  try {
+    const returnedPath = await downloadFile(url, path);
+    if (!returnedPath) throw new Error("No Path Returned");
+
+    const stream = fs.createReadStream(returnedPath);
+    fs.unlinkSync(returnedPath);
+    return stream;
+  } catch (err) {
+    throw err;
+  }
+}
+
 module.exports = {
   getStream,
   sleep,

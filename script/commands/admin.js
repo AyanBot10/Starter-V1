@@ -3,7 +3,8 @@ module.exports = {
     name: "admin",
     description: "Admin Panel",
     usage: "{pn} list\n{pn} add uid\n{pn} remove uid",
-    role: 1
+    role: 1,
+    category: "system"
   },
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd);

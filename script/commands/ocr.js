@@ -9,7 +9,8 @@ module.exports = {
       long: "Use Optical Character Recognition (OCR) on images to extract texts from images",
       short: "OCR"
     },
-    author: "Tanvir"
+    author: "Tanvir",
+    category: "utility"
   },
   start: async function({ api, message, event, cmd }) {
     const fileId = event?.reply_to_message?.photo?.slice(-1)[0]?.file_id;

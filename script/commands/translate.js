@@ -3,7 +3,8 @@ module.exports = {
     name: "translate",
     aliases: ["trans"],
     description: "Translates text",
-    usage: "{pn} text (or reply) | lang_code"
+    usage: "{pn} text (or reply) | lang_code",
+    category: "utility"
   },
   start: async function({ event, args, message, api, cmd }) {
     let inputText = args.length ? args.join(' ') : event?.reply_to_message?.text;

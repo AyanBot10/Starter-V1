@@ -6,7 +6,8 @@ module.exports = {
       long: "Provides a detailed list of all available commands"
     },
     usage: "{pn} - Logs all commands\n" +
-      "{pn} <cmd> - Logs the command's info"
+      "{pn} <cmd> - Logs the command's info",
+    category: "system"
   },
   start: async function({ api, event, args, message, looking }) {
     if (args[0]) {
@@ -69,16 +70,31 @@ module.exports = {
       }
     } else {
       let responseText = "";
-
-      global.cmds.forEach((commandConfig, commandName) => {
+      const categories = {};
+      global.cmds.forEach((commandConfig) => {
         const { name, description } = commandConfig.config;
+        let { category } = commandConfig.config;
+        if (category) category = category.trim();
         const descText =
           description?.short ||
           description?.long ||
           (typeof description === "string" ? description : "N/A");
-        responseText += `${name.toUpperCase()} -- <b>${descText}</b>\n\n`;
+        const categoryName = category?.toLowerCase() || "uncategorized";
+        if (!categories[categoryName]) {
+          categories[categoryName] = [];
+        }
+        categories[categoryName].push(name.toLowerCase());
       });
-      message.reply(`<pre><b>${responseText}</b></pre>`, { parse_mode: "HTML" })
+      const sortedCategories = Object.keys(categories).sort();
+      sortedCategories.forEach((category) => {
+        categories[category].sort();
+        responseText += `╭──『 ${category} 』\n`;
+        categories[category].forEach((command) => {
+          responseText += `✧${command} `;
+        });
+        responseText += `\n╰───────────◊\n`;
+      });
+      message.reply(`<pre><b>${responseText}</b></pre>`, { parse_mode: "HTML" });
     }
   },
   callback_query: async function({ event, api, ctx, Context, message }) {

@@ -10,7 +10,8 @@ module.exports = {
   config: {
     name: "ai",
     usage: "Either talk in chat with groq enabled in config or do '{pn} Hello World'",
-    description: "Talk to AI models from Groq"
+    description: "Talk to AI models from Groq",
+    category: "ai"
   },
 
   start: async function({ api, args, message, event }) {

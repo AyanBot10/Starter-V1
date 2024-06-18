@@ -5,7 +5,8 @@ module.exports = {
     name: "uptime",
     aliases: ["upt"],
     description: "Fetches Bot's uptime info",
-    usage: "{pn}"
+    usage: "{pn}",
+    category: "system"
   },
   start: async function({ api, message, event }) {
     try {
