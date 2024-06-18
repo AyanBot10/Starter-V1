@@ -1,6 +1,9 @@
 {
   "admins": [],
-  "skip": [],
+  "skip": {
+    "events": [],
+    "commands": []
+  },
   "adminOnly": {
     "toggle": false,
     "toggle_message": "Only the administrator can use the bot now"
@@ -12,6 +15,7 @@
   "authorization_prompt": true,
   "auto_clean": {
     "toggle": true,
-    "time": 1850000
+    "time": 1500000,
+    "log": false
   }
 }

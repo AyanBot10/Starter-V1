@@ -50,10 +50,10 @@ module.exports = {
           if (!fileExists(args[1] + ".js")) throw new Error("File doesn't exist.");
           const command = require(path.join(__dirname, args[1] + ".js"));
           const commandName = command.config.name;
-          if (global.config_handler.skip.includes(commandName)) {
-            const index = global.config_handler.skip.indexOf(commandName);
-            global.config_handler.skip.splice(index, 1);
-            global.utils.configSync({ skip: global.config_handler.skip });
+          if (global.config_handler.skip.commands.includes(commandName)) {
+            const index = global.config_handler.skip.commands.indexOf(commandName);
+            global.config_handler.skip.commands.splice(index, 1);
+            global.utils.configSync({ skip: { commands: global.config_handler.skip.commands } });
           }
           global.cmds.set(commandName, command);
           message.reply(`Command ${commandName} loaded successfully.`);
@@ -62,9 +62,9 @@ module.exports = {
           if (!args[1]) return message.Syntax(cmd);
           const commandUnload = require(path.join(__dirname, args[1]));
           const commandNameUnload = commandUnload.config.name;
-          if (!global.config_handler.skip.includes(commandNameUnload)) {
-            global.config_handler.skip.push(commandNameUnload);
-            global.utils.configSync({ skip: global.config_handler.skip });
+          if (!global.config_handler.skip.commands.includes(commandNameUnload)) {
+            global.config_handler.skip.commands.push(commandNameUnload);
+            global.utils.configSync({ skip: { commands: global.config_handler.skip.commands } });
           }
           message.reply(`Unloaded ${commandNameUnload} successfully.`);
           break;

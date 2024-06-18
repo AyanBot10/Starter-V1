@@ -9,6 +9,9 @@ const utils = require("./utils");
 global.config_handler = config_handler
 global.config = config;
 
+// Event Dependencies
+global.pending
+
 // Prefix
 global.prefix = {};
 

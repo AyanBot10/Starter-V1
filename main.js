@@ -20,7 +20,7 @@ process.on('unhandledRejection', (reason) => {
   log(`Unhandled Rejection:\n${reason.message}`, 'red');
 });
 
-require("./script/command.js");
+require("./script/command_loader")
 
 let userModel;
 let DB;
@@ -58,8 +58,6 @@ if (config.DATABASE.mongodb["CONNECT_MONGODB"]) {
   });
 }
 
-log("Started Bot", "cyan", true);
-
 if (config?.server?.toggle && config?.server?.port) {
   log("Starting Express Server", "green");
   try {
@@ -71,3 +69,5 @@ if (config?.server?.toggle && config?.server?.port) {
     log(err.message, "red");
   }
 }
+
+global.log("Logged into Bot", "cyan", true);

@@ -1,6 +1,6 @@
 const kleur = require('kleur');
 
-function logger({ name, command, uid, type, event }) {
+function logger({ name, command, uid, type, event, isEvent }) {
   const use24HourFormat = false;
   let timeZone = global.config?.timeZone;
   const now = new Date();
@@ -33,6 +33,7 @@ function logger({ name, command, uid, type, event }) {
   console.log(log);
 
   if (global.config.server["save_logs_in_server"]) {
+    if (isEvent) return
     const logEntry = {
       timestamp: now.getTime(),
       readable_time: timeString,

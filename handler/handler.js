@@ -27,8 +27,8 @@ function clearCache() {
         fs.rmSync(filePath, { recursive: true, force: true });
       }
     });
-
-    global.log('Cleared Cache: All files and directories in tmp have been removed.', 'red');
+    if (global.config_handler.auto_clean.log)
+      global.log('Cleared Cache: All files and directories in tmp have been removed.', 'magenta');
   } catch (err) {
     global.log(`Failed to clear cache: ${err.message}`, 'red');
   }
@@ -77,7 +77,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
       let check = await global.sqlite.usersData.exists(msg.from.id)
       if (!check) {
         global.sqlite.usersData.refresh(msg.from.id, msg)
-        global.log(`New User: @${msg.from.username}`, "yellow")
+        global.log(`New User: @${msg.from.username}`, "yellow", true)
         global.sqlite.usersData.update(msg.from.id, { authorized: false })
       }
       const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
@@ -145,7 +145,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           );
         }
         commandFound = true;
-        if (global.config_handler.skip.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
+        if (global.config_handler.skip.commands.includes(x.config.name)) return message.send(global.config_handler.skip_message || "Command is Unloaded")
         const userId = msg.from.id;
         const commandName = x.config.name;
         const cooldown = x.config?.cooldown * 1000 || 5000;
@@ -191,6 +191,14 @@ bot.on("message", async msg => {
   if (msg.text && msg.text.startsWith("/")) return
   let replied = false;
   try {
+    if (global.config.use_sqlite_on_chat) {
+      let check = await global.sqlite.usersData.exists(msg.from.id)
+      if (!check) {
+        global.sqlite.usersData.refresh(msg.from.id, msg)
+        global.log(`New User: @${msg.from.username}`, "yellow", true)
+        global.sqlite.usersData.update(msg.from.id, { authorized: false })
+      }
+    }
     if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
         const replyCTX = global.bot.reply.get(msg.reply_to_message.message_id)
@@ -212,6 +220,7 @@ bot.on("message", async msg => {
       for (const x of global.cmds.values()) {
         const args = msg?.text?.split(" ")
         const { username, id } = msg.from;
+        // chat function, Don't need them in events
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
@@ -265,7 +274,29 @@ const handleFunctionalEvent = async (ctx, eventType) => {
 const handleEvents = async (ctx, eventType) => {
   const { username, id } = ctx?.from;
   if (ctx?.text?.startsWith("/")) return
-  logger({ name: username, command: null, uid: id, type: ctx?.chat?.type || null, event: eventType });
+  try {
+    const { message, from } = ctx;
+    for (const cmd of global.events.values()) {
+      if (
+        cmd?.config.name?.toLowerCase() === eventType
+      ) {
+        const message_function = create_message(ctx);
+        if (cmd?.start) {
+          cmd.start({
+            event: ctx,
+            api: bot,
+            message: message_function,
+            cmd: cmd?.config?.name || null,
+            usersData: global.sqlite.usersData,
+            threadsData: global.sqlite.threadsData,
+            role: admins.includes(String(from.id)) ? 1 : 0
+          });
+        }
+        const { username, id } = from;
+        logger({ name: username, command: cmd?.config?.name || null, uid: id, type: ctx?.chat?.type || null, event: eventType, isEvent: true });
+      }
+    }
+  } catch (err) { throw err }
 }
 
 const functionalEvents = [
@@ -278,15 +309,8 @@ const functionalEvents = [
 ];
 
 const chatEvents = [
-  "text",
-  "edited_message",
-  "channel_post",
-  "edited_channel_post",
-  "poll",
-  "poll_answer",
-  "chat_member",
-  "my_chat_member",
-  "audio",
+  /*"text",
+    "audio",
   "document",
   "photo",
   "sticker",
@@ -295,7 +319,17 @@ const chatEvents = [
   "voice",
   "contact",
   "location",
-  "venue",
+  "venue"
+  
+  Check line 223
+  */
+  "edited_message",
+  "channel_post",
+  "edited_channel_post",
+  "poll",
+  "poll_answer",
+  "chat_member",
+  "my_chat_member",
   "new_chat_members",
   "left_chat_member",
   "new_chat_title",
@@ -319,7 +353,7 @@ functionalEvents.forEach(eventType => {
 
 chatEvents.forEach(eventType => {
   try {
-    if (global.config.log_events) {
+    if (global.config.event_listener) {
       bot.on(eventType, async (ctx) => handleEvents(ctx, eventType));
     }
   } catch (err) {
