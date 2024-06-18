@@ -17,7 +17,7 @@ async function formatsave(filename, link) {
     fs.writeFileSync(filePath, jsCode, "utf8");
     const requiredCode = require(filePath);
     if (!requiredCode.start) throw new Error("File Doesn't have start function set");
-    global.cmds.set(requiredCode.config.name, requiredCode);
+    global.cmds.set(filename, requiredCode);
   } catch (error) {
     throw error;
   }
@@ -29,7 +29,7 @@ async function saveString(filename, jsCode) {
   const filePath = path.join(__dirname, filename);
   fs.writeFileSync(filePath, jsCode, "utf8");
   const requiredCode = require(filePath);
-  global.cmds.set(requiredCode.config.name, requiredCode);
+  global.cmds.set(filename, requiredCode);
 }
 
 module.exports = {
@@ -53,20 +53,32 @@ module.exports = {
           if (global.config_handler.skip.commands.includes(commandName)) {
             const index = global.config_handler.skip.commands.indexOf(commandName);
             global.config_handler.skip.commands.splice(index, 1);
-            global.utils.configSync({ skip: { commands: global.config_handler.skip.commands } });
+            global.utils.configSync({
+              skip: {
+                ...global.config_handler.skip,
+                commands: global.config_handler.skip.commands
+              }
+            });
           }
-          global.cmds.set(commandName, command);
+          global.cmds.set(args[1] + ".js", command);
           message.reply(`Command ${commandName} loaded successfully.`);
           break;
         case "unload":
           if (!args[1]) return message.Syntax(cmd);
+          if (!args[1]?.endsWith(".js")) return message.reply("File name must end with .js")
           const commandUnload = require(path.join(__dirname, args[1]));
           const commandNameUnload = commandUnload.config.name;
           if (!global.config_handler.skip.commands.includes(commandNameUnload)) {
             global.config_handler.skip.commands.push(commandNameUnload);
-            global.utils.configSync({ skip: { commands: global.config_handler.skip.commands } });
+            global.utils.configSync({
+              skip: {
+                ...global.config_handler.skip,
+                commands: global.config_handler.skip.commands
+              }
+            });
           }
           message.reply(`Unloaded ${commandNameUnload} successfully.`);
+          global.cmds.delete(args[1]);
           break;
         case "install":
           if (!args[1] || !args[1].endsWith(".js")) return message.reply("Include File name with format");
