@@ -16,7 +16,7 @@ function startProject() {
 function handle_code(code) {
   switch (code) {
     case 2:
-      log("Error occurred while connecting to MongoDB", "red", true);
+      log("Error occurred while connecting to DATABASE", "red", true);
       console.log("Exiting Process, Resolve Issue");
       process.exit(3);
       break;

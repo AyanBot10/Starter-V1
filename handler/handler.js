@@ -10,6 +10,17 @@ const path = require("path");
 function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
+let usersData;
+let threadsData;
+
+if (config.DATABASE.mongodb['CONNECT_MONGODB']) {
+  usersData = global.sqlite.usersData;
+  threadsData = global.sqlite.threadsData;
+} else {
+  usersData = global.mongo.usersData;
+  threadsData = global.mongo.threadsData;
+}
+
 
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
@@ -73,17 +84,16 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     const command = match[1];
     const args = msg.text.split(" ").slice(1);
     let commandFound = false;
-    if (global.config["use_sqlite_on_start"]) {
-      let check = await global.sqlite.usersData.exists(msg.from.id)
-      if (!check) {
-        global.sqlite.usersData.refresh(msg.from.id, msg)
-        global.log(`New User: @${msg.from.username || msg.from.first_name}`, "yellow", true)
-        global.sqlite.usersData.update(msg.from.id, { authorized: false })
-      }
-      const userIsBanned = (await global.sqlite.usersData.retrieve(msg.from.id))
+    let check = await usersData.exists(msg.from.id)
+    if (!check) {
+      usersData.refresh(msg.from.id, msg)
+      global.log(`New User: @${msg.from.username || msg.from.first_name}`, "yellow", true)
+      usersData.update(msg.from.id, { authorized: false })
+    }
+    const userIsBanned = (await usersData.retrieve(msg.from.id))
 
-      if (!userIsBanned.authorized && global.config_handler.authorization_prompt) {
-        const authorizationMessage = await message.reply(`
+    if (!userIsBanned.authorized && global.config_handler.authorization_prompt) {
+      const authorizationMessage = await message.reply(`
   By accessing or using our services, you acknowledge and agree to the following:
 
    Interactions: Your interactions, including the initialization and execution of commands, may be recorded for analysis and optimization.
@@ -100,31 +110,30 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
 
   You will be able to use the commands once you agree to these terms.
   `, {
-          reply_markup: {
-            inline_keyboard: [
+        reply_markup: {
+          inline_keyboard: [
         [{ text: 'Agree', callback_data: 'confirm' },
-                { text: 'Disagree', callback_data: 'cancel' }]
+              { text: 'Disagree', callback_data: 'cancel' }]
       ]
-          }
-        });
+        }
+      });
 
-        return global.bot.callback_query.set(authorizationMessage.message_id, {
-          cmd: "authorization",
-          author: msg.from.id,
-          messageID: authorizationMessage.message_id
-        });
+      return global.bot.callback_query.set(authorizationMessage.message_id, {
+        cmd: "authorization",
+        author: msg.from.id,
+        messageID: authorizationMessage.message_id
+      });
+    }
+
+    if (userIsBanned?.isBanned) return message.reply(`You have been banned\nReason: ${userIsBanned?.ban_message}` || "You have been banned from the system.")
+    if (msg.chat.type !== "private") {
+      let threadCheck = await threadsData.exists(msg.chat.id);
+      if (!threadCheck) {
+        threadsData.refresh(msg.chat.id, msg)
       }
-
-      if (userIsBanned?.isBanned) return message.reply(`You have been banned\nReason: ${userIsBanned?.ban_message}` || "You have been banned from the system.")
-      if (msg.chat.type !== "private") {
-        let threadCheck = await global.sqlite.threadsData.exists(msg.chat.id);
-        if (!threadCheck) {
-          global.sqlite.threadsData.refresh(msg.chat.id, msg)
-        }
-        let bannedThread = await global.sqlite.threadsData.retrieve(msg.chat.id)
-        if (bannedThread?.isBanned) {
-          return message.reply(bannedThread?.ban_message ? `Chat is Banned\nReason: ${bannedThread?.ban_message.substring(0, 50)}` : global.config_handler.banned_threads.message)
-        }
+      let bannedThread = await threadsData.retrieve(msg.chat.id)
+      if (bannedThread?.isBanned) {
+        return message.reply(bannedThread?.ban_message ? `Chat is Banned\nReason: ${bannedThread?.ban_message.substring(0, 50)}` : global.config_handler.banned_threads.message)
       }
     }
     for (const x of global.cmds.values()) {
@@ -168,8 +177,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           api: bot,
           message,
           cmd: x?.config?.name,
-          usersData: global.sqlite.usersData,
-          threadsData: global.sqlite.threadsData,
+          usersData,
+          threadsData,
           role: admins.includes(String(msg.from.id)) ? 1 : 0
         });
         const { username, first_name, id } = msg.from;
@@ -191,13 +200,11 @@ bot.on("message", async msg => {
   if (msg.text && msg.text.startsWith("/")) return
   let replied = false;
   try {
-    if (global.config.use_sqlite_on_chat) {
-      let check = await global.sqlite.usersData.exists(msg.from.id)
-      if (!check) {
-        global.sqlite.usersData.refresh(msg.from.id, msg)
-        global.log(`New User: @${msg.from.username}`, "yellow", true)
-        global.sqlite.usersData.update(msg.from.id, { authorized: false })
-      }
+    let check = await usersData.exists(msg.from.id)
+    if (!check) {
+      usersData.refresh(msg.from.id, msg)
+      global.log(`New User: @${msg.from.username}`, "yellow", true)
+      usersData.update(msg.from.id, { authorized: false })
     }
     if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
@@ -209,7 +216,7 @@ bot.on("message", async msg => {
             const { username, first_name, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, Context: replyCTX, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData, Context: replyCTX, threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
             logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
@@ -224,7 +231,7 @@ bot.on("message", async msg => {
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
-          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData: global.sqlite.usersData, threadsData: global.sqlite.threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData, threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
           logger({
             name: username || first_name,
             command: x.config.name,
@@ -258,8 +265,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               Context: context,
               message: message_function,
               cmd: context?.cmd || cmd?.config?.name || null,
-              usersData: global.sqlite.usersData,
-              threadsData: global.sqlite.threadsData,
+              usersData,
+              threadsData,
               role: admins.includes(String(from.id)) ? 1 : 0
             });
           }
@@ -287,8 +294,8 @@ const handleEvents = async (ctx, eventType) => {
             api: bot,
             message: message_function,
             cmd: cmd?.config?.name || null,
-            usersData: global.sqlite.usersData,
-            threadsData: global.sqlite.threadsData,
+            usersData,
+            threadsData,
             role: admins.includes(String(from.id)) ? 1 : 0
           });
         }

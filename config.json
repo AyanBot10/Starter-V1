@@ -32,8 +32,7 @@
     },
     "mongodb": {
       "CONNECT_MONGODB": false,
-      "MONGO_URI": "",
-      "notes": "Don't use mongo"
+      "MONGO_URI": ""
     }
   }
 }
