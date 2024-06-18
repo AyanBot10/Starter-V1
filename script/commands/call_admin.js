@@ -13,7 +13,7 @@ module.exports = {
     if (!args[0] && !event.message) return message.Syntax(cmd);
 
     const text = args.join(' ') || (event.message && event.message.caption) || '';
-    const form = `User @${event.from.username} (${event.from.id}) Called for admin\n\n:\n*${text}*`;
+    const form = `User @${event.from.username} (${event.from.id}) Called for admin\n\n*${text}*`;
 
     for (let admin of config.admins) {
       let sentMessage;
@@ -52,7 +52,7 @@ module.exports = {
         return await message.reply("Sending reply to user...", { disable_notification: true });
       }
       case 'adminToUser': {
-        const form = `User @${event.from.username} (${event.from.id}) Replied with:\n${text}`;
+        const form = `User @${event.from.username} (${event.from.id}) Replied:\n${text}`;
         let sentMessage;
         sentMessage = await api.sendMessage(sent_event.chat.id, form, { reply_to_message_id: sent_event.message_id, disable_notification: false });
         global.bot.reply.set(sentMessage.message_id, {
