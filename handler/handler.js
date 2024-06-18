@@ -14,12 +14,14 @@ let usersData;
 let threadsData;
 
 if (config.DATABASE.mongodb['CONNECT_MONGODB']) {
-  usersData = global.sqlite.usersData;
-  threadsData = global.sqlite.threadsData;
-} else {
   usersData = global.mongo.usersData;
   threadsData = global.mongo.threadsData;
+} else {
+  usersData = global.sqlite.usersData;
+  threadsData = global.sqlite.threadsData;
 }
+global.usersData = usersData;
+global.threadsData = threadsData;
 
 
 function clearCache() {
@@ -177,8 +179,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
           api: bot,
           message,
           cmd: x?.config?.name,
-          usersData,
-          threadsData,
+          usersData: global.usersData,
+          threadsData: global.threadsData,
           role: admins.includes(String(msg.from.id)) ? 1 : 0
         });
         const { username, first_name, id } = msg.from;
@@ -216,7 +218,17 @@ bot.on("message", async msg => {
             const { username, first_name, id } = msg.from;
             if (msg.from.bot_id) break;
             const message = create_message(msg, x.config.name);
-            await x.reply({ event: msg, args, api: bot, message, cmd: x.config.name, usersData, Context: replyCTX, threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+            await x.reply({
+              event: msg,
+              args,
+              api: bot,
+              message,
+              cmd: x.config.name,
+              Context: replyCTX,
+              usersData: global.usersData,
+              threadsData: global.threadsData,
+              role: admins.includes(String(msg.from.id)) ? 1 : 0
+            });
             logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
             break;
           }
@@ -231,7 +243,16 @@ bot.on("message", async msg => {
         if (typeof x.chat === "function") {
           const message = create_message(msg, x.config.name);
           if (msg.from.bot_id) break;
-          x.chat({ event: msg, args, api: bot, message, cmd: x.config.name, usersData, threadsData, role: admins.includes(String(msg.from.id)) ? 1 : 0 });
+          x.chat({
+            event: msg,
+            args,
+            api: bot,
+            message,
+            cmd: x.config.name,
+            usersData: global.usersData,
+            threadsData: global.threadsData,
+            role: admins.includes(String(msg.from.id)) ? 1 : 0
+          });
           logger({
             name: username || first_name,
             command: x.config.name,
@@ -265,8 +286,8 @@ const handleFunctionalEvent = async (ctx, eventType) => {
               Context: context,
               message: message_function,
               cmd: context?.cmd || cmd?.config?.name || null,
-              usersData,
-              threadsData,
+              usersData: global.usersData,
+              threadsData: global.threadsData,
               role: admins.includes(String(from.id)) ? 1 : 0
             });
           }
@@ -294,8 +315,8 @@ const handleEvents = async (ctx, eventType) => {
             api: bot,
             message: message_function,
             cmd: cmd?.config?.name || null,
-            usersData,
-            threadsData,
+            usersData: global.usersData,
+            threadsData: global.threadsData,
             role: admins.includes(String(from.id)) ? 1 : 0
           });
         }

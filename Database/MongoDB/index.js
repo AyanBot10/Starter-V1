@@ -5,15 +5,11 @@ if (!global.config.DATABASE.mongodb['MONGO_URI']) {
   process.exit(2)
 }
 
-mongoose.connect(global.config.DATABASE.mongodb['MONGO_URI'], {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
+const instance = mongoose.connect(global.config.DATABASE.mongodb['MONGO_URI']).then(() => {
+  global.log('Connected to MongoDB', "cyan", true);
 }).catch(err => {
-  console.error('MongoDB connection error:', err.message);
+  global.log('MongoDB connection error: ' + err.message, "red", true);
+  process.exit(2)
 });
 
-module.exports = mongoose;
+module.exports = instance

@@ -22,7 +22,7 @@ module.exports = {
       }
     }
   },
-  callback_query: async function({ event, ctx, Context, message, api, usersData }) {
+  callback_query: async function({ event, ctx, Context, message, api }) {
     try {
       const { id, from, message: ctxMessage, data } = ctx;
       const { author, messageID } = Context;
@@ -41,7 +41,7 @@ module.exports = {
           await message.edit(`Confirmed Choice. Adding @${from.username || from.first_name} to Database`, message_id, chat.id, {
             reply_markup: { inline_keyboard: [] }
           });
-          global.sqlite.usersData.update(from.id, { authorized: true });
+          global.usersData.update(from.id, { authorized: true });
           break;
         }
         case 'cancel': {
