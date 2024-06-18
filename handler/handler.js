@@ -11,9 +11,6 @@ function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
 
-const fs = require('fs');
-const path = require('path');
-
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
 
