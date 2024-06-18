@@ -51,8 +51,13 @@ module.exports = {
           }
 
           if (x.config.usage) {
-            messageContent += "─── USAGE ────⭓\n";
+            messageContent += "─── USAGE ────⭓\n"
             messageContent += `${regexStr(x.config?.usage || "N/A", x.config.name)}\n`;
+          }
+
+          if (x.config.category) {
+            messageContent += "─── GENRE ────⭓\n"
+            messageContent += `${(x.config?.category || "Uncategorized").toUpperCase()}\n`;
           }
 
           messageContent += "───────⭔";
