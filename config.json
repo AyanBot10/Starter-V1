@@ -17,8 +17,6 @@
     "note": "This bot is primarily made for private inbox use. changing the this.level might break some commands. the `level` excludes the event.type if matched. If you put private then it will work only in private"
   },
   "event_listener": true,
-  "use_sqlite_on_start": true,
-  "use_sqlite_on_chat": true,
   "polling": true,
   "groq": {
     "groq_api_key": "",
@@ -27,12 +25,12 @@
   "timeZone": "Asia/Shanghai",
   "DATABASE": {
     "sqlite": {
-      "CONNECT_SQLITE": true,
-      "notes": "SQLITE necessary for many check ups"
+      "CONNECT_SQLITE": true
     },
     "mongodb": {
       "CONNECT_MONGODB": false,
       "MONGO_URI": ""
-    }
+    },
+    "NOTES": "Either use SQLite or MongoDB"
   }
 }
