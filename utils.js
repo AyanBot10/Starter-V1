@@ -131,11 +131,25 @@ async function uploadImgbb(file) {
   }
 }
 
+async function downloadFile(url = "", path = "") {
+  // @NTkhang03
+  if (!url || typeof url !== "string")
+    throw new Error(`The first argument (url) must be a string`);
+  if (!path || typeof path !== "string")
+    throw new Error(`The second argument (path) must be a string`);
+  const getFile = await axios.get(url, {
+    responseType: "arraybuffer"
+  });
+  fs.writeFileSync(path, Buffer.from(getFile.data));
+  return path;
+}
+
 module.exports = {
   getStream,
   sleep,
   uuid,
   configSync,
   translate,
-  uploadImgbb
+  uploadImgbb,
+  downloadFile
 }
