@@ -6,7 +6,7 @@ Starter-V1 BOT is a versatile Telegram bot project designed by SatoX69. Unlike m
 
 - **Respond to Command Initialization**: The bot listens and responds to messages starting with a slash (/) and notifies the user if it's a valid command.
 - **No External Services or Third-party APIs**: The project uses only first-party modules, resulting in lower latency.
-- **Database Integration**: The bot integrates with both SQLite and MongoDB, using them efficiently (though the MongoDB part still needs some fixes).
+- **Database Integration**: The bot integrates with both SQLite and MongoDB, using them efficiently.
 
 ## Installation and Setup
 
