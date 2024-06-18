@@ -2,6 +2,7 @@
   "BOT": {
     "token": "",
     "DOWNLOADER": "",
+    "INSTA_DOWNLOADER": "",
     "polling": true
   },
   "server": {
