@@ -10,19 +10,52 @@ const path = require("path");
 function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
-let usersData;
-let threadsData;
 
 if (config.DATABASE.mongodb['CONNECT_MONGODB']) {
-  usersData = global.mongo.usersData;
-  threadsData = global.mongo.threadsData;
+  global.usersData = global.mongo.usersData;
+  global.threadsData = global.mongo.threadsData;
+} else if (config.DATABASE.sqlite['CONNECT_SQLITE']) {
+  global.usersData = global.sqlite.usersData;
+  global.threadsData = global.sqlite.threadsData;
 } else {
-  usersData = global.sqlite.usersData;
-  threadsData = global.sqlite.threadsData;
+  global.log("NO DATABASE SELECTED", "red", true)
+  process.exit(2);
 }
-global.usersData = usersData;
-global.threadsData = threadsData;
 
+
+async function initializeCommands() {
+  var log = global.log;
+  var commandsPath = path.resolve("script", "commands");
+  var commandFiles;
+  try {
+    commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
+  } catch (error) {
+    throw error;
+  }
+
+  const commandsArray = commandFiles.map(file => {
+    var command = require(`./${commandsPath}/${file}`);
+    if (!global.cmds.has(file)) return null;
+
+    var { name, description } = command.config;
+    if (!name) return null;
+
+    return {
+      command: name,
+      description: description?.short || description?.long || (typeof description === 'string' ? description : 'Not Available')
+    };
+  }).filter(Boolean);
+
+  try {
+    await bot.setMyCommands(commandsArray);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return null
+  }
+}
+
+if (global.config.BOT["INITIALIZE_COMMANDS_ON_START"]) initializeCommands();
 
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
