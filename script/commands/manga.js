@@ -232,8 +232,8 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
         downloaded++
         pdfPath = await createPdfFromImages(folderName);
         const pdfFileName = path.basename(pdfPath);
-        message.edit(`Downloaded ${downloaded} chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
-        message.indicator("upload_document");
+        await message.edit(`Downloaded ${downloaded} chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
+        await message.indicator("upload_document");
         await api.sendDocument(event.chat.id, pdfPath, {
           filename: pdfFileName,
         });
@@ -249,8 +249,7 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
       }
     }
     await global.utils.sleep(400)
-    if (chapterUrls.length > 1)
-      await message.edit(`Downloaded all chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
+    await message.edit(`Downloaded all chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
   } catch (error) {
     await message.edit(`Error Occured`, downloadingMessage.message_id, downloadingMessage.chat.id);
     throw error
