@@ -14,7 +14,7 @@
     "level": ["private"],
     "level_options": ["private", "group", "supergroup", "channel"],
     "message": "",
-    "note": "This bot is primarily made for private inbox use. changing the this.level might break some commands. the `level` excludes the event.type if matched. If you put private then it will work only in private"
+    "note": "Put wherever you want to bot to run. like it will run on groups and supergroups if this.level includes `group` and `supergroup`"
   },
   "event_listener": true,
   "polling": true,
