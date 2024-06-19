@@ -19,8 +19,7 @@
   "event_listener": true,
   "polling": true,
   "groq": {
-    "groq_api_key": "",
-    "use_groq_on_chat": false
+    "groq_api_key": ""
   },
   "timeZone": "Asia/Shanghai",
   "DATABASE": {
