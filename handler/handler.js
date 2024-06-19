@@ -213,24 +213,28 @@ bot.on("message", async msg => {
         const replyCTX = global.bot.reply.get(msg.reply_to_message.message_id)
         for (const x of global.cmds.values()) {
           if (x.config.name === replyCTX.cmd) {
-            replied = true;
-            const args = msg?.text?.split(" ")
-            const { username, first_name, id } = msg.from;
-            if (msg.from.bot_id) break;
-            const message = create_message(msg, x.config.name);
-            await x.reply({
-              event: msg,
-              args,
-              api: bot,
-              message,
-              cmd: x.config.name,
-              Context: replyCTX,
-              usersData: global.usersData,
-              threadsData: global.threadsData,
-              role: admins.includes(String(msg.from.id)) ? 1 : 0
-            });
-            logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
-            break;
+            if (typeof x.reply === "function") {
+              replied = true;
+              const args = msg?.text?.split(" ")
+              const { username, first_name, id } = msg.from;
+              if (msg.from.bot_id) break;
+              const message = create_message(msg, x.config.name);
+              await x.reply({
+                event: msg,
+                args,
+                api: bot,
+                message,
+                cmd: x.config.name,
+                Context: replyCTX,
+                usersData: global.usersData,
+                threadsData: global.threadsData,
+                role: admins.includes(String(msg.from.id)) ? 1 : 0
+              });
+              logger({ name: username || first_name, command: x.config.name, uid: id, type: msg?.chat?.type || null, event: "message_reply" });
+              break;
+            } else {
+              global.log("chat is not a function " + x.config.name, "red")
+            }
           }
         }
       }
@@ -309,8 +313,8 @@ const handleEvents = async (ctx, eventType) => {
         cmd?.config.name?.toLowerCase() === eventType
       ) {
         const message_function = create_message(ctx);
-        if (cmd?.start) {
-          cmd.start({
+        if (cmd[eventType]) {
+          cmd[eventType]({
             event: ctx,
             api: bot,
             message: message_function,
@@ -320,7 +324,7 @@ const handleEvents = async (ctx, eventType) => {
             role: admins.includes(String(from.id)) ? 1 : 0
           });
         }
-        const { username, id, first_name } = from;
+        const { username, id, first_name } = from
         logger({ name: username || first_name, command: cmd?.config?.name || null, uid: id, type: ctx?.chat?.type || null, event: eventType, isEvent: true });
       }
     }
@@ -349,7 +353,7 @@ const chatEvents = [
   "location",
   "venue"
   
-  Check line 223
+  Check line 240 - 250
   */
   "edited_message",
   "channel_post",
