@@ -10,6 +10,7 @@ function fileExists(filename) {
 
 async function formatsave(filename, link) {
   try {
+    global.cmds.delete(filename);
     const response = await axios.get(link);
     let jsCode = response.data;
     jsCode = await prettier.format(jsCode, { parser: "babel", semi: true, singleQuote: true });
@@ -134,7 +135,7 @@ module.exports = {
           await formatsave(file, link);
 
           // Text parsing in telegram sucks, you can't install commands in chat, Template Literals won't work
-          message.edit(`Downloaded and acquired ${file} successfully`, messageID, chat);
+          message.edit(`Downloaded and acquired ${file} successfully, Restart recommended`, messageID, chat);
           break;
         case "cancel":
           await message.edit("Cancelled", messageID, chat, {
