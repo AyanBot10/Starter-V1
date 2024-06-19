@@ -14,10 +14,11 @@ module.exports = {
       short: "Downloads Manga"
     },
     usage: "1. URL | startCh -> endCh (https://mangapill.com/MANGA_LINK | 1 -> 3)\n2. Search_query",
-    cooldown: 30,
+    cooldown: 10,
     category: "anime"
   },
   start: async function({ event, message, args, api, cmd }) {
+    if (!global.tmp.manga) global.tmp.manga = new Set();
     if (!args[0]) return message.Syntax(cmd)
     const messageText = args.join(' ');
     const match = messageText.match(/(https:\/\/mangapill\.com\/manga\/\d+\/[\w-]+) \| (\d+) -> (\d+)/);
@@ -38,101 +39,40 @@ module.exports = {
       }
       return;
     }
-
     const [, url, start, end] = match;
     const startPoint = parseInt(start);
     const endPoint = parseInt(end);
 
-    if (isNaN(startPoint) || isNaN(endPoint) || startPoint <= 0 || endPoint <= 0 || startPoint > endPoint) {
-      message.reply('Invalid chapter range. Please provide valid starting and ending chapter numbers.');
+    if (
+      isNaN(startPoint) ||
+      isNaN(endPoint) ||
+      startPoint <= 0 ||
+      endPoint <= 0 ||
+      startPoint > endPoint ||
+      endPoint > (startPoint + 5)
+    ) {
+      message.reply('Invalid chapter range. Please provide valid starting and ending chapter numbers where the ending chapter is within 5 chapters of the starting chapter.');
       return;
     }
 
     try {
+      if (global.tmp.manga.has(event.from.id)) return await message.reply("You Already have manga actively downloading")
       const downloadingMessage = await message.reply('Downloading, please wait...');
+      global.tmp.manga.add(event.from.id)
+      const { fileName, folderName } = await scrapeChapterUrl(url);
+      const chapterUrls = getChapterUrls(startPoint, endPoint, fileName);
 
-      const urlsJson = await scrapeChapterUrl(url);
-
-      const chapterUrls = getChapterUrls(startPoint, endPoint, urlsJson);
-
-      const responsePDF = await processAllChapters(chapterUrls, event, api);
-      await message.edit(`All chapters Downloaded successfully.`, downloadingMessage.message_id, downloadingMessage.chat.id);
-      await message.indicator("upload_document");
-      await api.sendDocument(event.chat.id, responsePDF.pdfPath, {
-        filename: responsePDF.pdfFileName,
-      });
-      cleanup(responsePDF.folderName, responsePDF.pdfPath);
-
+      await processAllChapters({ chapterUrls, url, event, api, message, downloadingMessage, endPoint, folderName });
     } catch (error) {
       console.error('Error:', error);
       message.reply('An error occurred while processing the URL.');
+    } finally {
+      if (global.tmp.manga.has(event.from.id)) {
+        global.tmp.manga.delete(event.from.id);
+      }
     }
   },
 };
-
-const folderPath = path.join(__dirname, 'tmp');
-
-async function scrapeImagesAsura(url) {
-  try {
-    const folderName = path.join(__dirname, "tmp/") + url.split('/').filter(Boolean).pop().replace(/^(\d+-)/, '');
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
-    const readerArea = $('#readerarea');
-    const imgElements = readerArea.find('img[decoding="async"][src]');
-
-    if (!fs.existsSync(folderName)) {
-      fs.mkdirSync(folderName);
-    }
-
-    const imgSrcArray = [];
-
-    imgElements.each((index, element) => {
-      const imgSrc = $(element).attr('src');
-      imgSrcArray.push(imgSrc);
-    });
-
-    for (let i = 0; i < imgSrcArray.length; i++) {
-      const imgSrc = imgSrcArray[i];
-      if (imgSrc) {
-        const imgName = path.basename(imgSrc);
-        const imgPath = path.join(folderName, imgName);
-
-        await axios({
-          method: 'get',
-          url: imgSrc,
-          responseType: 'stream',
-        }).then((response) => {
-          response.data.pipe(fs.createWriteStream(imgPath));
-        })
-      }
-    }
-
-    return folderName;
-
-  } catch (error) {
-    throw error
-  }
-}
-
-function getAllFilesInFolder(folderPath) {
-  const allFiles = [];
-
-  function traverseDirectory(currentPath) {
-    const files = fs.readdirSync(currentPath, { withFileTypes: true });
-
-    for (const file of files) {
-      const filePath = path.join(currentPath, file.name);
-      if (file.isFile()) {
-        allFiles.push(filePath);
-      } else if (file.isDirectory()) {
-        traverseDirectory(filePath);
-      }
-    }
-  }
-
-  traverseDirectory(folderPath);
-  return allFiles;
-}
 
 async function createPdfFromImages(folderName) {
   try {
@@ -155,7 +95,7 @@ async function createPdfFromImages(folderName) {
           doc.image(imagePath, 0, 0, { width: imageWidth, height: imageHeight });
         }
 
-        doc.fontSize(14).fillColor('black').text('tg@Jsusbin', 30, 30);
+        doc.fontSize(10).fillColor('black').text('tg@Jsusbin', 30, 30);
       } catch (imageError) {
         continue;
       }
@@ -171,40 +111,37 @@ async function createPdfFromImages(folderName) {
 async function scrapeChapterUrl(url) {
   try {
     const baseUrl = new URL(url).origin;
+    const folderPath = path.join(__dirname, 'tmp', path.basename(url));
+    const fileName = path.join(folderPath, `${path.basename(url)}.json`);
 
-    const folderPath = 'chapters';
-    const fileName = path.join(__dirname, "tmp", path.basename(url) + '.json');
+    if (fs.existsSync(fileName)) {
+      return { fileName, folderName: folderPath };
+    }
 
-    if (fs.existsSync(fileName))
-      return fileName
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
 
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
-    const divWithFilterList = $('div[data-filter-list]');
-    const aElements = divWithFilterList.find('a');
-    const hrefArray = [];
+    const hrefArray = $('div[data-filter-list] a')
+      .map((_, element) => $(element).attr('href'))
+      .get()
+      .filter(href => href)
+      .map(href => href.startsWith('http') ? href : baseUrl + href)
+      .reverse();
 
-    aElements.each((index, element) => {
-      const href = $(element).attr('href');
-      if (href) {
-        const completeHref = href.startsWith('http') ? href : baseUrl + href;
-        hrefArray.push(completeHref);
-      }
-    });
-
-    const reversedArray = hrefArray.reverse();
     const jsonContent = {
       mangaName: path.basename(url),
       baseUrl: url,
-      reversedHrefValues: reversedArray,
+      reversedHrefValues: hrefArray,
     };
 
-    const jsonString = JSON.stringify(jsonContent, null, 2);
-    fs.writeFileSync(fileName, jsonString);
-    return fileName;
+    fs.writeFileSync(fileName, JSON.stringify(jsonContent, null, 2));
 
+    return { fileName, folderName: folderPath };
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
@@ -229,9 +166,12 @@ function getChapterUrls(startPoint, endPoint, urlsJson) {
 }
 
 
-async function scrapeImagesMangapill(url) {
+async function scrapeImagesMangapill(url, mainLink) {
   try {
-    const folderName = path.join(__dirname, "tmp/") + url.split('/').filter(Boolean).pop().replace(/^(\d+-)/, '');
+    const regex = /[^/]+$/;
+    let main2Link = mainLink.match(regex);;
+    main2Link = main2Link ? main2Link[0] : mainLink;
+    const folderName = path.join(__dirname, "tmp", main2Link + "/") + url.split('/').filter(Boolean).pop().replace(/^(\d+-)/, '');
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
     const readerArea = $('.relative.bg-card.flex.justify-center.items-center');
@@ -280,34 +220,36 @@ async function scrapeImagesMangapill(url) {
 }
 
 
-async function processAllChapters(chapterUrls) {
-  try {
+async function processAllChapters({ chapterUrls, event, api, message, downloadingMessage, endPoint, url, flname }) {
+  let downloaded = 0
+  let folderName;
+  let pdfPath;
+  let pdfFileName;
 
-    for (const url of chapterUrls) {
+  try {
+    for (const urx of chapterUrls) {
       try {
-        const folderName = await scrapeImagesMangapill(url);
-        const pdfPath = await createPdfFromImages(folderName);
-        const pdfFileName = path.basename(pdfPath);
-        return {
-          folderName,
-          pdfPath,
-          pdfFileName
-        }
+        folderName = await scrapeImagesMangapill(urx, url);
+        downloaded++
+        pdfPath = await createPdfFromImages(folderName);
+        pdfFileName = path.basename(pdfPath);
+        await message.edit(`Downloaded ${downloaded} chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
+        await message.indicator("upload_document");
+        await api.sendDocument(event.chat.id, pdfPath, {
+          filename: pdfFileName,
+        });
       } catch (error) {
         throw error
+      } finally {
+        if (pdfPath)
+          fs.unlinkSync(pdfPath)
+        if (pdfFileName)
+          fs.unlinkSync(pdfFileName)
       }
     }
+    await message.edit(`Downloaded all chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
   } catch (error) {
-    throw error
-  }
-}
-
-async function cleanup(folderName, pdfPath) {
-  try {
-    fs.rmSync(folderName, { recursive: true });
-    fs.unlinkSync(pdfPath);
-    console.log('Cleanup completed successfully.');
-  } catch (error) {
+    await message.edit(`Error Occured`, downloadingMessage.message_id, downloadingMessage.chat.id);
     throw error
   }
 }

@@ -6,8 +6,6 @@ const path = require("path");
 
 // SpotifyDL Module is very buggy sometimes
 
-global.tmp.spotify = global.tmp?.spotify || new Set();
-
 async function searchTrack(query, limit) {
   try {
     const searchResult = await search(query, limit);
@@ -77,6 +75,7 @@ module.exports = {
     category: "media"
   },
   start: async function({ event, api, args, message }) {
+    if (!global.tmp.spotify) global.tmp.spotify = new Set();
     const query = args.join(" ");
     let downloadResponse;
     if (!query) {
@@ -85,8 +84,8 @@ module.exports = {
     if (query.match(/^(https:\/\/open\.spotify\.com\/track\/|https:\/\/spotify\.link\/)/i)) {
       try {
         const prmsg = await api.sendMessage(event.chat.id, "✅ | Downloading track...");
-        api.sendChatAction(event.chat.id, 'upload_audio')
         downloadResponse = await downloadSong(query);
+        api.sendChatAction(event.chat.id, 'upload_audio')
         api.deleteMessage(event.chat.id, prmsg.message_id);
         await api.sendAudio(event.chat.id, downloadResponse.dir, {
           caption: `• Title: ${downloadResponse.title}\n• Artist: ${downloadResponse.artist}\n• Upload Date: ${downloadResponse.album.releaseDate}\n• Album: ${downloadResponse.album.name}\n• Duration: ${downloadResponse.duration}`,
@@ -121,7 +120,7 @@ module.exports = {
         }
       } finally {
         if (global.tmp.spotify.has(event.from.id)) {
-          global.tmp.spotify.remove(event.from.id)
+          global.tmp.spotify.delete(event.from.id)
         }
       }
     } else {

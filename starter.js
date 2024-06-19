@@ -5,6 +5,11 @@ const axios = require("axios");
 const utils = require("./utils");
 
 
+// Command dependencies
+global.tmp.manga = new Set();
+global.tmp.spotify = new Set();
+
+
 // Configs
 global.config_handler = config_handler
 global.config = config;
@@ -14,7 +19,6 @@ global.pending
 
 // Prefix
 global.prefix = {};
-
 
 global.tmp = {}
 global.utils = {};
