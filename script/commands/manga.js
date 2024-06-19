@@ -35,7 +35,7 @@ module.exports = {
         await api.sendMessage(event.chat.id, textToSend, { parse_mode: "Markdown", reply_to_message_id: event.message_id });
       } catch (error) {
         console.error("Error during search or message sending:", error);
-        return message.reply("An error occurred. Please try again later.");
+        return message.reply(error.message);
       }
       return;
     }
@@ -65,7 +65,7 @@ module.exports = {
       await processAllChapters({ chapterUrls, url, event, api, message, downloadingMessage, endPoint, folderName });
     } catch (error) {
       console.error('Error:', error);
-      message.reply('An error occurred while processing the URL.');
+      message.reply(error.message);
     } finally {
       if (global.tmp.manga.has(event.from.id)) {
         global.tmp.manga.delete(event.from.id);
