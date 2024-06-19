@@ -37,7 +37,8 @@ module.exports = {
             fs.unlinkSync(file);
           });
         } else {
-          message.reply("```shell" + `\n${stdout}\n` + "```", { parse_mode: "Markdown" });
+          if (stdout || stdout.length > 0)
+            message.reply("```shell" + `\n${stdout || "null"}\n` + "```", { parse_mode: "Markdown" });
         }
       }
     });
