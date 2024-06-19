@@ -324,6 +324,8 @@ const handleEvents = async (ctx, eventType) => {
             role: admins.includes(String(from.id)) ? 1 : 0
           });
         }
+        // Disable logging for text
+        if (eventType === "text" && !global.config.log_event_text) return
         const { username, id, first_name } = from
         logger({ name: username || first_name, command: cmd?.config?.name || null, uid: id, type: ctx?.chat?.type || null, event: eventType, isEvent: true });
       }
@@ -341,8 +343,8 @@ const functionalEvents = [
 ];
 
 const chatEvents = [
-  /*"text",
-    "audio",
+  /*
+  "audio",
   "document",
   "photo",
   "sticker",
@@ -355,6 +357,7 @@ const chatEvents = [
   
   Check line 240 - 250
   */
+  "text",
   "edited_message",
   "channel_post",
   "edited_channel_post",

@@ -17,6 +17,7 @@
     "note": "Put wherever you want to bot to run. like it will run on groups and supergroups if this.level includes `group` and `supergroup`"
   },
   "event_listener": true,
+  "log_event_text": false,
   "polling": true,
   "groq": {
     "groq_api_key": ""

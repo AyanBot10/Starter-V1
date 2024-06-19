@@ -21,7 +21,7 @@ This folder contains event commands for various types of events. The event files
 - `migrate_from_chat_id`
 - `pinned_message`
 
-**Note:** This is different from command handlers. Event handler commamd names must match the event type exactly as listed above.
+**Note:** This is different from command handlers. Event handler command names must match the event type exactly as listed above.
 
 ## Example Code
 ```javascript
@@ -34,4 +34,4 @@ module.exports = {
 Here, this code will only run when any event with the same type/name as `event_name` gets emitted
 
 ### Note
-`text` and `message` events won't work because the handler/handler.js has other implementations for them so they are compatible with commands
+`message` event won't work because the handler/handler.js has other implementations for it.
