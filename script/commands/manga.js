@@ -247,7 +247,9 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
           fs.unlinkSync(pdfFileName)
       }
     }
-    await message.edit(`Downloaded all chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
+    await global.utils.sleep(400)
+    if (chapterUrls.length > 1)
+      await message.edit(`Downloaded all chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
   } catch (error) {
     await message.edit(`Error Occured`, downloadingMessage.message_id, downloadingMessage.chat.id);
     throw error
