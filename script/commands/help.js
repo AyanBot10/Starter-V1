@@ -34,6 +34,10 @@ module.exports = {
           if (x.config.author) {
             messageContent += `» Author: ${x.config.author}\n`;
           }
+          const credits = x.config.credits || x.config.credit;
+          if (credits) {
+            messageContent += `» Credit: ${credits}\n`;
+          }
           if (x.config.cooldown) {
             messageContent += `» Cooldown: ${x.config.cooldown}s\n`;
           }

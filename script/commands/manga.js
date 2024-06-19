@@ -8,12 +8,12 @@ const path = require('path');
 module.exports = {
   config: {
     name: "manga",
-    author: "tas33n",
+    credits: "tas33n",
     description: {
       long: "Download mangas in bulk from mangapill.com in pdf format",
       short: "Downloads Manga"
     },
-    usage: "1. URL | startCh -> endCh (https://mangapill.com/MANGA_LINK | 1 -> 3)\n2. Search_query",
+    usage: "1. URL | startCh -> endCh (https://mangapill.com/MANGA_LINK | 1 -> 3)\n\n2. Search_query",
     cooldown: 10,
     category: "anime"
   },
@@ -31,7 +31,7 @@ module.exports = {
           return message.reply("Nothing Found");
         }
         let textToSend = searchResults.map(x => `[${x.name}](${x.href})`).join('\n\n');
-        textToSend += "\n\n*Copy the link and use that to initiate the bulk download*"
+        textToSend += "\n\nCopy the link and use it"
         await api.sendMessage(event.chat.id, textToSend, { parse_mode: "Markdown", reply_to_message_id: event.message_id });
       } catch (error) {
         console.error("Error during search or message sending:", error);
@@ -224,7 +224,6 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
   let downloaded = 0
   let folderName;
   let pdfPath;
-  let pdfFileName;
 
   try {
     for (const urx of chapterUrls) {
@@ -232,9 +231,9 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
         folderName = await scrapeImagesMangapill(urx, url);
         downloaded++
         pdfPath = await createPdfFromImages(folderName);
-        pdfFileName = path.basename(pdfPath);
-        await message.edit(`Downloaded ${downloaded} chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
-        await message.indicator("upload_document");
+        const pdfFileName = path.basename(pdfPath);
+        message.edit(`Downloaded ${downloaded} chapters`, downloadingMessage.message_id, downloadingMessage.chat.id);
+        message.indicator("upload_document");
         await api.sendDocument(event.chat.id, pdfPath, {
           filename: pdfFileName,
         });
@@ -243,8 +242,10 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
       } finally {
         if (pdfPath)
           fs.unlinkSync(pdfPath)
-        if (pdfFileName)
-          fs.unlinkSync(pdfFileName)
+        if (folderName) {
+          fs.rmSync(folderName, { recursive: true, force: true });
+        }
+        // use rmdirSync if you're on node < v14
       }
     }
     await global.utils.sleep(400)
