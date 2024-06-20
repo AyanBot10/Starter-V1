@@ -30,7 +30,7 @@ module.exports = {
       await api.answerCallbackQuery({ callback_query_id: id });
 
       if (author != from.id) {
-        return api.sendMessage(chat.id, `@${from.username || from.first_name} Unauthorized`);
+        return await api.answerCallbackQuery(ctx.id, { text: "Unauthorized" });;
       }
 
       if (global.bot.callback_query && message_id in global.bot.callback_query) {
