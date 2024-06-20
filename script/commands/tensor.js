@@ -136,8 +136,11 @@ async function generate({ prompt, ratio, negativePrompt, token, seed, params, im
       }
     });
   }
-  const { data: { uploadUrl, dbUrl } } = await getUploadUrl(token);
-  const uploadedImage = await uploadImageToTensor(uploadUrl, image);
+  let uploadedImage;
+  if (image) {
+    const { data: { uploadUrl, dbUrl } } = await getUploadUrl(token);
+    uploadedImage = await uploadImageToTensor(uploadUrl, image);
+  }
 
   const data = { params: { images: uploadedImage ? [uploadedImage] : [], height: dimensions.height, width: dimensions.width, ...params }, taskType: 'TXT2IMG', credits: 1.0 };
 
