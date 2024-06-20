@@ -6,6 +6,7 @@ const utils = require("./utils");
 
 
 // Command dependencies
+global.tmp = {}
 global.tmp.manga = new Set();
 global.tmp.spotify = new Set();
 
@@ -20,7 +21,6 @@ global.pending
 // Prefix
 global.prefix = {};
 
-global.tmp = {}
 global.utils = {};
 global.log = log;
 global.bot = {};
