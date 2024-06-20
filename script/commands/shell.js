@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const tmp_dir = path.join(__dirname, 'tmp');
-const hazard = path.join(__dirname, 'assets', 'hazard.jpeg')
+const hazard = path.join(__dirname, 'assets', 'hazard.png')
 module.exports = {
   config: {
     name: "shell",
