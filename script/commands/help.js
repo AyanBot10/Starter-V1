@@ -7,7 +7,7 @@ module.exports = {
     },
     usage: "{pn} - Logs all commands\n" +
       "{pn} <cmd> - Logs the command's info",
-    category: "system"
+    category: "utility"
   },
   start: async function({ api, event, args, message, looking }) {
     if (args[0]) {
