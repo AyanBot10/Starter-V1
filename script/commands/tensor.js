@@ -1,6 +1,59 @@
 const axios = require("axios");
 
-async function generate({ prompt, ratio, negativePrompt, token, seed, params }) {
+const style_list = [
+  {
+    "name": "(None)",
+    "prompt": "{prompt}",
+    "negative_prompt": "lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], malformed hands, mutated fingers, deformed body",
+    },
+  {
+    "name": "Cinematic",
+    "prompt": "{prompt}, cinematic still, emotional, harmonious, vignette, highly detailed, high budget, bokeh, cinemascope, moody, epic, gorgeous, film grain, grainy",
+    "negative_prompt": "cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Photographic",
+    "prompt": "{prompt}, cinematic photo, 35mm photograph, film, bokeh, professional, 4k, highly detailed",
+    "negative_prompt": "drawing, painting, crayon, sketch, graphite, impressionist, noisy, blurry, soft, deformed, ugly, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Anime",
+    "prompt": "{prompt}, anime artwork, anime style, key visual, vibrant, studio anime, highly detailed",
+    "negative_prompt": "photo, deformed, black and white, realism, disfigured, low contrast, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Manga",
+    "prompt": "{prompt}, manga style, vibrant, high-energy, detailed, iconic, Japanese comic style",
+    "negative_prompt": "ugly, deformed, noisy, blurry, low contrast, realism, photorealistic, Western comic style, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Digital Art",
+    "prompt": "{prompt}, concept art, digital artwork, illustrative, painterly, matte painting, highly detailed",
+    "negative_prompt": "photo, photorealistic, realism, ugly, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Pixel art",
+    "prompt": "{prompt}, pixel-art, low-res, blocky, pixel art style, 8-bit graphics",
+    "negative_prompt": "sloppy, messy, blurry, noisy, highly detailed, ultra textured, photo, realistic, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Fantasy art",
+    "prompt": "{prompt}, ethereal fantasy concept art, magnificent, celestial, ethereal, painterly, epic, majestic, magical, fantasy art, cover art, dreamy",
+    "negative_prompt": "photographic, realistic, realism, 35mm film, dslr, cropped, frame, text, deformed, glitch, noise, noisy, off-center, deformed, cross-eyed, closed eyes, bad anatomy, ugly, disfigured, sloppy, duplicate, mutated, black and white, malformed hands, mutated fingers",
+    },
+  {
+    "name": "Neonpunk",
+    "prompt": "{prompt}, neonpunk style, cyberpunk, vaporwave, neon, vibes, vibrant, stunningly beautiful, crisp, detailed, sleek, ultramodern, magenta highlights, dark purple shadows, high contrast, cinematic, ultra detailed, intricate, professional",
+    "negative_prompt": "painting, drawing, illustration, glitch, deformed, mutated, cross-eyed, ugly, disfigured, malformed hands, mutated fingers",
+    },
+  {
+    "name": "3D Model",
+    "prompt": "{prompt}, professional 3d model, octane render, highly detailed, volumetric, dramatic lighting",
+    "negative_prompt": "ugly, deformed, noisy, low poly, blurry, painting, malformed hands, mutated fingers",
+    },
+];
+
+async function generate({ prompt, ratio, negativePrompt, token, seed, params, image }) {
   const authToken = `Bearer ${token}`;
   const apiEndpoint = 'https://api.tensor.art/works/v1/works/task';
   const headers = {
@@ -83,8 +136,10 @@ async function generate({ prompt, ratio, negativePrompt, token, seed, params }) 
       }
     });
   }
+  const { data: { uploadUrl, dbUrl } } = await getUploadUrl(token);
+  const uploadedImage = await uploadImageToTensor(uploadUrl, image);
 
-  const data = { params: { height: dimensions.height, width: dimensions.width, ...params }, taskType: 'TXT2IMG', credits: 1.0 };
+  const data = { params: { images: uploadedImage ? [uploadedImage] : [], height: dimensions.height, width: dimensions.width, ...params }, taskType: 'TXT2IMG', credits: 1.0 };
 
   try {
     const response = await axios.post(apiEndpoint, data, { headers });
@@ -112,7 +167,7 @@ async function generate({ prompt, ratio, negativePrompt, token, seed, params }) 
   }
 }
 
-async function main({ token, params }) {
+async function main({ token, params, image }) {
   if (!params.prompt || !token) {
     throw new Error('Prompt and token are required.');
   }
@@ -151,66 +206,14 @@ async function main({ token, params }) {
       params,
       negativePrompt: styleNegativePrompt,
       seed,
-      token
+      token,
+      image
     });
     return response
   } catch (error) {
     throw error
   }
 }
-
-const style_list = [
-  {
-    "name": "(None)",
-    "prompt": "{prompt}",
-    "negative_prompt": "lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], malformed hands, mutated fingers, deformed body",
-    },
-  {
-    "name": "Cinematic",
-    "prompt": "{prompt}, cinematic still, emotional, harmonious, vignette, highly detailed, high budget, bokeh, cinemascope, moody, epic, gorgeous, film grain, grainy",
-    "negative_prompt": "cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Photographic",
-    "prompt": "{prompt}, cinematic photo, 35mm photograph, film, bokeh, professional, 4k, highly detailed",
-    "negative_prompt": "drawing, painting, crayon, sketch, graphite, impressionist, noisy, blurry, soft, deformed, ugly, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Anime",
-    "prompt": "{prompt}, anime artwork, anime style, key visual, vibrant, studio anime, highly detailed",
-    "negative_prompt": "photo, deformed, black and white, realism, disfigured, low contrast, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Manga",
-    "prompt": "{prompt}, manga style, vibrant, high-energy, detailed, iconic, Japanese comic style",
-    "negative_prompt": "ugly, deformed, noisy, blurry, low contrast, realism, photorealistic, Western comic style, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Digital Art",
-    "prompt": "{prompt}, concept art, digital artwork, illustrative, painterly, matte painting, highly detailed",
-    "negative_prompt": "photo, photorealistic, realism, ugly, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Pixel art",
-    "prompt": "{prompt}, pixel-art, low-res, blocky, pixel art style, 8-bit graphics",
-    "negative_prompt": "sloppy, messy, blurry, noisy, highly detailed, ultra textured, photo, realistic, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Fantasy art",
-    "prompt": "{prompt}, ethereal fantasy concept art, magnificent, celestial, ethereal, painterly, epic, majestic, magical, fantasy art, cover art, dreamy",
-    "negative_prompt": "photographic, realistic, realism, 35mm film, dslr, cropped, frame, text, deformed, glitch, noise, noisy, off-center, deformed, cross-eyed, closed eyes, bad anatomy, ugly, disfigured, sloppy, duplicate, mutated, black and white, malformed hands, mutated fingers",
-    },
-  {
-    "name": "Neonpunk",
-    "prompt": "{prompt}, neonpunk style, cyberpunk, vaporwave, neon, vibes, vibrant, stunningly beautiful, crisp, detailed, sleek, ultramodern, magenta highlights, dark purple shadows, high contrast, cinematic, ultra detailed, intricate, professional",
-    "negative_prompt": "painting, drawing, illustration, glitch, deformed, mutated, cross-eyed, ugly, disfigured, malformed hands, mutated fingers",
-    },
-  {
-    "name": "3D Model",
-    "prompt": "{prompt}, professional 3d model, octane render, highly detailed, volumetric, dramatic lighting",
-    "negative_prompt": "ugly, deformed, noisy, low poly, blurry, painting, malformed hands, mutated fingers",
-    },
-];
 
 module.exports = {
   config: {
@@ -225,6 +228,8 @@ module.exports = {
   start: async function({ event, args, api, message, cmd }) {
     if (!args[0]) return message.Syntax(cmd)
     try {
+      const fileId = event?.reply_to_message?.photo?.slice(-1)[0]?.file_id;
+
       const form = {
         token: '',
         params: {
@@ -240,13 +245,15 @@ module.exports = {
           negativePrompt: "lowres, bad anatomy, bad hands, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name, verybadimagenegative_v1.3, (worst quality, low quality:1.4), (malformed hands:1.4), (mutated fingers:1.4), signature, simple background",
           imageCount: 1,
           steps: 20,
-          models: [{
-            modelId: "635012521302153732",
-            modelFileId: "635012521301105157",
-            weight: 0.3
-        }],
+          models: [
+        //    {
+        //      modelId: "635012521302153732",
+        //     modelFileId: "635012521301105157",
+        //    weight: 0.3
+        //   }
+        // LORA MODELS
+          ],
           samplerName: 'Euler a',
-          images: [],
           cfgScale: 5,
           clipSkip: 2,
           workEngine: "TAMS_V1",
@@ -255,8 +262,10 @@ module.exports = {
         notes: "Get authorization bearer token from tensor.art"
       }
       if (!form.token) return message.reply("Token not Set")
+      if (fileId)
+        const fileLink = await api.getFileLink(fileId)
       message.react("👍", event.message_id)
-      const response = await main(form)
+      const response = await main({ token: form.token, params: form.params, image: fileLink })
       message.react("💯", event.message_id)
       message.indicator('upload_image');
       api.sendPhoto(event.chat.id, response.result, {
@@ -266,5 +275,45 @@ module.exports = {
       message.reply(err.message);
       console.error(err)
     }
+  }
+}
+
+async function uploadImageToTensor(uploadUrl, link) {
+  const buff = await axios.get(link, { responseType: 'arraybuffer' })
+  const buffer = Buffer.from(buff.data);
+  try {
+    const response = await axios.put(uploadUrl, buffer, {
+      headers: {
+        'Content-Type': "image/jpeg",
+      },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getUploadUrl(token) {
+  try {
+    const response = await axios.post("https://api.tensor.art/community-web/v1/cloudflare/upload/pre_sign", {
+      scene: "IMAGE_TO_IMAGE",
+      fileNameSuffix: "jpg"
+    }, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "sec-ch-ua": "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\"",
+        "sec-ch-ua-mobile": "?1",
+        "sec-ch-ua-platform": "\"Android\"",
+        "Referrer-Policy": "unsafe-url",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
   }
 }
