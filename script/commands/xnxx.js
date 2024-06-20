@@ -118,7 +118,7 @@ module.exports = {
         global.tmp.xnxx.delete(linkId);
         const response = await downloadXnxx(full_link.link);
         message.indicator('upload_document');
-        directory = path.join(__dirname, "tmp", `${global.uuid()}.mp4`)
+        directory = path.join(__dirname, "tmp", `${global.utils.uuid()}.mp4`)
         const buffer = await download(response.cdn, directory)
         await api.sendVideo(Context.chat, buffer, {
           thumb: full_link.image,
