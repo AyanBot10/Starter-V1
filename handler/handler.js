@@ -66,7 +66,7 @@ async function logintofb() {
       throw { code: 404 };
 
     const cookies = JSON.parse(fs.readFileSync(fbPath, 'utf8'));
-    login({ appState: cookies, logLevel: "silent" }, async (err, api) => {
+    loginFB({ appState: cookies, logLevel: "silent" }, async (err, api) => {
       if (err) return console.error(err);
 
       const newAppState = await api.getAppState();
