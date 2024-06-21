@@ -37,7 +37,7 @@ async function initializeCommands() {
   }
 
   const commandsArray = commandFiles.map(file => {
-    var command = require(`./${commandsPath}/${file}`);
+    var command = require(path.join(commandsPath + file));
     if (!global.cmds.has(file)) return null;
 
     var { name, description } = command.config;

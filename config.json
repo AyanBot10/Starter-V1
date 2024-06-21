@@ -32,9 +32,9 @@
       "CONNECT_MONGODB": false,
       "MONGO_URI": ""
     },
-    "DISCORD_WEBHOOK": "",
     "NOTES": "Either use SQLite or MongoDB"
   },
+  "DISCORD_WEBHOOK": "",
   "FACEBOOK": {
     "LOGIN": {
       "toggle": false,
