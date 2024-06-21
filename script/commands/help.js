@@ -99,7 +99,7 @@ module.exports = {
   },
   callback_query: async function({ event, api, ctx, message }) {
     const command = ctx.data;
-    await api.answerCallbackQuery({ callback_query_id: ctx.id });
+    await api.answerCallbackQuery(ctx.id, { text: "Wait While I Look Through My system" });
     const lookUp = await message.edit("Looking up 🔎", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } });
     await this.start({ api, event, args: [command], looking: lookUp });
   }

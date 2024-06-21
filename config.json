@@ -3,8 +3,7 @@
     "token": "",
     "DOWNLOADER": "",
     "INSTA_DOWNLOADER": "",
-    "polling": true,
-    "INITIALIZE_COMMANDS_ON_START": false
+    "polling": true
   },
   "server": {
     "toggle": true,

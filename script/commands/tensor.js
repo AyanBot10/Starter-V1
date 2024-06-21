@@ -266,7 +266,7 @@ module.exports = {
       }
       if (!form.token) return message.reply("Token not Set")
       if (fileId)
-        const fileLink = await api.getFileLink(fileId)
+        var fileLink = await api.getFileLink(fileId)
       message.react("👍", event.message_id)
       const response = await main({ token: form.token, params: form.params, image: fileLink })
       message.react("💯", event.message_id)

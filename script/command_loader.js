@@ -44,7 +44,7 @@ const validateItemConfig = (item, type, filePath) => {
 const loadFiles = async (files, basePath, type) => {
   logLoadingStatus(type, "yellow");
 
-  for (const file of files) {
+  for (let file of files) {
     if (!file.endsWith(".js")) continue;
 
     const filePath = path.join(basePath, file);

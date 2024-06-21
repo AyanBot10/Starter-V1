@@ -107,7 +107,7 @@ module.exports = {
   callback_query: async function({ event, api, ctx, Context, message }) {
     try {
       await api.answerCallbackQuery({ callback_query_id: ctx.id });
-      if (Context.author != ctx.message.from.id) return message.reply("Unauthorized");
+      if (Context.author != ctx.from.id) return message.reply("Unauthorized");
       await message.edit("Scrapping the selected video...", ctx.message.message_id, event.chat.id, { reply_markup: { inline_keyboard: [] } })
       await api.sendChatAction(event.chat?.id, "upload_video")
       await api.deleteMessage(event.chat.id, ctx.message.message_id);

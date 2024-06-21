@@ -25,40 +25,7 @@ if (config.DATABASE.mongodb['CONNECT_MONGODB']) {
   process.exit(2);
 }
 
-
-async function initializeCommands() {
-  var log = global.log;
-  var commandsPath = path.resolve("script", "commands");
-  var commandFiles;
-  try {
-    commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
-  } catch (error) {
-    throw error;
-  }
-
-  const commandsArray = commandFiles.map(file => {
-    var command = require(path.join(commandsPath + file));
-    if (!global.cmds.has(file)) return null;
-
-    var { name, description } = command.config;
-    if (!name) return null;
-
-    return {
-      command: name,
-      description: description?.short || description?.long || (typeof description === 'string' ? description : 'Not Available')
-    };
-  }).filter(Boolean);
-
-  try {
-    await bot.setMyCommands(commandsArray);
-    return true;
-  } catch (error) {
-    console.error(error);
-    return null
-  }
-}
-
-if (global.config.BOT["INITIALIZE_COMMANDS_ON_START"]) initializeCommands();
+var log = global.log;
 
 async function logintofb() {
   try {

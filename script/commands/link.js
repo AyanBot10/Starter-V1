@@ -1,5 +1,6 @@
-const axios = require('axios');
-const uri = global.config["DISCORD_WEBHOOK"] || ""
+const fetch = require('node-fetch');
+const FormData = require('form-data');
+const uri = global.config["DISCORD_WEBHOOK"];
 
 module.exports = {
   config: {
@@ -29,19 +30,27 @@ module.exports = {
       message.indicator();
       const fileLink = await api.getFileLink(fileId);
 
-      const webhookPayload = {
-        content: `${event?.from?.username ? `@${event.from.username}` : event.from.last_name ? event.from.first_name || "User" + " " + event.from.last_name : event.from.first_name} sent on TG`,
-        file: fileLink
-      };
+      const form = new FormData();
+      form.append('content', 'Sent from TG');
+      form.append('file', await fetch(fileLink).then(res => res.buffer()), 'file');
 
-      const response = await axios.post(uri, webhookPayload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await fetch(uri, {
+        method: 'POST',
+        headers: form.getHeaders(),
+        body: form
       });
-      if (!response.data) throw new Error(`Failed to send webhook: ${response.statusText}`);
-      const uploadedImageLink = response.data.attachments[0].url;
+
+      if (!response.ok) throw new Error(`Failed to send webhook: ${response.statusText}`);
+
+      const responseData = await response.json();
+
+      if (!responseData.attachments || responseData.attachments.length === 0) {
+        throw new Error('No attachments found in response');
+      }
+
+      const uploadedImageLink = responseData.attachments[0].url;
       await message.reply(uploadedImageLink);
+
     } catch (error) {
       console.error("Error occurred:", error);
       message.reply(error.message);

@@ -163,7 +163,8 @@ module.exports = {
           initials: {
             first: x.message_id,
             second: sent.message_id
-          }
+          },
+          authorMan: event.from.id
         });
       } catch (error) {
         console.error(error);
@@ -174,7 +175,8 @@ module.exports = {
   callback_query: async function({ event, api, ctx, Context, message }) {
     let dir;
     try {
-      await api.answerCallbackQuery({ callback_query_id: ctx.id });
+      await api.answerCallbackQuery(ctx.id, { text: Context.authorMan == ctx.from.id ? "Downloading Your Song" : "Authorized" });
+      if (Context.authorMan != ctx.from.id) return
       await api.deleteMessage(
         event.chat.id,
         Context.initials.second

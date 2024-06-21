@@ -4,6 +4,18 @@ process.emitWarning = (warning, type) => {
   }
 };
 
+process.on('uncaughtException', (err) => {
+  log(`Uncaught Exception: ${err.message}\n${err.stack}`, "red");
+});
+
+process.on('unhandledRejection', (reason) => {
+  if (reason instanceof Error) {
+    log(`Unhandled Rejection: ${reason.message}\n${reason.stack}`, "red");
+  } else {
+    log(`Unhandled Rejection: ${reason}`, "red");
+  }
+});
+
 const config = require("./config.json");
 require("./starter");
 const run_sqlite = require("./Database/SQLite/global.js");
@@ -13,13 +25,7 @@ var log = global.log;
 
 log("Starting Bot", "grey", true);
 
-process.on('uncaughtException', (err) => {
-  log(`Uncaught Exception: ${err.message}`, "red");
-});
 
-process.on('unhandledRejection', (reason) => {
-  log(`Unhandled Rejection:\n${reason.message}`, 'red');
-});
 
 require("./script/command_loader")
 
