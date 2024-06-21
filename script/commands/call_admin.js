@@ -13,11 +13,11 @@ module.exports = {
     if (!args[0] && !event.message) return message.Syntax(cmd);
 
     const text = args.join(' ') || (event.message && event.message.caption) || '';
-    const form = `User @${event.from.username} (${event.from.id}) Called for admin\n\n*${text}*`;
+    const form = `User ${event.from.username ? "@" +event.from.username : event.from.first_name || event.from.last_name} (${event.from.id || "N/A"}) requested help\n${text}`;
 
     for (let admin of config.admins) {
       let sentMessage;
-      sentMessage = await api.sendMessage(admin, form, { parse_mode: "Markdown", disable_notification: false });
+      sentMessage = await api.sendMessage(admin, form, { disable_notification: false });
 
       global.bot.reply.set(sentMessage.message_id, {
         cmd,
@@ -38,7 +38,7 @@ module.exports = {
 
     switch (who) {
       case 'userToAdmin': {
-        const form = `Admin @${event.from.username} (${event.from.id}) Replied:\n${text}`;
+        const form = `Admin ${event.from.username ? "@" +event.from.username : event.from.first_name || event.from.last_name} (${event.from.id || "N/A"}) Replied \n${text}`;
         let sentMessage;
         sentMessage = await api.sendMessage(sent_event.chat.id, form, { reply_to_message_id: sent_event.message_id, disable_notification: false });
         global.bot.reply.set(sentMessage.message_id, {
@@ -49,10 +49,10 @@ module.exports = {
           sent_event: event
         });
         delete global.bot.reply[messageID];
-        return await message.reply("Sending reply to user...", { disable_notification: true });
+        return await message.reply("Sent reply to user.", { disable_notification: true });
       }
       case 'adminToUser': {
-        const form = `User @${event.from.username} (${event.from.id}) Replied:\n${text}`;
+        const form = `User ${event.from.username ? "@" +event.from.username : event.from.first_name || event.from.last_name} (${event.from.id || "N/A"}) Replied:\n${text}`;
         let sentMessage;
         sentMessage = await api.sendMessage(sent_event.chat.id, form, { reply_to_message_id: sent_event.message_id, disable_notification: false });
         global.bot.reply.set(sentMessage.message_id, {
