@@ -71,7 +71,7 @@ module.exports = {
       checkLink(args[0]);
       const response = await downloader(args[0]);
       if (!response || !response.data || !response.data.formats) {
-        throw new Error("Invalid Response");
+        throw new Error("Couldn't Fetch the Video");
       }
 
       const chosenFormat = chooseFormat(response.data.formats);
@@ -86,14 +86,23 @@ module.exports = {
         .map((format, i) => [{ text: `${format?.height || `CDN ${i + 1}`}`, url: format.url }]);
 
       const reply_markup = { inline_keyboard };
-      api.sendChatAction(event.chat.id, "upload_video");
-      api.sendVideo(event.chat.id, chosenFormat.url, {
+      await api.sendChatAction(event.chat.id, "upload_video");
+      await api.sendVideo(event.chat.id, chosenFormat.url, {
         reply_to_message_id: event.message_id,
         caption: form.body,
         reply_markup
       });
     } catch (err) {
-      message.reply(err.message);
+      function regexLink(url) {
+        const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch|fb\.gg|fb\.me)\/.+$/;
+        return facebookRegex.test(url);
+      }
+      if (regexLink(args[0])) {
+        message.reply("There's a dedicated Facebook video downloader command which uses an actual Facebook account to download videos first hand. You might wanna use that.\n\n*THIS IS AN ERROR MESSAGE*", { parse_mode: "Markdown" });
+      }
+      else {
+        message.reply(err.message);
+      }
     }
   }
 };

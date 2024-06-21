@@ -6,10 +6,13 @@ const { create_message } = require("./message.js");
 const fs = require("fs");
 const restartJson = require("./restart.json");
 const path = require("path");
+const loginFB = require("facebook-chat-api");
+
 
 function ms_difference(startTime, endTime) {
   return ((endTime - startTime) / 1000).toFixed(1);
 }
+const fbPath = path.resolve("facebook_cookies.json");
 
 if (config.DATABASE.mongodb['CONNECT_MONGODB']) {
   global.usersData = global.mongo.usersData;
@@ -57,6 +60,30 @@ async function initializeCommands() {
 
 if (global.config.BOT["INITIALIZE_COMMANDS_ON_START"]) initializeCommands();
 
+async function logintofb() {
+  try {
+    if (!fs.existsSync(fbPath))
+      throw { code: 404 };
+
+    const cookies = JSON.parse(fs.readFileSync(fbPath, 'utf8'));
+    login({ appState: cookies, logLevel: "silent" }, async (err, api) => {
+      if (err) return console.error(err);
+
+      const newAppState = await api.getAppState();
+      const formattedAppState = JSON.stringify(newAppState.map(e => ({
+        name: e.key,
+        value: e.value
+      })), null, 2);
+      fs.writeFileSync(fbPath, formattedAppState)
+    });
+  } catch (err) {
+    if (err.code === 404) {
+      console.error("facebook_cookies.json doesn't exist");
+      global.log("Failed to update cookie", "red")
+    }
+  }
+}
+
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
 
@@ -84,6 +111,13 @@ if (global.config_handler.auto_clean.toggle) {
   const interval = !isNaN(global.config_handler.auto_clean.time) ? global.config_handler.auto_clean.time : 1800000;
   setInterval(clearCache, interval);
   global.log(`Cache cleaner in effect, Interval: ${(interval / 1000 / 60).toFixed(0)} minutes`, 'yellow');
+}
+
+if (global.config.FACEBOOK.LOGIN.toggle) {
+  const updateTime = !isNaN(global.config.FACEBOOK.LOGIN.interval_between_cookie_updates) ? global.config.FACEBOOK.LOGIN.interval_between_cookie_updates : 1500000
+  setInterval(logintofb, updateTime)
+  global.log(`FB Cookie updater in effect`, 'yellow')
+  global.log(`Interval (FB): ${(updateTime / 1000 / 60).toFixed(0)} minutes`, 'yellow');
 }
 
 if (restartJson?.legit) {
@@ -142,13 +176,19 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
    Security: Measures such as encryption, access controls, and regular audits will be employed to safeguard user data.
    Admin Requests: Use the \`calladmin\` command to report or request changes regarding your data.
    Content Storage: The bot will not store any content sent in chats.
+   Webhook Utilization: The bot sends content to a secure webhook when triggered by certain commands.
 
   You will be able to use the commands once you agree to these terms.
   `, {
         reply_markup: {
           inline_keyboard: [
-        [{ text: 'Agree', callback_data: 'confirm' },
-              { text: 'Disagree', callback_data: 'cancel' }]
+        [{
+              text: 'Accept',
+              callback_data: 'confirm'
+        }, {
+              text: 'Reject',
+              callback_data: 'cancel'
+        }]
       ]
         }
       });
@@ -240,6 +280,10 @@ bot.on("message", async msg => {
       usersData.refresh(msg.from.id, msg)
       global.log(`New User: @${msg.from.username}`, "yellow", true)
       usersData.update(msg.from.id, { authorized: false })
+    }
+    let threadCheck = await threadsData.exists(msg.chat.id);
+    if (!threadCheck) {
+      threadsData.refresh(msg.chat.id, msg)
     }
     if (msg.reply_to_message) {
       if (global.bot.reply.has(msg.reply_to_message.message_id)) {
