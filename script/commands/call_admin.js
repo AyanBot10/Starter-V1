@@ -24,6 +24,7 @@ module.exports = {
         ctx: sentMessage,
         messageID: sentMessage.message_id,
         who: "userToAdmin",
+        author: event.from.id,
         sent_event: event
       });
       await global.utils.sleep(650);
@@ -31,8 +32,8 @@ module.exports = {
     await message.reply("Sent your message to the admins.", { disable_notification: true });
   },
   reply: async function({ message, event, args, Context, api }) {
-    let { cmd, messageID, who, ctx, sent_event } = Context;
-
+    let { cmd, messageID, who, ctx, sent_event, author } = Context;
+    if (author != event.from.id) return
     const text = event.text || "No Text";
     if (!text) return;
 

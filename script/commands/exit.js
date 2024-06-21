@@ -26,7 +26,7 @@ module.exports = {
   callback_query: async function({ event, ctx, Context, message, api }) {
     const { author, messageID, chat, author_message } = Context;
     await api.answerCallbackQuery({ callback_query_id: ctx.id });
-    if (author != ctx.from.id) return message.send("Unauthorized");
+    if (author != ctx.message.from.id) return message.send("Unauthorized");
     switch (ctx.data) {
       case 'confirm': {
         await message.edit("Confirmed, Exiting Process", messageID, chat, {
