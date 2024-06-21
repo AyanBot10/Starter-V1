@@ -95,9 +95,9 @@ module.exports = {
     usage: "{pn} [ Facebook URL ]"
   },
 
-  start: async function({ message, args, event, api }) {
+  start: async function({ message, args, event, api, cmd }) {
     const fbUrl = args[0];
-    if (!fbUrl) return message.Syntax();
+    if (!fbUrl) return message.Syntax(cmd);
     let processing;
     try {
       processing = await message.reply("Downloading Video");

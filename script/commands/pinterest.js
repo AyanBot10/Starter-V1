@@ -10,9 +10,9 @@ module.exports = {
     category: "miscellaneous"
   },
 
-  start: async function({ message, args, event, api }) {
+  start: async function({ message, args, event, api, cmd }) {
     const query = args.join(" ");
-    if (!query) return message.Syntax();
+    if (!query) return message.Syntax(cmd);
 
     try {
       message.react('', event.message_id)
