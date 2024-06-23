@@ -4,6 +4,7 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const sharp = require('sharp');
 const path = require('path');
+const { v4: uuid } = require("uuid");
 
 module.exports = {
   config: {
@@ -13,12 +14,13 @@ module.exports = {
       long: "Download mangas in bulk from mangapill.com in pdf format",
       short: "Downloads Manga"
     },
-    usage: "1. URL | startCh -> endCh (https://mangapill.com/MANGA_LINK | 1 -> 3)\n\n2. Search_query",
+    usage: "{pn} manga name. It will look for mangas and then prompt you with similar titles and when a prompt (button) is selected, it will fetch the chapter details of the manga and will ask you to reply with the chapter index (reply with '20 22' for downloading chapters from 20 to 22) or to download a single chapter, reply with let's say '33'",
     cooldown: 10,
     category: "anime"
   },
   start: async function({ event, message, args, api, cmd }) {
     if (!global.tmp.manga) global.tmp.manga = new Set();
+    if (!global.tmp.mangaID) global.tmp.mangaID = new Map();
     if (!args[0]) return message.Syntax(cmd)
     const messageText = args.join(' ');
     const match = messageText.match(/(https:\/\/mangapill\.com\/manga\/\d+\/[\w-]+) \| (\d+) -> (\d+)/);
@@ -26,13 +28,31 @@ module.exports = {
     if (!match) {
       try {
         const searchQuery = args.join(' ');
+        await message.indicator()
         const searchResults = await scrapeMangaPill(searchQuery);
         if (searchResults.length === 0) {
           return message.reply("Nothing Found");
         }
-        let textToSend = searchResults.map(x => `[${x.name}](${x.href})`).join('\n\n');
-        textToSend += "\n\nCopy the link and use it"
-        await api.sendMessage(event.chat.id, textToSend, { parse_mode: "Markdown", reply_to_message_id: event.message_id });
+
+        const inline_data = searchResults.map((item) => {
+          const random = uuid();
+          global.tmp.mangaID.set(random, item.href);
+          return [{
+            text: item.name,
+            callback_data: random
+          }]
+        });
+
+        const sendButtons = await message.reply('Select Manga', {
+          reply_markup: {
+            inline_keyboard: inline_data
+          },
+          disable_notification: true
+        });
+        global.bot.callback_query.set(sendButtons.message_id, {
+          cmd,
+          author: event.from.id
+        })
       } catch (error) {
         console.error("Error during search or message sending:", error);
         return message.reply(error.message);
@@ -72,6 +92,84 @@ module.exports = {
       }
     }
   },
+  callback_query: async function({ event, ctx, api, message, Context }) {
+    const isAuthor = Context.author == ctx.from.id;
+    const xxx = await message.edit("Confirmed...", ctx.message.message_id, ctx.message.chat.id, {
+      reply_markup: { inline_keyboard: [] }
+    })
+    api.answerCallbackQuery(ctx.id, { text: isAuthor ? "Wait while we fetch the chapters" : "Unauthorized" })
+    if (!isAuthor) return
+    try {
+      await message.indicator("typing", ctx.message.chat.id)
+      let response = await getMangaDetails(global.tmp.mangaID.get(ctx.data));
+      if (response.chapters.length === 0)
+        return await message.edit("No Manga Chapters found", ctx.message.message_id, ctx.message.chat.id);
+      await message.unsend(xxx.message_id, ctx.message.chat.id)
+      const mangaChapter = await api.sendMessage(ctx.message.chat.id, `Found ${response.chapters.length} Chapters. Reply with the chapters numbers you want to download (eg. '10 12' or just '10')`, { force_reply: true })
+      global.bot.reply.set(mangaChapter.message_id, {
+        cmd: Context.cmd,
+        author: ctx.from.id,
+        messageID: mangaChapter.message_id,
+        mangaUri: global.tmp.mangaID.get(ctx.data),
+        mangaLength: response.chapters.length
+      })
+    } catch (error) {
+      console.log(error);
+      await message.edit(error.message, ctx.message.message_id, ctx.message.chat.id)
+    }
+  },
+  reply: async function({ message, event, args, Context, api }) {
+    let { author, cmd, messageID, mangaUri, mangaLength } = Context;
+    if (author != event.from.id) return;
+    if (!event.text) return;
+
+    const buzz = "Invalid chapter range. Please provide valid starting and ending chapter numbers where the ending chapter is within 5 chapters of the starting chapter.\n\nExample: replying with '20 21' 20 being the starting point and 21 being the ending point. Type " + Context.cmd + " for detailed explanation";
+
+    const match = event.text.match(/(\d+)\s+(\d+)/);
+    const singleNumberMatch = event.text.match(/^(\d+)$/);
+
+    let startPoint, endPoint;
+
+    if (match) {
+      const [, start, end] = match;
+      startPoint = parseInt(start);
+      endPoint = parseInt(end);
+    } else if (singleNumberMatch) {
+      const [number] = singleNumberMatch;
+      startPoint = endPoint = parseInt(number);
+    } else {
+      return await message.reply(buzz);
+    }
+
+    if (
+      isNaN(startPoint) ||
+      isNaN(endPoint) ||
+      startPoint <= 0 ||
+      endPoint <= 0 ||
+      startPoint > endPoint ||
+      endPoint > (startPoint + 5) ||
+      endPoint > mangaLength
+    ) {
+      return await message.reply(buzz);
+    }
+
+    try {
+      await message.indicator()
+      let argsToSend = `${Context.mangaUri} | ${startPoint} -> ${endPoint}`;
+      argsToSend = argsToSend.split(" ");
+      await message.unsend(Context.messageID);
+      await this.start({
+        event,
+        message,
+        args: argsToSend,
+        api,
+        cmd: Context.cmd
+      });
+    } catch (error) {
+      console.log(error);
+      message.reply(error.message);
+    }
+  }
 };
 
 async function createPdfFromImages(folderName) {
@@ -273,5 +371,28 @@ async function scrapeMangaPill(name) {
     return mangaArray
   } catch (error) {
     throw error
+  }
+}
+
+async function getMangaDetails(url) {
+  try {
+    const response = await axios.get(url);
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const chapters = [];
+    $('#chapters .grid a').each((index, element) => {
+      const chapterName = $(element).text().trim();
+      const chapterLink = 'https://mangapill.com' + $(element).attr('href');
+      chapters.push({ chapterName, chapterLink });
+    });
+
+    //    const imageElement = $('img[data-src]').first();
+    //    const imageUrl = imageElement.attr('data-src');
+
+    return { chapters: chapters.length > 0 ? chapters.reverse() : [], /*imageUrl*/ };
+  } catch (error) {
+    console.error('Error fetching the page:', error);
+    return { chapters: [] };
   }
 }

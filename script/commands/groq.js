@@ -38,7 +38,7 @@ module.exports = {
 
   reply: async function({ message, event, args, Context }) {
     let { author, cmd, messageID } = Context;
-    if (event.from.id != author) return;
+    if (author != event.from.id) return;
     if (!event.text) return
     const prompt = args.join(" ");
     history[event.from.id].push({ role: 'user', content: prompt })
@@ -91,7 +91,6 @@ async function main(history, message, event, chatType) {
     if (chatType) return
     global.bot.reply.set(reply.message_id, {
       cmd: "ai",
-      ctx: reply,
       author: event.from.id,
       messageID: reply.message_id
     })

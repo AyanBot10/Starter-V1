@@ -32,7 +32,7 @@ module.exports = {
 
       const form = new FormData();
       form.append('content', 'Sent from TG');
-      form.append('file', await fetch(fileLink).then(res => res.buffer()), 'file');
+      form.append('file', fileLink);
 
       const response = await fetch(uri, {
         method: 'POST',
@@ -50,7 +50,6 @@ module.exports = {
 
       const uploadedImageLink = responseData.attachments[0].url;
       await message.reply(uploadedImageLink);
-
     } catch (error) {
       console.error("Error occurred:", error);
       message.reply(error.message);

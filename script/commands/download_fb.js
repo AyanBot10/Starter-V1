@@ -95,7 +95,7 @@ module.exports = {
     usage: "{pn} [ Facebook URL ]"
   },
 
-  start: async function({ message, args, event, api, cmd }) {
+  start: async function({ message, args, event, api, cmd, isFallback }) {
     const fbUrl = args[0];
     if (!fbUrl) return message.Syntax(cmd);
     let processing;
@@ -122,6 +122,9 @@ module.exports = {
       console.error(error);
       message.unsend(processing.message_id);
       message.reply(error.message);
+    } finally {
+      if (isFallback.legit)
+        await message.unsend(isFallback.messageID)
     }
   }
 };

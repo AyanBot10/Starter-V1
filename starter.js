@@ -8,6 +8,7 @@ const utils = require("./utils");
 // Command dependencies
 global.tmp = {}
 global.tmp.manga = new Set();
+global.tmp.mangaID = new Map();
 global.tmp.spotify = new Set();
 
 

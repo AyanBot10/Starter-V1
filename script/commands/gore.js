@@ -82,7 +82,7 @@ module.exports = {
         const random = uuid();
         global.tmp.gore.set(random, item.streamLink);
         return [{
-          text: item.title.substring(0, 50),
+          text: item.title,
           callback_data: random
         }];
       });

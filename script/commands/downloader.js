@@ -98,7 +98,20 @@ module.exports = {
         return facebookRegex.test(url);
       }
       if (regexLink(args[0])) {
-        message.reply("There's a dedicated Facebook video downloader command which uses an actual Facebook account to download videos first hand. You might wanna use that.\n\n*THIS IS AN ERROR MESSAGE*", { parse_mode: "Markdown" });
+        const sentWarn = await message.reply(`/${cmd} failed. Fallback Initiated`, { parse_mode: "Markdown" });
+        const x = [...global.cmds.values()].find(cmd => cmd.config.name === "facebook");
+        if (x && x.start)
+          return await x.start({
+            message,
+            args,
+            event,
+            api,
+            cmd: "facebook",
+            isFallback: {
+              legit: true,
+              messageID: sentWarn.message_id
+            }
+          })
       }
       else {
         message.reply(err.message);
