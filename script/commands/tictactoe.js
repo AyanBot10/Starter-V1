@@ -23,7 +23,7 @@ const TAUNTS = [
   "I'm not just a bot, I'm your worst nightmare in this game!",
   "You're playing checkers while I'm playing 4D chess.",
   "I hope you're ready to lose spectacularly!",
-  "Interesting...",
+  "You are never going to win against me!",
   "I'm giving you a chance. Don't waste it!"
 ];
 
@@ -77,13 +77,12 @@ module.exports = {
       reply_markup: generateKeyboard(gameState.board),
       parse_mode: "Markdown"
     });
-    await api.sendMessage(event.chat.id, symbols, { reply_to_message_id: initiate.message_id, disable_reply: true });
-
     global.bot.callback_query.set(initiate.message_id, {
       cmd,
       author: userId,
       messageID: initiate.message_id,
-      gameKey
+      gameKey,
+      symbols
     });
 
     if (botStarts) {
@@ -125,7 +124,7 @@ module.exports = {
           return;
         }
 
-        await botMove(api, chatId, ctx.message.message_id, gameState, gameKey);
+        await botMove(api, chatId, ctx.message.message_id, gameState, gameKey, Context.symbols);
       } else {
         await api.answerCallbackQuery(ctx.id, { text: "That spot is taken. Are your eyes working?" });
       }
@@ -192,7 +191,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
   }
 }
 
-async function botMove(api, chatId, messageId, gameState, gameKey) {
+async function botMove(api, chatId, messageId, gameState, gameKey, symbols) {
   let bestScore = -Infinity;
   let move;
   for (let [i, j] of getAvailableMoves(gameState.board)) {
@@ -213,8 +212,10 @@ async function botMove(api, chatId, messageId, gameState, gameKey) {
     await handleGameEnd(api, chatId, messageId, gameState, winner, gameKey);
   } else {
     let taunt = TAUNTS[Math.floor(Math.random() * TAUNTS.length)];
+    taunt += `\n${symbols}`
     await api.editMessageText(taunt, {
       chat_id: chatId,
+      parse_mode: "Markdown",
       message_id: messageId,
       reply_markup: generateKeyboard(gameState.board)
     });
