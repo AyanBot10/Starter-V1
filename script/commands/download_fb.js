@@ -114,9 +114,8 @@ module.exports = {
         reply_to_message_id: event.message_id,
         allow_sending_without_reply: true,
         caption: fb_title || "tg@Jsusbin",
-      //  reply_markup: inlineKeyboard
+        //  reply_markup: inlineKeyboard
       });
-      await message.react("👍", event.message_id);
       await message.unsend(processing.message_id);
     } catch (error) {
       console.error(error);
