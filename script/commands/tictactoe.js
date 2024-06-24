@@ -33,8 +33,7 @@ module.exports = {
     aliases: ["ttt"],
     description: "Advanced Game of Tic-Tac-Toe",
     usage: "{pn} - Starts the game\n{pn} forfeit - Ends the game",
-    category: "miscellaneous"
-    // I know it should be games
+    category: "games"
   },
   start: async function({ event, message, api, cmd, args }) {
     const userId = event.from.id;
@@ -53,7 +52,8 @@ module.exports = {
     if (global.games.ttt.has(gameKey)) {
       return message.reply(`Already in a game. Finish it or forfeit, if you dare`);
     }
-    await message.indicator()
+
+    await message.indicator();
     const playerSymbol = PLAYER_SYMBOLS[Math.floor(Math.random() * 2)];
     const botSymbol = playerSymbol === 'X' ? 'O' : 'X';
     const botStarts = Math.random() < 0.5;
@@ -62,7 +62,8 @@ module.exports = {
       board: createEmptyBoard(),
       playerSymbol,
       botSymbol,
-      currentTurn: botStarts ? botSymbol : playerSymbol
+      currentTurn: botStarts ? botSymbol : playerSymbol,
+      gameOver: false
     };
 
     global.games.ttt.set(gameKey, gameState);
@@ -70,13 +71,13 @@ module.exports = {
     let initialMessage = botStarts ?
       "I'll start this game. Prepare to lose!" :
       "Your turn first. Don't mess it up!";
-    let symbols = `\nYou are *${playerSymbol}*, I am *${botSymbol}*`
+    let symbols = `\nYou are *${playerSymbol}*, I am *${botSymbol}*`;
     initialMessage += symbols;
     const initiate = await api.sendMessage(chatId, initialMessage, {
       reply_markup: generateKeyboard(gameState.board),
       parse_mode: "Markdown"
     });
-    await api.sendMessage(event.chat.id, symbols, { reply_to_message_id: initiate.message_id, disable_reply: true })
+    await api.sendMessage(event.chat.id, symbols, { reply_to_message_id: initiate.message_id, disable_reply: true });
 
     global.bot.callback_query.set(initiate.message_id, {
       cmd,
@@ -102,8 +103,10 @@ module.exports = {
     const gameKey = `${userId}-${chatId}`;
     const gameState = global.games.ttt.get(gameKey);
 
-    if (!gameState)
-      return await api.answerCallbackQuery(ctx.id, { text: "Womp Womp" });
+    if (!gameState || gameState.gameOver) {
+      await api.answerCallbackQuery(ctx.id, { text: "This game has ended. Start a new one!" });
+      return;
+    }
 
     if (gameState.currentTurn !== gameState.playerSymbol) {
       await api.answerCallbackQuery(ctx.id, { text: "Not your turn. Patience is a virtue!" });
@@ -118,12 +121,11 @@ module.exports = {
 
         let winner = checkWinner(gameState.board);
         if (winner || isBoardFull(gameState.board)) {
-          await handleGameEnd(api, chatId, ctx.message.message_id, gameState, winner, Context.gameKey);
-          global.games.ttt.delete(gameKey);
+          await handleGameEnd(api, chatId, ctx.message.message_id, gameState, winner, gameKey);
           return;
         }
 
-        await botMove(api, chatId, ctx.message.message_id, gameState, Context.gameKey);
+        await botMove(api, chatId, ctx.message.message_id, gameState, gameKey);
       } else {
         await api.answerCallbackQuery(ctx.id, { text: "That spot is taken. Are your eyes working?" });
       }
@@ -190,7 +192,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
   }
 }
 
-async function botMove(api, chatId, messageId, gameState, userID) {
+async function botMove(api, chatId, messageId, gameState, gameKey) {
   let bestScore = -Infinity;
   let move;
   for (let [i, j] of getAvailableMoves(gameState.board)) {
@@ -208,8 +210,7 @@ async function botMove(api, chatId, messageId, gameState, userID) {
 
   let winner = checkWinner(gameState.board);
   if (winner || isBoardFull(gameState.board)) {
-    await handleGameEnd(api, chatId, messageId, gameState, winner, userID);
-    global.games.ttt.delete(`${chatId}`);
+    await handleGameEnd(api, chatId, messageId, gameState, winner, gameKey);
   } else {
     let taunt = TAUNTS[Math.floor(Math.random() * TAUNTS.length)];
     await api.editMessageText(taunt, {
@@ -224,22 +225,23 @@ function generateKeyboard(board) {
   return {
     inline_keyboard: board.map((row, i) =>
       row.map((cell, j) => ({
-        text: cell === EMPTY ? ' ' : (cell === 'X' ? 'X' : 'O'),
+        text: cell === EMPTY ? ' ' : cell,
         callback_data: `move_${i}_${j}`
       }))
     )
   };
 }
 
-async function handleGameEnd(api, chatId, messageId, gameState, winner, uid) {
+async function handleGameEnd(api, chatId, messageId, gameState, winner, gameKey) {
+  gameState.gameOver = true;
   let message = winner ?
     (winner === gameState.botSymbol ? "I win! As expected. Want to try again and lose some more?" : "You... won? Impossible! I demand a rematch!") :
     "It's a draw. You're tougher than I thought, but still not good enough!";
-  message += "\nPress one of the buttons to acknowledge."
+  message += "\nGame Over. Start a new game if you dare!";
   await api.editMessageText(message, {
     chat_id: chatId,
     message_id: messageId,
     reply_markup: generateKeyboard(gameState.board)
   });
-  delete global.games.ttt[uid];
+  global.games.ttt.delete(gameKey);
 }
