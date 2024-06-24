@@ -10,6 +10,7 @@ global.tmp = {}
 global.tmp.manga = new Set();
 global.tmp.mangaID = new Map();
 global.tmp.spotify = new Set();
+global.games = {};
 
 
 // Configs
