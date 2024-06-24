@@ -32,16 +32,15 @@ async function logintofb() {
     if (!fs.existsSync(fbPath))
       throw { code: 404 };
 
-    const cookies = JSON.parse(fs.readFileSync(fbPath, 'utf8'));
-    loginFB({ appState: cookies, logLevel: "silent" }, async (err, api) => {
+    const cookies = JSON.parse(fs.readFileSync(fbPath, 'utf-8'));
+    loginFB({
+      appState: cookies,
+      forceLogin: true
+    }, async (err, api) => {
       if (err) return console.error(err);
-
-      const newAppState = await api.getAppState();
-      const formattedAppState = JSON.stringify(newAppState.map(e => ({
-        name: e.key,
-        value: e.value
-      })), null, 2);
-      fs.writeFileSync(fbPath, formattedAppState)
+      const newAppState = JSON.stringify(await api.getAppState(), null, 2)
+      fs.writeFileSync(fbPath, newAppState)
+      global.log("Updated FB Cookies", "cyan")
     });
   } catch (err) {
     if (err.code === 404) {
@@ -248,6 +247,8 @@ bot.on("message", async msg => {
       global.log(`New User: @${msg.from.username}`, "yellow", true)
       usersData.update(msg.from.id, { authorized: false })
     }
+    const userData = await usersData.retrieve(event.from.id);
+    usersData.update(event.from.id, { message_count: userData?.message_count ? userData.message_count : 0 + 1 })
     let threadCheck = await threadsData.exists(msg.chat.id);
     if (!threadCheck) {
       threadsData.refresh(msg.chat.id, msg)

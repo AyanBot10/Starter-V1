@@ -24,7 +24,8 @@ const TAUNTS = [
   "You're playing checkers while I'm playing 4D chess.",
   "I hope you're ready to lose spectacularly!",
   "You are never going to win against me!",
-  "I'm giving you a chance. Don't waste it!"
+  "I'm giving you a chance. Don't waste it!",
+  "I was made by @Jsusbin So, I know how to beat people"
 ];
 
 module.exports = {
@@ -120,11 +121,11 @@ module.exports = {
 
         let winner = checkWinner(gameState.board);
         if (winner || isBoardFull(gameState.board)) {
-          await handleGameEnd(api, chatId, ctx.message.message_id, gameState, winner, gameKey);
+          await handleGameEnd(api, chatId, ctx.message.message_id, gameState, winner, gameKey, userId);
           return;
         }
 
-        await botMove(api, chatId, ctx.message.message_id, gameState, gameKey, Context.symbols);
+        await botMove(api, chatId, ctx.message.message_id, gameState, gameKey, Context.symbols, userId);
       } else {
         await api.answerCallbackQuery(ctx.id, { text: "That spot is taken. Are your eyes working?" });
       }
@@ -191,7 +192,7 @@ function minimax(board, depth, isMaximizing, botSymbol, playerSymbol) {
   }
 }
 
-async function botMove(api, chatId, messageId, gameState, gameKey, symbols) {
+async function botMove(api, chatId, messageId, gameState, gameKey, symbols, userId) {
   let bestScore = -Infinity;
   let move;
   for (let [i, j] of getAvailableMoves(gameState.board)) {
@@ -209,7 +210,7 @@ async function botMove(api, chatId, messageId, gameState, gameKey, symbols) {
 
   let winner = checkWinner(gameState.board);
   if (winner || isBoardFull(gameState.board)) {
-    await handleGameEnd(api, chatId, messageId, gameState, winner, gameKey);
+    await handleGameEnd(api, chatId, messageId, gameState, winner, gameKey, userId);
   } else {
     let taunt = TAUNTS[Math.floor(Math.random() * TAUNTS.length)];
     taunt += `\n${symbols}`
@@ -233,16 +234,39 @@ function generateKeyboard(board) {
   };
 }
 
-async function handleGameEnd(api, chatId, messageId, gameState, winner, gameKey) {
+async function handleGameEnd(api, chatId, messageId, gameState, winner, gameKey, userId) {
   gameState.gameOver = true;
-  let message = winner ?
-    (winner === gameState.botSymbol ? "I win! As expected. Want to try again and lose some more?" : "You... won? Impossible! I demand a rematch!") :
-    "It's a draw. You're tougher than I thought, but still not good enough!";
-  message += "\nGame Over. Start a new game if you dare!";
+  const userData = await global.usersData.retrieve(userId);
+
+  if (!userData.games) {
+    userData.games = {};
+  }
+
+  if (!userData.games.tic_tac_toe) {
+    userData.games.tic_tac_toe = { wins: 0, losses: 0, draws: 0 };
+  }
+
+  let message;
+
+  if (winner) {
+    if (winner === gameState.botSymbol) {
+      message = "I win! As expected. Want to try again and lose some more?";
+      userData.games.tic_tac_toe.losses += 1;
+    } else {
+      message = "You... won? Impossible! I demand a rematch!";
+      userData.games.tic_tac_toe.wins += 1;
+    }
+  } else {
+    message = "It's a draw. You're tougher than I thought, but still not good enough!";
+    userData.games.tic_tac_toe.draws += 1;
+  }
+
   await api.editMessageText(message, {
     chat_id: chatId,
     message_id: messageId,
     reply_markup: generateKeyboard(gameState.board)
   });
+
+  await global.usersData.update(userId, userData);
   global.games.ttt.delete(gameKey);
 }
