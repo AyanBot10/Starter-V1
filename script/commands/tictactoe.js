@@ -235,6 +235,7 @@ async function handleGameEnd(api, chatId, messageId, gameState, winner, uid) {
   let message = winner ?
     (winner === gameState.botSymbol ? "I win! As expected. Want to try again and lose some more?" : "You... won? Impossible! I demand a rematch!") :
     "It's a draw. You're tougher than I thought, but still not good enough!";
+  message += "\nPress one of the buttons to acknowledge."
   await api.editMessageText(message, {
     chat_id: chatId,
     message_id: messageId,
