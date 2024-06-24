@@ -86,7 +86,7 @@ module.exports = {
     });
 
     if (botStarts) {
-      await botMove(api, chatId, initiate.message_id, gameState, gameKey);
+      await botMove(api, chatId, initiate.message_id, gameState, gameKey, symbols);
     }
   },
   callback_query: async function({ event, message, api, ctx, Context }) {
