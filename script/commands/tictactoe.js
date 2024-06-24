@@ -51,7 +51,7 @@ module.exports = {
     }
 
     if (global.games.ttt.has(gameKey)) {
-      return message.reply(`Already in a game. Finish it or forfeit, if you dare.`);
+      return message.reply(`Already in a game. Finish it or forfeit, if you dare`);
     }
     await message.indicator()
     const playerSymbol = PLAYER_SYMBOLS[Math.floor(Math.random() * 2)];
@@ -70,13 +70,13 @@ module.exports = {
     let initialMessage = botStarts ?
       "I'll start this game. Prepare to lose!" :
       "Your turn first. Don't mess it up!";
-
-    initialMessage += `\nYou are *${playerSymbol}*, I am *${botSymbol}*`;
-
+    let symbols = `\nYou are *${playerSymbol}*, I am *${botSymbol}*`
+    initialMessage += symbols;
     const initiate = await api.sendMessage(chatId, initialMessage, {
       reply_markup: generateKeyboard(gameState.board),
       parse_mode: "Markdown"
     });
+    await api.sendMessage(event.chat.id, symbols, { reply_to_message_id: initiate.message_id, disable_reply: true })
 
     global.bot.callback_query.set(initiate.message_id, {
       cmd,
