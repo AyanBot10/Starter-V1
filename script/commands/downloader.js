@@ -90,7 +90,7 @@ module.exports = {
       await api.sendVideo(event.chat.id, chosenFormat.url, {
         reply_to_message_id: event.message_id,
         caption: form.body,
-        reply_markup
+       // reply_markup
       });
     } catch (err) {
       function regexLink(url) {
