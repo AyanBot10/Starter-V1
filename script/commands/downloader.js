@@ -106,11 +106,7 @@ module.exports = {
             args,
             event,
             api,
-            cmd: "facebook",
-            isFallback: {
-              legit: true,
-              messageID: sentWarn.message_id
-            }
+            cmd: "facebook"
           })
       }
       else {
