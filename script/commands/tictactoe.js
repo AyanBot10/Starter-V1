@@ -34,7 +34,7 @@ module.exports = {
     description: "Advanced Game of Tic-Tac-Toe",
     usage: "{pn} - Starts the game\n{pn} forfeit - Ends the game",
     category: "miscellaneous"
-    // IK it should be games
+    // I know it should be games
   },
   start: async function({ event, message, api, cmd, args }) {
     const userId = event.from.id;
