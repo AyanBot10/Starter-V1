@@ -39,5 +39,9 @@
       "toggle": false,
       "interval_between_cookie_updates": 1500000
     }
+  },
+  "RESTART": {
+    "toggle": false,
+    "interval": 3600000
   }
 }

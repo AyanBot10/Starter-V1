@@ -11,12 +11,12 @@ module.exports = {
     name: "manga",
     credits: "tas33n",
     description: {
-      long: "Download mangas in bulk from mangapill.com in pdf format",
+      long: "Download mangas in bulk",
       short: "Downloads Manga"
     },
-    usage: "{pn} manga name. It will look for mangas and then prompt you with similar titles and when a prompt (button) is selected, it will fetch the chapter details of the manga and will ask you to reply with the chapter index (reply with '20 22' for downloading chapters from 20 to 22) or to download a single chapter, reply with let's say '33'",
+    usage: "{pn} <manga_name> . It will look for mangas and then prompt you with similar titles and when a prompt (button) is selected, it will fetch the chapter details of the manga and will ask you to reply with the chapter index (reply with '20 22' for downloading chapters from 20 to 22) or to download a single chapter, reply with let's say '33'",
     cooldown: 10,
-    category: "anime"
+    category: "magazine"
   },
   start: async function({ event, message, args, api, cmd }) {
     if (!global.tmp.manga) global.tmp.manga = new Set();
@@ -293,7 +293,7 @@ async function scrapeImagesMangapill(url, mainLink) {
         const imgPath = path.join(folderName, imgName);
         const headers = {
           'sec-ch-ua': '"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"',
-          'Referer': 'https://www.mangapill.com/',
+          'Referer': 'https://' + process.env.MANGA,
           'DNT': '1',
           'sec-ch-ua-mobile': '?0',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
@@ -356,13 +356,13 @@ async function processAllChapters({ chapterUrls, event, api, message, downloadin
 
 async function scrapeMangaPill(name) {
   try {
-    const { data } = await axios.get('https://mangapill.com/search?q=' + (name.split(" ")).join("+"));
+    const { data } = await axios.get('https://' + process.env.MANGA + '/search?q=' + (name.split(" ")).join("+"));
     const $ = cheerio.load(data);
     let mangaArray = [];
 
     $('div:has(.flex.flex-col.justify-end)').slice(2, 6).each((index, element) => {
       const name = $(element).find('.flex.flex-col.justify-end a > .mt-3.font-black.leading-tight.line-clamp-2').text().trim();
-      const href = `https://mangapill.com${$(element).find('.flex.flex-col.justify-end a').attr('href')}`;
+      const href = `https://${process.env.MANGA}${$(element).find('.flex.flex-col.justify-end a').attr('href')}`;
       const coverImage = $(element).find('figure img').attr('data-src');
 
       mangaArray.push({ name, href, coverImage });
@@ -383,7 +383,7 @@ async function getMangaDetails(url) {
     const chapters = [];
     $('#chapters .grid a').each((index, element) => {
       const chapterName = $(element).text().trim();
-      const chapterLink = 'https://mangapill.com' + $(element).attr('href');
+      const chapterLink = 'https://' + process.env.MANGA + $(element).attr('href');
       chapters.push({ chapterName, chapterLink });
     });
 

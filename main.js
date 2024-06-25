@@ -15,7 +15,13 @@ process.on('unhandledRejection', (reason) => {
     log(`Unhandled Rejection: ${reason}`, "red");
   }
 });
+const { existsSync } = require("fs");
 
+if (!existsSync(".env")) {
+  log(".env DOESN'T EXISTS", "red", true)
+  process.exit(1)
+}
+require('dotenv').config();
 const config = require("./config.json");
 require("./starter");
 const run_sqlite = require("./Database/SQLite/global.js");
@@ -24,8 +30,6 @@ const run_mongo = require("./Database/MongoDB/global.js");
 var log = global.log;
 
 log("Starting Bot", "grey", true);
-
-
 
 require("./script/command_loader")
 

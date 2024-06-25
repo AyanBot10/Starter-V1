@@ -50,6 +50,13 @@ async function logintofb() {
   }
 }
 
+async function restartProject() {
+  await api.clearTextListeners()
+  await global.utils.sleep(3000)
+  global.log("Restarting Project", "yellow", true)
+  process.exit(4);
+}
+
 function clearCache() {
   const dir = path.resolve('script', 'commands', 'tmp');
 
@@ -77,6 +84,12 @@ if (global.config_handler.auto_clean.toggle) {
   const interval = !isNaN(global.config_handler.auto_clean.time) ? global.config_handler.auto_clean.time : 1800000;
   setInterval(clearCache, interval);
   global.log(`Cache cleaner in effect, Interval: ${(interval / 1000 / 60).toFixed(0)} minutes`, 'yellow');
+}
+
+if (global.config["RESTART"].toggle) {
+  const interval = !isNaN(global.config["RESTART"].time) ? global.config["RESTART"].time : 3600000;
+  setInterval(restartProject, interval);
+  global.log(`Project will restart in ${(interval / 1000 / 60).toFixed(0)} mins`, 'yellow');
 }
 
 if (global.config.FACEBOOK.LOGIN.toggle) {
