@@ -110,7 +110,7 @@ module.exports = {
         break;
       }
     }
-
+    if (response.mangas.length === 0) return message.reply("No Magazine Found")
     const media = response.mangas.slice(0, 8).map((item) => ({
       type: "photo",
       media: item.thumbnail_url,
