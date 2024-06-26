@@ -51,7 +51,7 @@ async function logintofb() {
 }
 
 async function restartProject() {
-  await api.clearTextListeners()
+  await bot.clearTextListeners()
   await global.utils.sleep(3000)
   global.log("Restarting Project", "yellow", true)
   process.exit(4);
