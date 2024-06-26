@@ -240,9 +240,8 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         break;
       }
     }
-    if (!commandFound) {
-      message.reply("Command Not Found")
-    }
+    if (!commandFound)
+      return message.Syntax("help", "No Such Command Found")
   } catch (err) {
     throw err
   }
