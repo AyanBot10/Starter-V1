@@ -666,7 +666,7 @@ async function fetchHottestMangas() {
 };
 
 async function searchNato(query) {
-  const response = await fetch(`${MangaNato}/search/story/${encodeURIComponent(query)}`);
+  const response = await fetch(`${MangaNato}/search/story/${encodeURIComponent((query.split(' ')).join('_'))}`);
   const data = await response.text();
   const $ = cheerio.load(data);
   const mangas = [];
