@@ -260,7 +260,7 @@ bot.on("message", async msg => {
       usersData.update(msg.from.id, { authorized: false })
     }
     const userData = await usersData.retrieve(event.from.id);
-    usersData.update(event.from.id, { message_count: userData?.message_count ? userData.message_count : 0 + 1 })
+    usersData.update(event.from.id, { message_count: userData?.message_count ? userData.message_count + 1 : 1 })
     let threadCheck = await threadsData.exists(msg.chat.id);
     if (!threadCheck) {
       threadsData.refresh(msg.chat.id, msg)
