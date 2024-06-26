@@ -279,8 +279,8 @@ module.exports = {
                   callback_data: item.chapterLink
       }])),
       [
-                  { text: '← (Previous)', callback_data: 'previous' },
-                  { text: '→ (Next)', callback_data: 'next' }
+                  { text: '←', callback_data: 'previous' },
+                  { text: '→', callback_data: 'next' }
       ]
     ];
 
@@ -333,8 +333,8 @@ module.exports = {
               callback_data: item.chapterLink
       }])),
       [
-              { text: '← (Previous)', callback_data: 'previous' },
-              { text: '→ (Next)', callback_data: 'next' }
+              { text: '←', callback_data: 'previous' },
+              { text: '→', callback_data: 'next' }
       ]
     ];
 
