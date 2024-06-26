@@ -35,18 +35,19 @@ function create_message(msg) {
         return null;
       }
     },
-    handleText: async function(cmdName, textBody = null, api) {
+    handleText: async function(cmdName, msg, textBody, toast) {
       let cmd = cmdName || "help";
       const button = {
         text: textBody || cmd.toUpperCase(),
         callback_data: cmd.toLowerCase()
       };
+      let textToast = toast || textBody;
       const options = {
         reply_markup: {
           inline_keyboard: [[button]]
         }
       };
-      const helpButton = await api.sendMessage(msg.chat.id, textBody, {
+      const helpButton = await bot.sendMessage(msg.chat.id, textToast, {
         reply_to_message_id: msg.message_id,
         ...options
       });
@@ -58,8 +59,8 @@ function create_message(msg) {
         cmd_file: cmd.toLowerCase()
       })
     },
-    Syntax: async function(cmdName, textBody) {
-      this.handleText(cmdName, textBody, msg)
+    Syntax: async function(cmdName = "help", textBody = "Invalid Usage", textToast) {
+      this.handleText(cmdName, msg, textBody, textToast)
     },
     react: async function(text, message_id = msg.message_id, is_big = false) {
       let emoji = text || "👍";
