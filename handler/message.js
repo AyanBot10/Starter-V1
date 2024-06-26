@@ -2,6 +2,7 @@
 
 const bot = require("./login.js");
 let api = bot;
+
 function create_message(msg) {
   return {
     send: async function(text, options = {}) {
@@ -34,10 +35,10 @@ function create_message(msg) {
         return null;
       }
     },
-    handleText: async function(text = false, msg, body = "Invalid Usage") {
-      let cmd = text || "help";
+    handleText: async function(cmdName, textBody = null, api) {
+      let cmd = cmdName || "help";
       const button = {
-        text: cmd.toUpperCase(),
+        text: textBody || cmd.toUpperCase(),
         callback_data: cmd.toLowerCase()
       };
       const options = {
@@ -45,7 +46,7 @@ function create_message(msg) {
           inline_keyboard: [[button]]
         }
       };
-      const helpButton = await bot.sendMessage(msg.chat.id, body, {
+      const helpButton = await api.sendMessage(msg.chat.id, body, {
         reply_to_message_id: msg.message_id,
         ...options
       });
@@ -57,8 +58,8 @@ function create_message(msg) {
         cmd_file: cmd.toLowerCase()
       })
     },
-    Syntax: async function(text = null, options) {
-      this.handleText(text, msg, options)
+    Syntax: async function(cmdName, textBody) {
+      this.handleText(cmdName, textBody, msg)
     },
     react: async function(text, message_id = msg.message_id, is_big = false) {
       let emoji = text || "👍";

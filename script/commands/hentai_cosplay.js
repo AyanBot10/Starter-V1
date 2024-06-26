@@ -6,7 +6,7 @@ const uuid = require("uuid");
 const PDFDocument = require('pdfkit');
 const sharp = require('sharp');
 
-const baseUrl = process.env["HCOSPLAY"]
+const baseUrl = ''
 
 const headers = {
   Referer: baseUrl,

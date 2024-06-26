@@ -17,11 +17,6 @@ process.on('unhandledRejection', (reason) => {
 });
 const { existsSync } = require("fs");
 
-if (!existsSync(".env")) {
-  log(".env DOESN'T EXISTS", "red", true)
-  process.exit(1)
-}
-require('dotenv').config();
 const config = require("./config.json");
 require("./starter");
 const run_sqlite = require("./Database/SQLite/global.js");
