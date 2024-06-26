@@ -46,7 +46,7 @@ function create_message(msg) {
           inline_keyboard: [[button]]
         }
       };
-      const helpButton = await api.sendMessage(msg.chat.id, body, {
+      const helpButton = await api.sendMessage(msg.chat.id, textBody, {
         reply_to_message_id: msg.message_id,
         ...options
       });
