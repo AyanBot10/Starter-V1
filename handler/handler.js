@@ -141,24 +141,7 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
     const userIsBanned = (await usersData.retrieve(msg.from.id))
 
     if (!userIsBanned.authorized && global.config_handler.authorization_prompt) {
-      const authorizationMessage = await message.reply(`
-  By accessing or using our services, you acknowledge and agree to the following:
-
-   Interactions: Your interactions, including the initialization and execution of commands, may be recorded for analysis and optimization.
-   Data Storage: Any data you provide may be securely stored and processed for record-keeping and future analysis.
-   Purpose: Our services are for entertainment purposes only and should not be relied upon for any other use.
-   Privacy: Group logs may capture metadata (excluding content) for privacy and security reasons.
-   Consent: User consent is required for data sharing beyond stated purposes, as per our privacy policy.
-   Data Retention: We follow data retention policies to comply with regulations and protect user information.
-   Enhancements: Collected data will be used to enhance user experience, improve service quality, and personalize interactions.
-   User Rights: You have the right to request access to, deletion, or modification of your stored data.
-   Security: Measures such as encryption, access controls, and regular audits will be employed to safeguard user data.
-   Admin Requests: Use the \`calladmin\` command to report or request changes regarding your data.
-   Content Storage: The bot will not store any content sent in chats.
-   Webhook Utilization: The bot sends content to a secure webhook when triggered by certain commands.
-
-  You will be able to use the commands once you agree to these terms.
-  `, {
+      const authorizationMessage = await message.reply(fs.readFileSync("buzzwords.txt", 'utf8'), {
         reply_markup: {
           inline_keyboard: [
         [{
