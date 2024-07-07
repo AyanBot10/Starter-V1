@@ -3,7 +3,8 @@
     "token": "",
     "DOWNLOADER": "",
     "INSTA_DOWNLOADER": "",
-    "polling": true
+    "polling": true,
+    "LANGUAGE": "en"
   },
   "server": {
     "toggle": true,
@@ -34,12 +35,6 @@
     "NOTES": "Either use SQLite or MongoDB"
   },
   "DISCORD_WEBHOOK": "",
-  "FACEBOOK": {
-    "LOGIN": {
-      "toggle": false,
-      "interval_between_cookie_updates": 1500000
-    }
-  },
   "RESTART": {
     "toggle": false,
     "interval": 3600000

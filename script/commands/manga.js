@@ -404,7 +404,8 @@ module.exports = {
           message,
           args: argsToSend,
           api,
-          cmd: Context.cmd
+          cmd: Context.cmd,
+          usersData: global.usersData
         });
       } catch (error) {
         console.log(error);
