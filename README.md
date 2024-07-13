@@ -1,3 +1,7 @@
+# This project has been archived. 
+*Head over to *[Starter-V2](https://github.com/SatoX69/Starter-V2)**
+
+
 # Starter-V1
 
 Starter-V1 BOT is a versatile Telegram bot project designed by SatoX69. Unlike many other bots, this project has no obfuscation or encrypted code chunks. It operates independently without relying on any external APIs.
