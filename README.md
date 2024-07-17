@@ -1,5 +1,5 @@
 # This project has been archived. 
-*Head over to *[Starter-V2](https://github.com/SatoX69/Starter-V2)**
+*Head over to *[Starter-V2.5](https://github.com/SatoX69/Starter-V2.5)**
 
 
 # Starter-V1
