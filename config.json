@@ -1,0 +1,43 @@
+{
+  "BOT": {
+    "token": "7693858286:AAGcEoeoQ2yzFXSot7_MCaADTBRxngtbHqw",
+    "DOWNLOADER": "",
+    "INSTA_DOWNLOADER": "",
+    "polling": true,
+    "LANGUAGE": "en",
+    "prefix": "/"
+  },
+  "server": {
+    "toggle": true,
+    "port": 3000,
+    "save_logs_in_server": true
+  },
+  "chat": {
+    "level": ["private", "group", "supergroup"],
+    "level_options": ["private", "group", "supergroup", "channel"],
+    "message": "Access has been restricted for this chat",
+    "note": "Put wherever you want to bot to run. like it will run on groups and supergroups if this.level includes `group` and `supergroup`"
+  },
+  "event_listener": true,
+  "log_event_text": false,
+  "polling": true,
+  "groq": {
+    "groq_api_key": "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"
+  },
+  "timeZone": "Asia/Shanghai",
+  "DATABASE": {
+    "sqlite": {
+      "CONNECT_SQLITE": true
+    },
+    "mongodb": {
+      "CONNECT_MONGODB": false,
+      "MONGO_URI": ""
+    },
+    "NOTES": "Either use SQLite or MongoDB"
+  },
+  "DISCORD_WEBHOOK": "",
+  "RESTART": {
+    "toggle": false,
+    "interval": 3600000
+  }
+}
